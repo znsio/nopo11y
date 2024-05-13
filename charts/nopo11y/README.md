@@ -1,8 +1,8 @@
 # Introduction
 
-Set of Helm charts that can be used to install and configure observability in your kubernetes cluster.
+Nopo11y is a wrapper on top of nopo11y-stack, using nopo11y one can create basic dashboards with golder signals, alerts and SLOs for every microservice.
 
-# Usage
+# How to install?
 
 [Helm](https://helm.sh) must be installed to use the charts. Please refer to
 Helm's [documentation](https://helm.sh/docs) to get started.
@@ -15,14 +15,10 @@ If you had already added this repo earlier, run following command to retrieve th
 
     helm repo update
 
-You can then run following command to see the available charts,
+To install the chart:
 
-    helm search repo znsio
-
-To install the <chart-name> chart:
-
-    helm install my-<chart-name> znsio/<chart-name>
+    helm install <service_name>-nopo11y znsio/nopo11y
 
 To uninstall the chart:
 
-    helm delete my-<chart-name>
+    helm delete <service_name>-nopo11y
