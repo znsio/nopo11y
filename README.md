@@ -27,7 +27,7 @@ If you had already added this repo earlier, run following command to retrieve th
 
 You can then run following command to see the charts,
 
-    helm search repo <alias>
+    helm search repo znsio
 
 To install the <chart-name> chart:
 
