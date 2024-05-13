@@ -12,14 +12,23 @@ Nopo11y is a collection of multiple open-source components charts. It includes f
 - kiali-server v1.83.0
 - jaeger v1.0.0
 
-# How to configure?
+# Usage
 
-All the sub-charts have their configuration with documentation in `values.yaml` file.
+[Helm](https://helm.sh) must be installed to use the charts.  Please refer to
+Helm's [documentation](https://helm.sh/docs) to get started.
 
-# How to install?
+Once Helm has been set up correctly, add the repo as follows:
 
-1. Update the `values.yaml` file as per your requirement.
-2. Install the chart using below command,
-```bash
-helm upgrade --install nopo11y-stack . -n <NAMEPSPACE>
-```
+  helm repo add <alias> https://<orgname>.github.io/helm-charts
+
+If you had already added this repo earlier, run `helm repo update` to retrieve
+the latest versions of the packages.  You can then run `helm search repo
+<alias>` to see the charts.
+
+To install the <chart-name> chart:
+
+    helm install my-<chart-name> <alias>/<chart-name>
+
+To uninstall the chart:
+
+    helm delete my-<chart-name>
