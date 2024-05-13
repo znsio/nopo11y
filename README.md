@@ -1,5 +1,3 @@
-[WIP]
-
 # Introduction
 
 Nopo11y is a collection of multiple open-source components charts. It includes following sub-charts:
@@ -25,7 +23,7 @@ If you had already added this repo earlier, run following command to retrieve th
 
     helm repo update
 
-You can then run following command to see the charts,
+You can then run following command to see the available charts,
 
     helm search repo znsio
 
