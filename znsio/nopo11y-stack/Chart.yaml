@@ -1,0 +1,35 @@
+apiVersion: v2
+appVersion: 1.0.0
+dependencies:
+- condition: kube-prometheus-stack.enabled
+  name: kube-prometheus-stack
+  repository: https://prometheus-community.github.io/helm-charts
+  version: 58.2.2
+- condition: thanos.enabled
+  name: thanos
+  repository: https://charts.bitnami.com/bitnami
+  version: 15.4.1
+- condition: grafana-loki.enabled
+  name: grafana-loki
+  repository: https://charts.bitnami.com/bitnami
+  version: 4.0.0
+- condition: promtail.enabled
+  name: promtail
+  repository: https://grafana.github.io/helm-charts
+  version: 6.15.5
+- condition: sloth.enabled
+  name: sloth
+  repository: https://github.com/slok/sloth
+  version: 0.7.0
+- condition: kiali-server.enabled
+  name: kiali-server
+  repository: https://kiali.org/helm-charts
+  version: 1.83.0
+- condition: jaeger.enabled
+  name: jaeger
+  repository: https://jaegertracing.io
+  version: 1.0.0
+description: A Helm chart for observability stack
+name: nopo11y-stack
+type: application
+version: 1.0.0

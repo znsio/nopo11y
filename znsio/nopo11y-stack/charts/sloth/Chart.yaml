@@ -1,0 +1,7 @@
+apiVersion: v2
+description: Base chart for Sloth.
+home: https://github.com/slok/sloth
+kubeVersion: '>= 1.19.0-0'
+name: sloth
+type: application
+version: 0.7.0

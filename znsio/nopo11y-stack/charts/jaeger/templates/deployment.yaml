@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-jaeger
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: jaeger
+spec:
+  replicas: 1
+  {{- if .Values.jaeger.persistence.enabled }}
+  strategy:
+    type: Recreate
+  {{- end }}
+  selector:
+    matchLabels:
+      app: jaeger
+  template:
+    metadata:
+      labels:
+        app: jaeger
+      annotations:
+        sidecar.istio.io/inject: "false"
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "14269"
+    spec:
+      containers:
+        - name: jaeger
+          image: {{ .Values.jaeger.image }}
+          env:
+            - name: BADGER_EPHEMERAL
+              value: "false"
+            - name: SPAN_STORAGE_TYPE
+              value: "badger"
+            - name: BADGER_DIRECTORY_VALUE
+              value: "/badger/data"
+            - name: BADGER_DIRECTORY_KEY
+              value: "/badger/key"
+            - name: COLLECTOR_ZIPKIN_HOST_PORT
+              value: ":9411"
+            - name: QUERY_BASE_PATH
+              value: {{ .Values.jaeger.pathPrefix | quote }}
+            {{- if .Values.jaeger.tracesTTL }}
+            - name: BADGER_SPAN_STORE_TTL
+              value: {{ .Values.jaeger.tracesTTL }}
+            {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 14269
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 14269
+          volumeMounts:
+            - name: data
+              mountPath: /badger
+          resources:
+            {{- toYaml .Values.jaeger.resources |nindent 12 }}
+      volumes:
+      {{- if .Values.jaeger.persistence.enabled }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-jaeger-pvc
+      {{- else }}
+        - name: data
+          emptyDir: {}
+      {{- end }}

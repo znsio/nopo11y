@@ -1,0 +1,129 @@
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "sloth.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "sloth.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "sloth.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "sloth.labels" . | nindent 8 }}
+      annotations:
+        kubectl.kubernetes.io/default-container: sloth
+        {{- if .Values.customSloConfig.enabled }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- end }}
+    spec:
+      serviceAccountName: {{ include "sloth.fullname" . }}
+      {{- with .Values.securityContext.pod }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: sloth
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          args:
+            - kubernetes-controller
+            {{- if .Values.sloth.resyncInterval }}
+            - --resync-interval={{ .Values.sloth.resyncInterval }}
+            {{- end}}
+            {{- if .Values.sloth.workers }}
+            - --workers={{ .Values.sloth.workers }}
+            {{- end}}
+            {{- if .Values.sloth.namespace }}
+            - --namespace={{ .Values.sloth.namespace }}
+            {{- end}}
+            {{- if .Values.sloth.labelSelector }}
+            - --label-selector={{ .Values.sloth.labelSelector }}
+            {{- end}}
+            {{- range $key, $val := .Values.sloth.extraLabels }}
+            - --extra-labels={{ $key }}={{ $val }}
+            {{- end}}
+            {{- if .Values.commonPlugins.enabled }}
+            - --sli-plugins-path=/plugins
+            {{- end }}
+            {{- with .Values.sloth.defaultSloPeriod }}
+            - --default-slo-period={{ . }}
+            {{- end }}
+            {{- if not .Values.sloth.optimizedRules }}
+            - --disable-optimized-rules
+            {{- end }}
+            {{- if .Values.customSloConfig.enabled }}
+            - --slo-period-windows-path={{ .Values.customSloConfig.path }}
+            {{- end }}
+            - --logger={{ .Values.sloth.logger }}
+            {{- if .Values.sloth.debug.enabled }}
+            - --debug
+            {{- end}}
+          {{- if .Values.metrics.enabled }}
+          ports:
+            - containerPort: 8081
+              name: metrics
+              protocol: TCP
+          {{- end }}
+          {{- if or .Values.commonPlugins.enabled .Values.customSloConfig.enabled }}
+          volumeMounts:
+          {{- if .Values.commonPlugins.enabled }}
+            - name: sloth-common-sli-plugins
+              mountPath: /plugins/sloth-common-sli-plugins
+          {{- end }}
+          {{- if .Values.customSloConfig.enabled }}
+            - name: sloth-windows
+              mountPath: {{ .Values.customSloConfig.path }}
+          {{- end }}
+          {{- end }}
+          {{- with .Values.securityContext.container }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+          {{- with .Values.tolerations }}
+          tolerations:
+{{ toYaml . | trim | indent 12 }}
+          {{- end }}
+        {{- if .Values.commonPlugins.enabled }}
+        - name: git-sync-plugins
+          image: {{ .Values.commonPlugins.image.repository }}:{{ .Values.commonPlugins.image.tag }}
+          args:
+            - --repo={{.Values.commonPlugins.gitRepo.url}}
+            - --branch={{.Values.commonPlugins.gitRepo.branch}}
+            - --wait=30
+            - --webhook-url=http://localhost:8082/-/reload
+          volumeMounts:
+            - name: sloth-common-sli-plugins
+              # Default path for git-sync.
+              mountPath: /tmp/git
+          {{- with .Values.securityContext.container }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources:
+          {{- toYaml .Values.commonPlugins.gitRepo.resources | nindent 12 }}
+        {{- end }}
+      {{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+{{ include "sloth.imagePullSecrets" . | trim | indent 8 }}
+      {{- end }}
+      {{- if or .Values.commonPlugins.enabled .Values.customSloConfig.enabled }}
+      volumes:
+      {{- if .Values.commonPlugins.enabled }}
+        - name: sloth-common-sli-plugins
+          emptyDir: {}
+      {{- end }}
+      {{- if .Values.customSloConfig.enabled }}
+        - name: sloth-windows
+          configMap:
+            defaultMode: 420
+            name: {{ include "sloth.fullname" . }}
+      {{- end }}
+      {{- end }}
+

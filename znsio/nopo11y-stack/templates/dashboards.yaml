@@ -1,0 +1,16 @@
+{{- if .Values.sloth.enabled }}
+{{- range $file, $_ := .Files.Glob "dashboards/*" }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-{{ base $file |trimSuffix ".json" }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    grafana_dashboard: "1"
+data:
+{{- base $file | nindent 2 }}: |-
+{{ $.Files.Get $file | indent 6 }}
+
+---
+{{- end }}
+{{- end }}
