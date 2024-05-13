@@ -19,7 +19,7 @@ dependencies:
   version: 6.15.5
 - condition: sloth.enabled
   name: sloth
-  repository: https://github.com/slok/sloth
+  repository: ""
   version: 0.7.0
 - condition: kiali-server.enabled
   name: kiali-server
@@ -27,7 +27,7 @@ dependencies:
   version: 1.83.0
 - condition: jaeger.enabled
   name: jaeger
-  repository: https://jaegertracing.io
+  repository: ""
   version: 1.0.0
 description: A Helm chart for observability stack
 name: nopo11y-stack
