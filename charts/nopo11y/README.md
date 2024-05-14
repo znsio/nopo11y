@@ -9,7 +9,7 @@ Helm's [documentation](https://helm.sh/docs) to get started.
 
 Once Helm has been set up correctly, add the repo as follows:
 
-    helm repo add znsio https://znsio.github.io/charts
+    helm repo add znsio https://znsio.github.io/nopo11y
 
 If you had already added this repo earlier, run following command to retrieve the latest versions of the packages,
 
