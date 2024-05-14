@@ -1,6 +1,6 @@
 # Introduction
 
-Set of Helm charts that can be used to install and configure observability in your kubernetes cluster.
+NopO11y provides a set of Helm charts that can be used to install and configure observability in your kubernetes cluster.
 
 # Usage
 
