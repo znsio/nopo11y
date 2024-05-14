@@ -1,0 +1,2025 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" type="image/png" href="img/fav/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="img/fav/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="img/fav/android-chrome-192x192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="img/fav/android-chrome-512x512.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="img/fav/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="img/fav/favicon-16x16.png">
+  <meta name="og:type" content="website">
+  <meta name="twitter:card" content="photo">
+  <style type="text/css">
+    .turbo-progress-bar {
+      position: fixed;
+      display: block;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: #0076ff;
+      z-index: 9999;
+      transition:
+        width 300ms ease-out,
+        opacity 150ms 150ms ease-in;
+      transform: translate3d(0, 0, 0);
+    }
+  </style>
+  <style id="st_globalStyles">
+    /* MEDIA QUERIES */
+    .anima-desktop-only {
+      @media (max-width: 768px) {
+        display: none !important;
+      }
+    }
+
+    /* SCROLLBAR */
+
+    [dark-scroll]::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    [dark-scroll]::-webkit-scrollbar-track-piece {
+      background-color: #2b2b2b;
+      border: 1px solid #1d1d1d;
+    }
+
+    [dark-scroll]::-webkit-scrollbar-thumb {
+      height: 10px;
+      background-color: #4d4d4d;
+    }
+
+    [dark-scroll]::-webkit-scrollbar-thumb:hover {
+      background-color: #5a5a5a;
+    }
+
+    /* LOAD PROGRESS */
+
+    .turbolinks-progress-bar {
+      height: 3px;
+      background-color: #ff6250;
+    }
+
+    /* GROUPING */
+
+    [data-id].ui-selecting {
+      box-shadow: inset 0 0 0 1px #4285f4 !important;
+    }
+
+    [data-id].ui-selected {
+      box-shadow: inset 0 0 0 1px #4285f4 !important;
+    }
+
+    /* CURSOR */
+
+    body[mode='comments'] * {
+      cursor: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAiIGhlaWdodD0iMzAiIHZpZXdCb3g9IjAgMCAzMCAzMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik00LjkxNjQ4IDIzLjQxMDlDNS40OTE1MyAyMi45ODg3IDUuOTMxNzkgMjIuMzkzNSA2LjIzMjggMjEuNjQwN0M0Ljc5MDY5IDE5LjczODMgNCAxNy4zOTMzIDQgMTQuOTk3NUM0IDguOTM0MSA4LjkzMjgyIDQgMTUuMDAyMiA0QzIxLjA3MTcgNCAyNiA4LjkzOTE5IDI2IDE1LjAwMjVDMjYgMjEuMDY1OSAyMS4wNjcyIDI2IDE0Ljk5NzggMjZDMTIuOTg5NiAyNiAxMS4wMzUzIDI1LjQ1NTcgOS4zMjM2NyAyNC40MjMxQzguNDI5NjUgMjQuOTU3MiA3LjQxNDM0IDI1LjIyNjggNi4zMDAxOCAyNS4yMjY4QzUuOTU0MjYgMjUuMjI2OCA1LjU5OTM1IDI1LjIwMTQgNS4yNTM0MiAyNS4xNDU0QzQuOTAzIDI1LjA4OTUgNC42Mjg5NiAyNC44MDQ2IDQuNTUyNTggMjQuNDE4QzQuNDc2MjEgMjQuMDI2NCA0LjYxOTk3IDIzLjYyOTYgNC45MTY0OCAyMy40MTA5WiIgZmlsbD0iI0ZGNjI1MCIvPgo8L3N2Zz4K') 0 24,
+        auto !important;
+    }
+
+    body[mode='code'] [data-id]:not(.hidden) {
+      cursor: default;
+    }
+
+    /* default node state */
+
+    body[mode='code'] [data-id]:not(.hidden),
+    body[mode='comments'] [data-id]:not(.hidden) {
+      pointer-events: all;
+    }
+
+    /* is_image */
+
+    body[mode='code'] [data-id].is_image [data-id],
+    body[mode='comments'] [data-id].is_image [data-id] {
+      pointer-events: none !important;
+    }
+
+    /* without a data-id or ignored */
+
+    [data-id].ignore,
+    body[mode='code'] *:not([data-id]) {
+      pointer-events: none !important;
+    }
+
+    /* disable transforms for ignored elements */
+
+
+    body[mode='code'] [data-id]:hover {
+      transform: none !important;
+    }
+
+    /* ANIMA BUTTONS */
+    .an-button {
+      position: relative;
+      height: 28px;
+      padding: 0 20px;
+      font-size: 14px;
+      border-radius: 4px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      vertical-align: middle;
+      white-space: nowrap;
+      transition-property: all;
+      transition-duration: 100ms;
+      appearance: none;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s ease;
+      border-width: 0;
+    }
+
+    .an-button>div {
+      width: 100%;
+    }
+
+    .an-button.primary {
+      background: #ff6250;
+      color: #ffffff;
+    }
+
+    .an-button.primary:hover:not(:disabled) {
+      background: #e2412e;
+    }
+
+    .an-button.secondary {
+      background: transparent;
+      border: 1px solid #ff6250;
+      color: #ff6250;
+    }
+
+    .an-button.secondary:hover:not(:disabled) {
+      color: #ffffff;
+      background: #ff6250;
+    }
+
+    .an-button.rounded {
+      border-radius: 100px;
+    }
+
+    .an-button:disabled {
+      opacity: 0.5;
+    }
+
+    .an-button:disabled {
+      cursor: default;
+    }
+
+    .an-button:active,
+    .an-button:focus {
+      outline: none;
+    }
+  </style>
+  <style id="hotspots-styles">
+    .hotspot {
+      position: absolute;
+      border: 1px solid #2a9fd8;
+      background: rgba(0, 173, 255, 0.54);
+      opacity: 0;
+      z-index: -1;
+      pointer-events: none;
+    }
+  </style>
+  <style>
+    @import url("https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css");
+
+    @import url("https://fonts.googleapis.com/css?family=Plus+Jakarta+Sans:400,700,800,600|Open+Sans:400");
+
+    .screen textarea:focus,
+    .screen input:focus {
+      outline: none;
+    }
+
+    .screen * {
+      -webkit-font-smoothing: antialiased;
+      box-sizing: border-box;
+    }
+
+    .screen div {
+      -webkit-text-size-adjust: none;
+    }
+
+    .component-wrapper a {
+      display: contents;
+      pointer-events: auto;
+      text-decoration: none;
+    }
+
+    .component-wrapper * {
+      -webkit-font-smoothing: antialiased;
+      box-sizing: border-box;
+      pointer-events: none;
+    }
+
+    .component-wrapper a *,
+    .component-wrapper input,
+    .component-wrapper video,
+    .component-wrapper iframe {
+      pointer-events: auto;
+    }
+
+    .component-wrapper.not-ready,
+    .component-wrapper.not-ready * {
+      visibility: hidden !important;
+    }
+
+    .screen a {
+      display: contents;
+      text-decoration: none;
+    }
+
+    .full-width-a {
+      width: 100%;
+    }
+
+    .full-height-a {
+      height: 100%;
+    }
+
+    .container-center-vertical {
+      align-items: center;
+      display: flex;
+      flex-direction: row;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .container-center-vertical>* {
+      flex-shrink: 0;
+      pointer-events: auto;
+    }
+
+    .container-center-horizontal {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      pointer-events: none;
+      width: 100%;
+    }
+
+    .container-center-horizontal>* {
+      flex-shrink: 0;
+      pointer-events: auto;
+    }
+
+    .auto-animated div {
+      --z-index: -1;
+      opacity: 0;
+      position: absolute;
+    }
+
+    .auto-animated input {
+      --z-index: -1;
+      opacity: 0;
+      position: absolute;
+    }
+
+    .auto-animated .container-center-vertical,
+    .auto-animated .container-center-horizontal {
+      opacity: 1;
+    }
+
+    .overlay-base {
+      display: none;
+      height: 100%;
+      opacity: 0;
+      position: fixed;
+      top: 0;
+      width: 100%;
+    }
+
+    .overlay-base.animate-appear {
+      align-items: center;
+      animation: reveal 0.3s ease-in-out 1 normal forwards;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      opacity: 0;
+    }
+
+    .overlay-base.animate-disappear {
+      animation: reveal 0.3s ease-in-out 1 reverse forwards;
+      display: block;
+      opacity: 1;
+      pointer-events: none;
+    }
+
+    .overlay-base.animate-disappear * {
+      pointer-events: none;
+    }
+
+    @keyframes reveal {
+      from {
+        opacity: 0
+      }
+
+      to {
+        opacity: 1
+      }
+    }
+
+    .animate-nodelay {
+      animation-delay: 0s;
+    }
+
+    .align-self-flex-start {
+      align-self: flex-start;
+    }
+
+    .align-self-flex-end {
+      align-self: flex-end;
+    }
+
+    .align-self-flex-center {
+      align-self: flex-center;
+    }
+
+    .valign-text-middle {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .valign-text-bottom {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    input:focus {
+      outline: none;
+    }
+
+    .listeners-active,
+    .listeners-active * {
+      pointer-events: auto;
+    }
+
+    .hidden,
+    .hidden * {
+      pointer-events: none;
+      visibility: hidden;
+    }
+
+    .smart-layers-pointers,
+    .smart-layers-pointers * {
+      pointer-events: auto;
+      visibility: visible;
+    }
+
+    .listeners-active-click,
+    .listeners-active-click * {
+      cursor: pointer;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --aero-blue: #c4fff1;
+      --black: #000000;
+      --charade: #1f2937;
+      --dark: #09132e;
+      --mischka: #d1d5db;
+      --navy-blue: #287cd8;
+      --river-bed: #3c515c;
+      --santas-gray: #9ca3af;
+      --scarpa-flow: #4b5563;
+      --white: #ffffff;
+
+      --font-size-l: 32px;
+      --font-size-m: 18px;
+      --font-size-s: 16px;
+      --font-size-xl: 36px;
+      --font-size-xxl: 56px;
+
+      --font-family-open_sans: "Open Sans", Helvetica;
+      --font-family-plus_jakarta_sans: "Plus Jakarta Sans", Helvetica;
+    }
+
+    .plusjakartasans-bold-charade-32px {
+      color: var(--charade);
+      font-family: var(--font-family-plus_jakarta_sans);
+      font-size: var(--font-size-l);
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    .opensans-normal-scarpa-flow-18px {
+      color: var(--scarpa-flow);
+      font-family: var(--font-family-open_sans);
+      font-size: var(--font-size-m);
+      font-style: normal;
+      font-weight: 400;
+    }
+
+    .plusjakartasans-semi-bold-white-16px {
+      color: var(--white);
+      font-family: var(--font-family-plus_jakarta_sans);
+      font-size: var(--font-size-s);
+      font-style: normal;
+      font-weight: 600;
+    }
+
+    .plusjakartasans-normal-charade-18px {
+      color: var(--charade);
+      font-family: var(--font-family-plus_jakarta_sans);
+      font-size: var(--font-size-m);
+      font-style: normal;
+      font-weight: 400;
+    }
+
+    .opensans-normal-river-bed-16px {
+      color: var(--river-bed);
+      font-family: var(--font-family-open_sans);
+      font-size: var(--font-size-s);
+      font-style: normal;
+      font-weight: 400;
+    }
+
+    .plusjakartasans-normal-santas-gray-18px {
+      color: var(--santas-gray);
+      font-family: var(--font-family-plus_jakarta_sans);
+      font-size: var(--font-size-m);
+      font-style: normal;
+      font-weight: 400;
+    }
+
+    .plusjakartasans-semi-bold-charade-18px {
+      color: var(--charade);
+      font-family: var(--font-family-plus_jakarta_sans);
+      font-size: var(--font-size-m);
+      font-style: normal;
+      font-weight: 600;
+    }
+
+    :root {}
+
+
+    /* screen - landing-page-61 */
+
+    .landing-page-61 {
+      background-color: var(--white);
+      height: 3820px;
+      overflow: hidden;
+      overflow-x: hidden;
+      position: relative;
+      width: 1440px;
+    }
+
+    .landing-page-61 .rectangle-9552-HKuffp {
+      background-color: #eff9ff;
+      height: 882px;
+      left: 1px;
+      position: absolute;
+      top: 0px;
+      width: 1439px;
+    }
+
+    .landing-page-61 .mask-group-HKuffp {
+      background-color: transparent;
+      height: 882px;
+      left: 1px;
+      position: absolute;
+      top: 0px;
+      width: 1439px;
+    }
+
+    .landing-page-61 .deco-HKuffp {
+      background-color: transparent;
+      height: 914px;
+      left: 71px;
+      mix-blend-mode: normal;
+      position: absolute;
+      top: 9749px;
+      width: 883px;
+    }
+
+    .landing-page-61 .rectangle-9456-HKuffp {
+      background-color: transparent;
+      height: 96px;
+      left: 0px;
+      position: absolute;
+      top: 0px;
+      width: 1440px;
+    }
+
+    .landing-page-61 .home-HKuffp {
+      background-color: transparent;
+      color: var(--charade);
+      font-family: var(--font-family-plus_jakarta_sans);
+      font-size: var(--font-size-s);
+      font-style: normal;
+      font-weight: 400;
+      height: auto;
+      left: 1112px;
+      letter-spacing: 0.00px;
+      line-height: normal;
+      position: absolute;
+      text-align: left;
+      top: 38px;
+      width: auto;
+    }
+
+    .landing-page-61 .why-choose-nop-o11y-HKuffp {
+      background-color: transparent;
+      color: var(--charade);
+      font-family: var(--font-family-plus_jakarta_sans);
+      font-size: var(--font-size-xl);
+      font-style: normal;
+      font-weight: 700;
+      height: auto;
+      left: 295px;
+      letter-spacing: 0.00px;
+      line-height: normal;
+      position: absolute;
+      text-align: center;
+      top: 945px;
+      width: 849px;
+    }
+
+    .landing-page-61 .discover-the-benefit-HKuffp {
+      background-color: transparent;
+      color: var(--charade);
+      font-family: var(--font-family-open_sans);
+      font-size: var(--font-size-m);
+      font-style: normal;
+      font-weight: 400;
+      height: auto;
+      left: 282px;
+      letter-spacing: 0.00px;
+      line-height: 32px;
+      position: absolute;
+      text-align: center;
+      top: 1006px;
+      width: 877px;
+    }
+
+    .landing-page-61 .logo-HKuffp {
+      height: 58px;
+      left: 101px;
+      top: 19px;
+      width: 58px;
+    }
+
+    .landing-page-61 .group-40454-HKuffp {
+      background-color: transparent;
+      height: 48px;
+      left: 1190px;
+      position: absolute;
+      top: 24px;
+      width: 152px;
+    }
+
+    .landing-page-61 .rectangle-9372-fz04Vg {
+      width: 152px;
+    }
+
+    .landing-page-61 .contact-us-fz04Vg {
+      background-color: transparent;
+      height: 16px;
+      left: 28px;
+      letter-spacing: 0.00px;
+      line-height: normal;
+      position: absolute;
+      text-align: center;
+      top: 16px;
+      white-space: nowrap;
+      width: 94px;
+    }
+
+    .landing-page-61 .group-40456-HKuffp {
+      background-color: transparent;
+      height: 351px;
+      left: 99px;
+      position: absolute;
+      top: 298px;
+      width: 605px;
+    }
+
+    .landing-page-61 .group-40455-1H5z3I {
+      background-color: transparent;
+      height: 48px;
+      left: 2px;
+      position: absolute;
+      top: 303px;
+      width: 152px;
+    }
+
+    .landing-page-61 .rectangle-9372-ICxudW {
+      width: 152px;
+    }
+
+    .landing-page-61 .learn-more-ICxudW {
+      background-color: transparent;
+      height: 16px;
+      left: 28px;
+      letter-spacing: 0.00px;
+      line-height: normal;
+      position: absolute;
+      text-align: center;
+      top: 16px;
+      white-space: nowrap;
+      width: 94px;
+    }
+
+    .landing-page-61 .no-ops-total-observa-1H5z3I {
+      background-color: transparent;
+      color: var(--charade);
+      font-family: var(--font-family-plus_jakarta_sans);
+      font-size: var(--font-size-xxl);
+      font-style: normal;
+      font-weight: 800;
+      height: auto;
+      left: 2px;
+      letter-spacing: 0.00px;
+      line-height: normal;
+      position: absolute;
+      text-align: left;
+      text-shadow: 0px 4px 4px #0000001a;
+      top: 0px;
+      width: 599px;
+    }
+
+    .landing-page-61 .unlock-the-future-of-1H5z3I {
+      background-color: transparent;
+      height: auto;
+      left: 0px;
+      letter-spacing: 0.00px;
+      line-height: 32px;
+      position: absolute;
+      text-align: center;
+      top: 229px;
+      white-space: nowrap;
+      width: auto;
+    }
+
+    .landing-page-61 .group-40460-HKuffp {
+      background-color: transparent;
+      height: 523px;
+      left: 742px;
+      position: absolute;
+      top: 212px;
+      width: 697px;
+    }
+
+    .landing-page-61 .group-40465-HKuffp {
+      background-color: transparent;
+      height: 350px;
+      left: 0px;
+      position: absolute;
+      top: 3539px;
+      width: 1440px;
+    }
+
+    .landing-page-61 .background-5TR5CN {
+      background-color: var(--white);
+      height: 350px;
+      left: 0px;
+      position: absolute;
+      top: 0px;
+      width: 1440px;
+    }
+
+    .landing-page-61 .group-40464-5TR5CN {
+      background-color: transparent;
+      height: 261px;
+      left: 100px;
+      position: absolute;
+      top: 50px;
+      width: 1342px;
+    }
+
+    .landing-page-61 .divider-IDZAkf {
+      background-color: var(--dark);
+      border: 1px solid;
+      border-color: var(--dark);
+      height: 3px;
+      left: -1px;
+      opacity: 0.06;
+      position: absolute;
+      top: 213px;
+      width: 1243px;
+    }
+
+    .landing-page-61 .logo-and-contact-email-IDZAkf {
+      background-color: transparent;
+      height: 182px;
+      left: 0px;
+      position: absolute;
+      top: 0px;
+      width: 378px;
+    }
+
+    .landing-page-61 .group-40462-UCx2qX {
+      background-color: transparent;
+      height: 182px;
+      left: 0px;
+      position: relative;
+      top: 0px;
+      width: 380px;
+    }
+
+    .landing-page-61 .supportpersonalcom-KabvO6 {
+      top: 86px;
+      width: 378px;
+    }
+
+    .landing-page-61 .logo-KabvO6 {
+      height: 70px;
+      left: 0px;
+      top: 0px;
+      width: 70px;
+    }
+
+    .landing-page-61 .copyright-xnsio-2024-IDZAkf {
+      background-color: transparent;
+      height: auto;
+      left: 0px;
+      letter-spacing: 0.00px;
+      line-height: normal;
+      position: absolute;
+      text-align: left;
+      top: 239px;
+      width: auto;
+    }
+
+    .landing-page-61 .group-40463-IDZAkf {
+      background-color: transparent;
+      height: 86px;
+      left: 1067px;
+      position: absolute;
+      top: 48px;
+      width: 176px;
+    }
+
+    .landing-page-61 .supportpersonalcom-FjxOUs {
+      top: 0px;
+      white-space: nowrap;
+      width: auto;
+    }
+
+    .landing-page-61 .social-links-FjxOUs {
+      background-color: transparent;
+      height: 36px;
+      left: 38px;
+      position: absolute;
+      top: 50px;
+      width: 136px;
+    }
+
+    .landing-page-61 .group-6631-IDZAkf {
+      background-color: transparent;
+      height: 22px;
+      left: 944px;
+      position: absolute;
+      top: 239px;
+      width: 288px;
+    }
+
+    .landing-page-61 .terms-and-condtions-3d5vTd {
+      background-color: transparent;
+      height: auto;
+      left: 0px;
+      letter-spacing: 0.00px;
+      line-height: normal;
+      position: absolute;
+      text-align: left;
+      top: 0px;
+      width: auto;
+    }
+
+    .landing-page-61 .ellipse-61-3d5vTd {
+      background-color: var(--river-bed);
+      border-radius: 2px/2.01px;
+      height: 4px;
+      left: 170px;
+      position: absolute;
+      top: 9px;
+      width: 4px;
+    }
+
+    .landing-page-61 .privacy-policy-3d5vTd {
+      background-color: transparent;
+      height: auto;
+      left: 184px;
+      letter-spacing: 0.00px;
+      line-height: normal;
+      position: absolute;
+      text-align: left;
+      top: 0px;
+      width: auto;
+    }
+
+    .landing-page-61 .up-icon-IDZAkf {
+      background-color: transparent;
+      height: 40px;
+      left: 1300px;
+      position: absolute;
+      top: 71px;
+      width: 40px;
+    }
+
+    .landing-page-61 .oval-2-yBefoC {
+      background-color: #0374c2;
+      border-radius: 20px/20.03px;
+      height: 40px;
+      left: 0px;
+      position: absolute;
+      top: 0px;
+      width: 40px;
+    }
+
+    .landing-page-61 .shape-yBefoC {
+      background-color: transparent;
+      height: 8px;
+      left: 13px;
+      position: absolute;
+      top: 16px;
+      width: 14px;
+    }
+
+    .landing-page-61 .section-HKuffp {
+      background-color: #003da4;
+      height: 635px;
+      left: 0px;
+      overflow: hidden;
+      position: absolute;
+      top: 2904px;
+      width: 1440px;
+    }
+
+    .landing-page-61 .ellipses-5QIvXQ {
+      background-color: transparent;
+      height: 730px;
+      left: -365px;
+      position: absolute;
+      top: 286px;
+      transform: rotate(180deg);
+      width: 730px;
+    }
+
+    .landing-page-61 .ellipse-15-cNguHU {
+      background-color: transparent;
+      height: 349px;
+      left: 0px;
+      position: absolute;
+      top: 381px;
+      transform: rotate(-180deg);
+      width: 365px;
+    }
+
+    .landing-page-61 .ellipse-19-cNguHU {
+      background-color: transparent;
+      height: 66px;
+      left: 118px;
+      position: absolute;
+      top: 381px;
+      transform: rotate(-180deg);
+      width: 143px;
+    }
+
+    .landing-page-61 .ellipse-20-cNguHU {
+      background-color: transparent;
+      height: 165px;
+      left: 19px;
+      position: absolute;
+      top: 381px;
+      transform: rotate(-180deg);
+      width: 346px;
+    }
+
+    .landing-page-61 .group-40470-5QIvXQ {
+      background-color: transparent;
+      height: 507px;
+      left: 140px;
+      position: absolute;
+      top: 64px;
+      width: 1160px;
+    }
+
+    .landing-page-61 .group-40447-s1571x {
+      background-color: transparent;
+      height: 507px;
+      left: 760px;
+      position: absolute;
+      top: 0px;
+      width: 412px;
+    }
+
+    .landing-page-61 .bg-kcFAcY {
+      background-color: var(--white);
+      border: 1px solid;
+      border-color: var(--mischka);
+      border-radius: 10px;
+      box-shadow: 0px 34px 33px -23px #161c2d21;
+      height: 509px;
+      left: -1px;
+      position: absolute;
+      top: -1px;
+      width: 402px;
+    }
+
+    .landing-page-61 .group-40314-kcFAcY {
+      background-color: transparent;
+      height: 48px;
+      left: 25px;
+      position: absolute;
+      top: 429px;
+      width: 351px;
+    }
+
+    .landing-page-61 .rectangle-9372-Q2PfDx {
+      width: 351px;
+    }
+
+    .landing-page-61 .send-message-Q2PfDx {
+      background-color: transparent;
+      height: 20px;
+      left: 118px;
+      letter-spacing: 0.00px;
+      line-height: normal;
+      position: absolute;
+      text-align: center;
+      top: 14px;
+      width: auto;
+    }
+
+    .landing-page-61 .bg-border-kcFAcY {
+      height: 52px;
+      top: 57px;
+    }
+
+    .landing-page-61 .input-name-kcFAcY {
+      top: 72px;
+      width: 108px;
+    }
+
+    .landing-page-61 .label-kcFAcY {
+      top: 25px;
+      width: 95px;
+    }
+
+    .landing-page-61 .bg-border-5dRjTj {
+      height: 52px;
+      top: 150px;
+    }
+
+    .landing-page-61 .input-name-5dRjTj {
+      top: 165px;
+      width: 161px;
+    }
+
+    .landing-page-61 .label-5dRjTj {
+      top: 118px;
+      width: 92px;
+    }
+
+    .landing-page-61 .select-name-kcFAcY {
+      background-color: transparent;
+      height: auto;
+      left: 43px;
+      letter-spacing: 0.00px;
+      line-height: normal;
+      position: absolute;
+      text-align: left;
+      top: 267px;
+      width: 228px;
+    }
+
+    .landing-page-61 .select-label-kcFAcY {
+      background-color: transparent;
+      height: auto;
+      left: 25px;
+      letter-spacing: -0.10px;
+      line-height: 26px;
+      position: absolute;
+      text-align: left;
+      top: 222px;
+      white-space: nowrap;
+      width: auto;
+    }
+
+    .landing-page-61 .bg-border-iuhNlL {
+      height: 152px;
+      top: 254px;
+    }
+
+    .landing-page-61 .group-40469-s1571x {
+      background-color: transparent;
+      height: 269px;
+      left: 0px;
+      position: absolute;
+      top: 119px;
+      width: 600px;
+    }
+
+    .landing-page-61 .group-40199-YfH6Pa {
+      background-color: transparent;
+      height: 72px;
+      left: 0px;
+      position: absolute;
+      top: 197px;
+      width: 214px;
+    }
+
+    .landing-page-61 .with-lots-of-unique-063Ig0 {
+      font-weight: 400;
+      top: 40px;
+      width: 210px;
+    }
+
+    .landing-page-61 .with-lots-of-unique-Sxdyxx {
+      font-weight: 700;
+      top: 0px;
+      width: 94px;
+    }
+
+    .landing-page-61 .secondary-headline-YfH6Pa {
+      background-color: transparent;
+      color: var(--white);
+      font-family: var(--font-family-plus_jakarta_sans);
+      font-size: var(--font-size-xxl);
+      font-style: normal;
+      font-weight: 800;
+      height: auto;
+      left: 0px;
+      letter-spacing: 0.00px;
+      line-height: 61.6px;
+      position: absolute;
+      text-align: center;
+      top: 0px;
+      white-space: nowrap;
+      width: auto;
+    }
+
+    .landing-page-61 .paragraph-YfH6Pa {
+      background-color: transparent;
+      color: var(--white);
+      font-family: var(--font-family-plus_jakarta_sans);
+      font-size: var(--font-size-m);
+      font-style: normal;
+      font-weight: 400;
+      height: auto;
+      left: 0px;
+      letter-spacing: 0.00px;
+      line-height: 28.8px;
+      position: absolute;
+      text-align: left;
+      top: 86px;
+      width: 501px;
+    }
+
+    .landing-page-61 .frame-40447-HKuffp {
+      align-items: flex-start;
+      background-color: transparent;
+      display: inline-flex;
+      flex-direction: column;
+      gap: 138px;
+      left: 236px;
+      position: absolute;
+      top: 1201px;
+    }
+
+    .landing-page-61 .group-40480-zGYp8S {
+      background-color: transparent;
+      height: 202px;
+      position: relative;
+      width: 969px;
+    }
+
+    .landing-page-61 .group-40468-KOl2bj {
+      background-color: transparent;
+      height: 202px;
+      left: 0px;
+      position: relative;
+      top: 0px;
+      width: 969px;
+    }
+
+    .landing-page-61 .group-40467-CXJio2 {
+      background-color: transparent;
+      height: 192px;
+      left: 0px;
+      position: absolute;
+      top: 5px;
+      width: 460px;
+    }
+
+    .landing-page-61 .seamless-no-ops-experience-2R8e5L {
+      background-color: transparent;
+      height: auto;
+      left: 0px;
+      letter-spacing: 0.00px;
+      line-height: normal;
+      position: absolute;
+      text-align: left;
+      top: 0px;
+      width: auto;
+    }
+
+    .landing-page-61 .automate-your-operat-2R8e5L {
+      background-color: transparent;
+      height: auto;
+      left: 0px;
+      letter-spacing: 0.00px;
+      line-height: 32px;
+      position: absolute;
+      text-align: left;
+      top: 64px;
+      width: 456px;
+    }
+
+    .landing-page-61 .group-40466-CXJio2 {
+      background-color: transparent;
+      height: 202px;
+      left: 692px;
+      position: absolute;
+      top: 0px;
+      width: 277px;
+    }
+
+    .landing-page-61 .ellipse-64-aR161w {
+      left: 75px;
+    }
+
+    .landing-page-61 .group-40471-aR161w {
+      background-color: transparent;
+      height: 145px;
+      left: 0px;
+      position: absolute;
+      top: 17px;
+      width: 181px;
+    }
+
+    .landing-page-61 .group-40481-zGYp8S {
+      background-color: transparent;
+      height: 224px;
+      position: relative;
+      width: 960px;
+    }
+
+    .landing-page-61 .group-40475-Ke1Np7 {
+      background-color: transparent;
+      height: 224px;
+      left: 504px;
+      position: absolute;
+      top: 0px;
+      width: 460px;
+    }
+
+    .landing-page-61 .enhanced-observability-zk3FhW {
+      background-color: transparent;
+      height: auto;
+      left: 0px;
+      letter-spacing: 0.00px;
+      line-height: normal;
+      position: absolute;
+      text-align: left;
+      top: 0px;
+      width: auto;
+    }
+
+    .landing-page-61 .gain-deep-insights-i-zk3FhW {
+      background-color: transparent;
+      height: auto;
+      left: 0px;
+      letter-spacing: 0.00px;
+      line-height: 32px;
+      position: absolute;
+      text-align: left;
+      top: 64px;
+      width: 456px;
+    }
+
+    .landing-page-61 .group-40474-Ke1Np7 {
+      background-color: transparent;
+      height: 202px;
+      left: 25px;
+      position: absolute;
+      top: 11px;
+      width: 202px;
+    }
+
+    .landing-page-61 .ellipse-64-zRLiK4 {
+      left: 0px;
+    }
+
+    .landing-page-61 .carbonibm-aiops-insights-zRLiK4 {
+      background-color: transparent;
+      height: 145px;
+      left: 46px;
+      position: absolute;
+      top: 19px;
+      width: 145px;
+    }
+
+    .landing-page-61 .zoom-in-Ke1Np7 {
+      background-color: transparent;
+      height: 80px;
+      left: 0px;
+      position: absolute;
+      top: 107px;
+      width: 80px;
+    }
+
+    .landing-page-61 .group-40482-zGYp8S {
+      background-color: transparent;
+      height: 202px;
+      position: relative;
+      width: 969px;
+    }
+
+    .landing-page-61 .group-40472-FpEDcS {
+      background-color: transparent;
+      height: 192px;
+      left: 0px;
+      position: absolute;
+      top: 5px;
+      width: 460px;
+    }
+
+    .landing-page-61 .scalability-and-flexibility-xXrcHs {
+      background-color: transparent;
+      height: auto;
+      left: 0px;
+      letter-spacing: 0.00px;
+      line-height: normal;
+      position: absolute;
+      text-align: left;
+      top: 0px;
+      width: 447px;
+    }
+
+    .landing-page-61 .built-for-modern-dyn-xXrcHs {
+      background-color: transparent;
+      height: auto;
+      left: 0px;
+      letter-spacing: 0.00px;
+      line-height: 32px;
+      position: absolute;
+      text-align: left;
+      top: 64px;
+      width: 456px;
+    }
+
+    .landing-page-61 .group-40473-FpEDcS {
+      background-color: transparent;
+      height: 202px;
+      left: 736px;
+      position: absolute;
+      top: 0px;
+      width: 233px;
+    }
+
+    .landing-page-61 .icon-parkscale-WrmBuA {
+      background-color: transparent;
+      height: 145px;
+      left: 88px;
+      position: absolute;
+      top: 29px;
+      width: 145px;
+    }
+
+    .landing-page-61 .group-40483-zGYp8S {
+      background-color: transparent;
+      height: 202px;
+      position: relative;
+      width: 968px;
+    }
+
+    .landing-page-61 .group-40476-RO5cSy {
+      background-color: transparent;
+      height: 192px;
+      left: 512px;
+      position: absolute;
+      top: 5px;
+      width: 460px;
+    }
+
+    .landing-page-61 .user-friendly-interface-fImUOl {
+      background-color: transparent;
+      height: auto;
+      left: 0px;
+      letter-spacing: 0.00px;
+      line-height: normal;
+      position: absolute;
+      text-align: left;
+      top: 0px;
+      width: 373px;
+    }
+
+    .landing-page-61 .with-an-intuitive-da-fImUOl {
+      background-color: transparent;
+      height: auto;
+      left: 0px;
+      letter-spacing: 0.00px;
+      line-height: 32px;
+      position: absolute;
+      text-align: left;
+      top: 64px;
+      width: 456px;
+    }
+
+    .landing-page-61 .group-40477-RO5cSy {
+      background-color: transparent;
+      height: 202px;
+      left: 0px;
+      position: absolute;
+      top: 0px;
+      width: 219px;
+    }
+
+    .landing-page-61 .ellipse-64-VyecVG {
+      left: 17px;
+    }
+
+    .landing-page-61 .fluentcard-ui-24-regular-VyecVG {
+      background-color: transparent;
+      height: 145px;
+      left: 0px;
+      position: absolute;
+      top: 25px;
+      width: 145px;
+    }
+
+    .landing-page-61 .user-RO5cSy {
+      background-color: transparent;
+      height: 80px;
+      left: 145px;
+      position: absolute;
+      top: 87px;
+      width: 80px;
+    }
+
+    .landing-page-61 .vector-RO5cSy {
+      background-color: transparent;
+      height: 29px;
+      left: 146px;
+      position: absolute;
+      top: 59px;
+      width: 37px;
+    }
+
+    .landing-page-61 .group-40484-zGYp8S {
+      background-color: transparent;
+      height: 211px;
+      position: relative;
+      width: 969px;
+    }
+
+    .landing-page-61 .group-40478-EUusB9 {
+      background-color: transparent;
+      height: 192px;
+      left: 0px;
+      position: absolute;
+      top: 19px;
+      width: 460px;
+    }
+
+    .landing-page-61 .security-and-reliability-VSsIyC {
+      background-color: transparent;
+      height: auto;
+      left: 0px;
+      letter-spacing: 0.00px;
+      line-height: normal;
+      position: absolute;
+      text-align: left;
+      top: 0px;
+      width: 447px;
+    }
+
+    .landing-page-61 .trust-in-our-robust-VSsIyC {
+      background-color: transparent;
+      height: auto;
+      left: 0px;
+      letter-spacing: 0.00px;
+      line-height: 32px;
+      position: absolute;
+      text-align: left;
+      top: 64px;
+      width: 456px;
+    }
+
+    .landing-page-61 .group-40479-EUusB9 {
+      background-color: transparent;
+      height: 202px;
+      left: 736px;
+      position: absolute;
+      top: 0px;
+      width: 233px;
+    }
+
+    .landing-page-61 .hugeiconssecurity-check-ETkv3v {
+      background-color: transparent;
+      height: 145px;
+      left: 88px;
+      position: absolute;
+      top: 29px;
+      width: 145px;
+    }
+
+    .landing-page-61 .bg-border {
+      background-color: transparent;
+      border: 1px solid;
+      border-color: var(--mischka);
+      border-radius: 4px;
+      left: 24px;
+      position: absolute;
+      width: 351px;
+    }
+
+    .landing-page-61 .ellipse-64 {
+      background-color: var(--aero-blue);
+      border-radius: 101px;
+      height: 202px;
+      position: absolute;
+      top: 0px;
+      width: 202px;
+    }
+
+    .landing-page-61 .ellipse-65 {
+      background-color: var(--aero-blue);
+      border-radius: 101px;
+      height: 202px;
+      left: 0px;
+      position: absolute;
+      top: 0px;
+      width: 202px;
+    }
+
+    .landing-page-61 .input-name {
+      background-color: transparent;
+      height: auto;
+      left: 43px;
+      letter-spacing: 0.00px;
+      line-height: normal;
+      mix-blend-mode: normal;
+      opacity: 0.7;
+      position: absolute;
+      text-align: left;
+    }
+
+    .landing-page-61 .label {
+      background-color: transparent;
+      height: auto;
+      left: 25px;
+      letter-spacing: -0.10px;
+      line-height: 26px;
+      position: absolute;
+      text-align: left;
+    }
+
+    .landing-page-61 .logo {
+      background-color: transparent;
+      object-fit: cover;
+      position: absolute;
+    }
+
+    .landing-page-61 .rectangle-9372 {
+      background-color: var(--navy-blue);
+      border-radius: 4px;
+      height: 50px;
+      left: -1px;
+      position: absolute;
+      top: -1px;
+    }
+
+    .landing-page-61 .supportpersonalcom {
+      background-color: transparent;
+      height: auto;
+      left: 0px;
+      letter-spacing: 0.00px;
+      line-height: 32px;
+      position: absolute;
+      text-align: left;
+    }
+
+    .landing-page-61 .with-lots-of-unique {
+      background-color: transparent;
+      color: var(--white);
+      font-family: var(--font-family-plus_jakarta_sans);
+      font-size: var(--font-size-m);
+      font-style: normal;
+      height: auto;
+      left: 0px;
+      letter-spacing: -0.20px;
+      line-height: 32px;
+      mix-blend-mode: normal;
+      position: absolute;
+      text-align: left;
+      white-space: nowrap;
+    }
+  </style>
+  <style id="action-links-styles">
+    @import url('https://fonts.googleapis.com/css2?family=Mulish&display=swap');
+
+    #anima-interface {
+      transition: all 0.5s ease-in-out;
+    }
+
+    #anima-watermark {
+      transition: all 0.5s ease-in-out;
+      display: none;
+    }
+
+    #anima-watermark-link {
+      position: fixed;
+      bottom: 20px;
+      height: 30px;
+      border-radius: 1000px;
+      background: #3B3B3B;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      transition: width 0.25s cubic-bezier(0.175, 0.885, 0.320, 1.275);
+      text-decoration: none;
+      color: #fff;
+      padding: 8px 16px 8px 11px;
+      font-family: Mulish, sans-serif;
+      font-size: 12px;
+    }
+
+    #anima-watermark-link .text {
+      margin-left: 6px;
+    }
+
+    .omniview-anima-action-links .link {
+      height: 30px;
+      width: 30px;
+      border-radius: 1000px;
+      background: #3B3B3B;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      transition: width 0.25s cubic-bezier(0.175, 0.885, 0.320, 1.275);
+      text-decoration: none;
+      color: #fff;
+    }
+
+    .omniview-anima-action-links #comment-link .text,
+    .omniview-anima-action-links #code-link .text {
+      display: none;
+      font-size: 12px;
+      margin-right: 5px;
+    }
+
+    .omniview-anima-action-links #comment-link:hover,
+    .omniview-anima-action-links #code-link:hover {
+      width: 105px;
+    }
+
+    .omniview-anima-action-links #comment-link.pop-active,
+    .omniview-anima-action-links #code-link.pop-active {
+      width: 105px;
+      background: #FF6250;
+    }
+
+    .omniview-anima-action-links #comment-link.pop-active .text,
+    .omniview-anima-action-links #code-link.pop-active .text {
+      display: block
+    }
+
+    .omniview-anima-action-links #comment-link:hover .text,
+    .omniview-anima-action-links #code-link:hover .text {
+      display: block;
+    }
+
+    .link.navigation {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      width: auto;
+      height: 32px;
+      color: #fff;
+      font-size: 12px;
+      cursor: default;
+      padding: 0 5px;
+    }
+
+    .link.navigation .icon {
+      margin: 0 6px;
+      fill: none;
+      stroke: currentColor;
+      cursor: pointer;
+    }
+
+    .link.navigation .icon.disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+
+    .link.navigation .home-icon {
+      margin-left: 6px;
+      fill: currentColor;
+      stroke: currentColor;
+      cursor: pointer;
+    }
+
+    .omniview-anima-action-links .restart {
+      height: 30px;
+      padding: 0 12px;
+      background: #3B3B3B;
+      border-radius: 1000px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #f1f1f1;
+      font-size: 12px;
+    }
+
+    .omniview-anima-action-links {
+      display: flex;
+      align-items: center;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      font-family: Mulish, sans-serif;
+      transition: all 0.5s ease-in-out;
+      opacity: 1;
+    }
+
+    .omniview-anima-action-links>*+* {
+      margin-right: 0;
+      margin-left: 10px;
+    }
+
+    .idle {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #popoverOpener {
+      position: absolute;
+      left: 50%;
+      margin-left: -10vw;
+      text-align: center;
+      top: 45vh;
+      width: 20vw;
+    }
+
+
+    .popover {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1060;
+      display: none;
+      font-family: "sans-serif";
+      font-size: 14px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+    }
+
+    .popover.top {
+      margin-top: -12px
+    }
+
+    .popover.right {
+      margin-left: 10px
+    }
+
+    .popover.bottom {
+      margin-top: 10px
+    }
+
+    .popover.left {
+      margin-left: -10px
+    }
+
+    .popover-title {
+      padding: 8px 14px;
+      margin: 0;
+      font-size: 14px;
+      background-color: #f7f7f7;
+      border-bottom: 1px solid #ebebeb;
+      border-radius: 5px 5px 0 0
+    }
+
+    .popover-content {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      overflow: hidden;
+      font-family: Mulish, sans-serif;
+    }
+
+
+
+    .popover>.arrow,
+    .popover>.arrow:after {
+      position: absolute;
+      display: block;
+      width: 0;
+      height: 0;
+      border-color: transparent;
+      border-style: solid
+    }
+
+    .popover>.arrow {
+      border-width: 11px
+    }
+
+    .popover>.arrow:after {
+      content: "";
+      border-width: 10px
+    }
+
+    .popover.top>.arrow {
+      bottom: -11px;
+      left: 50%;
+      margin-left: -11px;
+      border-top-color: #999;
+      border-top-color: rgba(0, 0, 0, .25);
+      border-bottom-width: 0
+    }
+
+    .popover.top>.arrow:after {
+      bottom: 1px;
+      margin-left: -10px;
+      content: " ";
+      border-top-color: #fff;
+      border-bottom-width: 0
+    }
+
+    .popover.right>.arrow {
+      top: 50%;
+      left: -11px;
+      margin-top: -11px;
+      border-right-color: #999;
+      border-right-color: rgba(0, 0, 0, .25);
+      border-left-width: 0
+    }
+
+    .popover.right>.arrow:after {
+      bottom: -10px;
+      left: 1px;
+      content: " ";
+      border-right-color: #fff;
+      border-left-width: 0
+    }
+
+    .popover.bottom>.arrow {
+      top: -11px;
+      left: 50%;
+      margin-left: -11px;
+      border-top-width: 0;
+      border-bottom-color: #999;
+      border-bottom-color: rgba(0, 0, 0, .25)
+    }
+
+    .popover.bottom>.arrow:after {
+      top: 1px;
+      margin-left: -10px;
+      content: " ";
+      border-top-width: 0;
+      border-bottom-color: #fff
+    }
+
+    .popover.left>.arrow {
+      top: 50%;
+      right: -11px;
+      margin-top: -11px;
+      border-right-width: 0;
+      border-left-color: #999;
+      border-left-color: rgba(0, 0, 0, .25)
+    }
+
+    .popover.left>.arrow:after {
+      right: 1px;
+      bottom: -10px;
+      content: " ";
+      border-right-width: 0;
+      border-left-color: #fff
+    }
+
+
+
+    #anima-comment-popover,
+    #anima-code-popover {
+      background: #333333;
+      color: #fff;
+    }
+
+    #anima-comment-popover.top>.arrow,
+    #anima-comment-popover.top>.arrow:after,
+    #anima-code-popover.top>.arrow:after,
+    #anima-code-popover.top>.arrow {
+      border-top-color: #333;
+    }
+
+    #anima-comment-popover .btn,
+    #anima-code-popover .btn {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      padding: 6px 20px;
+      background: #FF6250;
+      color: #fff;
+      border-radius: 100px;
+      width: max-content;
+      text-decoration: none;
+    }
+
+    @media screen and (max-width: 550px) {
+      #anima-watermark-link {
+        padding: 6px !important;
+      }
+
+      #anima-watermark-link .text {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body style="margin: 0px; background: rgb(255, 255, 255); overflow-x: hidden;" dark-scroll="">
+  <div class="container-center-horizontal">
+    <div class="landing-page-61 screen " data-id="1:12499">
+      <div class="rectangle-9552-HKuffp" data-id="1:12500"></div><img class="mask-group-HKuffp" data-id="1:12501"
+        src="img/mask-group.png" alt="Mask group"><img class="deco-HKuffp" data-id="1:12505" src="img/deco.png"
+        alt="deco"><img class="rectangle-9456-HKuffp" data-id="1:12666" src="img/rectangle-9456.png"
+        alt="Rectangle 9456">
+      <div class="home-HKuffp" data-id="1:12668">Home</div>
+      <div class="why-choose-nop-o11y-HKuffp" data-id="1:12669">Why Choose NopO11y?</div>
+      <p class="discover-the-benefit-HKuffp" data-id="1:12670">Our aim is to build a cutting-edge platform that allows
+        you manage and monitor your IT infrastructure using the NoOps principles. Combining the power of NoOps with
+        unparalleled observability, NopO11y empowers your development teams to focus on innovation while we handle the
+        rest.</p>
+      <img class="logo-HKuffp logo" data-id="1:12671" src="img/logo.png" alt="photo1715683987 1" />
+      <div class="group-40454-HKuffp" data-id="1:12672">
+        <div class="rectangle-9372-fz04Vg rectangle-9372" data-id="1:12673"></div>
+        <div class="contact-us-fz04Vg valign-text-middle plusjakartasans-semi-bold-white-16px" data-id="1:12674">
+          Contact us
+        </div>
+      </div>
+      <div class="group-40456-HKuffp" data-id="1:12675">
+        <div class="group-40455-1H5z3I" data-id="1:12676">
+          <div class="rectangle-9372-ICxudW rectangle-9372" data-id="1:12677"></div>
+          <div class="learn-more-ICxudW valign-text-middle plusjakartasans-semi-bold-white-16px" data-id="1:12678">Learn
+            More</div>
+        </div>
+        <h1 class="no-ops-total-observa-1H5z3I" data-id="1:12679">NopO11y:<br>NoOps Observability Redefined.</h1>
+        <p class="unlock-the-future-of-1H5z3I plusjakartasans-normal-charade-18px" data-id="1:12680">
+          NoOps Observability. Infinite Possibilities
+        </p>
+      </div>
+      <img class="group-40460-HKuffp" data-id="1:12681" src="img/group-40460.png" alt="Group 40460">
+      <div class="group-40465-HKuffp" data-id="1:12799">
+        <div class="background-5TR5CN" data-id="1:12800"></div>
+        <div class="group-40464-5TR5CN" data-id="1:12801">
+          <div class="divider-IDZAkf" data-id="1:12802"></div>
+          <div class="logo-and-contact-email-IDZAkf" data-id="1:12803">
+            <div class="group-40462-UCx2qX" data-id="1:12804">
+              <p class="supportpersonalcom-KabvO6 supportpersonalcom plusjakartasans-normal-charade-18px"
+                data-id="1:12805">The cutting-edge platform that revolutionizes how you manage and monitor your IT
+                infrastructure.</p>
+              <img class="logo-KabvO6 logo" data-id="1:12806" src="img/logo.png" alt="NopO11y Logo">
+            </div>
+          </div>
+          <div class="copyright-xnsio-2024-IDZAkf opensans-normal-river-bed-16px" data-id="1:12807">© Copyright Xnsio
+            2024</div>
+          <div class="group-40463-IDZAkf" data-id="1:12808">
+            <div class="supportpersonalcom-FjxOUs supportpersonalcom plusjakartasans-normal-charade-18px"
+              data-id="1:12809">nopo11y@xnsio.com</div>
+            <img class="social-links-FjxOUs" data-id="1:12810" src="img/social-links@2x.png" alt="Social Links">
+          </div>
+          <div class="group-6631-IDZAkf" data-id="1:12824">
+            <div class="terms-and-condtions-3d5vTd opensans-normal-river-bed-16px" data-id="1:12825">Terms and
+              Conditions</div>
+            <div class="ellipse-61-3d5vTd" data-id="1:12826"></div>
+            <div class="privacy-policy-3d5vTd opensans-normal-river-bed-16px" data-id="1:12827">Privacy Policy</div>
+          </div>
+          <div class="up-icon-IDZAkf" data-id="1:12828">
+            <div class="oval-2-yBefoC" data-id="1:12829"></div><img class="shape-yBefoC" data-id="1:12830"
+              src="img/shape.svg" alt="Shape">
+          </div>
+        </div>
+      </div>
+      <div class="section-HKuffp" data-id="1:12831">
+        <div class="ellipses-5QIvXQ" data-id="1:12832">
+          <img class="ellipse-15-cNguHU" data-id="1:12833" src="img/ellipse-15.svg" alt="Ellipse 15">
+          <img class="ellipse-19-cNguHU" data-id="1:12834" src="img/ellipse-19.svg" alt="Ellipse 19">
+          <img class="ellipse-20-cNguHU" data-id="1:12835" src="img/ellipse-20.svg" alt="Ellipse 20">
+        </div>
+        <div class="group-40470-5QIvXQ" data-id="1:12838">
+          <div class="group-40447-s1571x" data-id="1:12839">
+            <div class="bg-kcFAcY" data-id="1:12840"></div>
+            <div class="group-40314-kcFAcY" data-id="1:12841">
+              <div class="rectangle-9372-Q2PfDx rectangle-9372" data-id="1:12842"></div>
+              <div class="send-message-Q2PfDx valign-text-middle plusjakartasans-semi-bold-white-16px"
+                data-id="1:12843">Send Message</div>
+            </div>
+            <div class="bg-border-kcFAcY bg-border" data-id="1:12844"></div>
+            <div class="input-name-kcFAcY input-name plusjakartasans-normal-santas-gray-18px" data-id="1:12845">i.e.
+              John Doe</div>
+            <div class="label-kcFAcY label plusjakartasans-semi-bold-charade-18px" data-id="1:12846">Name</div>
+            <div class="bg-border-5dRjTj bg-border" data-id="1:12847"></div>
+            <div class="input-name-5dRjTj input-name plusjakartasans-normal-santas-gray-18px" data-id="1:12848">i.e.
+              john@mail.com</div>
+            <div class="label-5dRjTj label plusjakartasans-semi-bold-charade-18px" data-id="1:12849">Email</div>
+            <div class="select-name-kcFAcY plusjakartasans-normal-santas-gray-18px" data-id="1:12850">Type your message
+              here..</div>
+            <div class="select-label-kcFAcY plusjakartasans-semi-bold-charade-18px" data-id="1:12851">Message</div>
+            <div class="bg-border-iuhNlL bg-border" data-id="1:12852"></div>
+          </div>
+          <div class="group-40469-s1571x" data-id="1:12853" id="contactUs">
+            <div class="group-40199-YfH6Pa" data-id="1:12854">
+              <div class="with-lots-of-unique-063Ig0 with-lots-of-unique" data-id="1:12855">nopo11y@xnsio.com</div>
+              <div class="with-lots-of-unique-Sxdyxx with-lots-of-unique" data-id="1:12856">Email Us At</div>
+            </div>
+            <div class="secondary-headline-YfH6Pa" data-id="1:12857">Ready to get started?</div>
+            <p class="paragraph-YfH6Pa" data-id="1:12858">Experience the future of IT operations with NopO11y. Transform
+              your workflows, enhance your observability, and let us help you achieve operational excellence.</p>
+          </div>
+        </div>
+      </div>
+      <div class="frame-40447-HKuffp" data-id="1:12859">
+        <div class="group-40480-zGYp8S" data-id="1:12860">
+          <div class="group-40468-KOl2bj" data-id="1:12861">
+            <div class="group-40467-CXJio2" data-id="1:12862">
+              <div class="seamless-no-ops-experience-2R8e5L plusjakartasans-bold-charade-32px" data-id="1:12863">
+                Seamless NoOps Experience</div>
+              <p class="automate-your-operat-2R8e5L opensans-normal-scarpa-flow-18px" data-id="1:12864">Automate your
+                operations and eliminate the need for manual intervention. NopO11y ensures your infrastructure is always
+                up and running, allowing your team to concentrate on delivering value</p>
+            </div>
+            <div class="group-40466-CXJio2" data-id="1:12865">
+              <div class="ellipse-64-aR161w ellipse-64" data-id="1:12866"></div><img class="group-40471-aR161w"
+                data-id="1:12867" src="img/group-40471@2x.png" alt="Group 40471">
+            </div>
+          </div>
+        </div>
+        <div class="group-40481-zGYp8S" data-id="1:12874">
+          <div class="group-40475-Ke1Np7" data-id="1:12875">
+            <div class="enhanced-observability-zk3FhW plusjakartasans-bold-charade-32px" data-id="1:12876">Enhanced
+              Observability</div>
+            <p class="gain-deep-insights-i-zk3FhW opensans-normal-scarpa-flow-18px" data-id="1:12877">Gain deep insights
+              into your system's health and performance with advanced monitoring and logging. Our platform provides
+              comprehensive visibility, enabling proactive issue resolution and optimal performance tuning.</p>
+          </div>
+          <div class="group-40474-Ke1Np7" data-id="1:12878">
+            <div class="ellipse-64-zRLiK4 ellipse-64" data-id="1:12879"></div><img
+              class="carbonibm-aiops-insights-zRLiK4" data-id="1:12880" src="img/carbon-ibm-aiops-insights.svg"
+              alt="carbon:ibm-aiops-insights">
+          </div>
+          <img class="zoom-in-Ke1Np7" data-id="1:12885" src="img/zoom-in.svg" alt="zoom-in">
+        </div>
+        <div class="group-40482-zGYp8S" data-id="1:12888">
+          <div class="group-40472-FpEDcS" data-id="1:12889">
+            <div class="scalability-and-flexibility-xXrcHs plusjakartasans-bold-charade-32px" data-id="1:12890">
+              Scalability and Flexibility</div>
+            <p class="built-for-modern-dyn-xXrcHs opensans-normal-scarpa-flow-18px" data-id="1:12891">Built for modern,
+              dynamic environments, NopO11y scales effortlessly with your needs. Whether you're running in the cloud,
+              on-premises, or in a hybrid setup, our platform adapts to your requirements.</p>
+          </div>
+          <div class="group-40473-FpEDcS" data-id="1:12892">
+            <div class="ellipse-65" data-id="1:12893"></div><img class="icon-parkscale-WrmBuA" data-id="1:12894"
+              src="img/icon-park-scale.svg" alt="icon-park:scale">
+          </div>
+        </div>
+        <div class="group-40483-zGYp8S" data-id="1:12900">
+          <div class="group-40476-RO5cSy" data-id="1:12901">
+            <div class="user-friendly-interface-fImUOl plusjakartasans-bold-charade-32px" data-id="1:12902">
+              User-Friendly Interface</div>
+            <p class="with-an-intuitive-da-fImUOl opensans-normal-scarpa-flow-18px" data-id="1:12903">With an intuitive
+              dashboard and easy-to-use tools, NopO11y makes it simple to manage and visualize your operations. No steep
+              learning curves, just seamless functionality.</p>
+          </div>
+          <div class="group-40477-RO5cSy" data-id="1:12904">
+            <div class="ellipse-64-VyecVG ellipse-64" data-id="1:12905"></div><img
+              class="fluentcard-ui-24-regular-VyecVG" data-id="1:12906" src="img/fluent-card-ui-24-regular.svg"
+              alt="fluent:card-ui-24-regular">
+          </div><img class="user-RO5cSy" data-id="1:12908" src="img/user.svg" alt="user"><img class="vector-RO5cSy"
+            data-id="1:12911" src="img/vector.svg" alt="Vector">
+        </div>
+        <div class="group-40484-zGYp8S" data-id="1:12912">
+          <div class="group-40478-EUusB9" data-id="1:12913">
+            <div class="security-and-reliability-VSsIyC plusjakartasans-bold-charade-32px" data-id="1:12914">Security
+              and Reliability</div>
+            <p class="trust-in-our-robust-VSsIyC opensans-normal-scarpa-flow-18px" data-id="1:12915">Trust in our
+              robust, secure infrastructure that ensures your data and operations are protected. NopO11y's resilient
+              design guarantees high availability and minimal downtime.</p>
+          </div>
+          <div class="group-40479-EUusB9" data-id="1:12916">
+            <div class="ellipse-65" data-id="1:12917"></div><img class="hugeiconssecurity-check-ETkv3v"
+              data-id="1:12918" src="img/hugeicons-security-check.svg" alt="hugeicons:security-check">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
