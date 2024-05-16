@@ -1,0 +1,49 @@
+{{- if and .Values.kuberhealthy.enabled }}
+apiVersion: comcast.github.io/v1
+kind: KuberhealthyCheck
+metadata:
+  name: nopo11y-health-check
+  namespace: {{ .Release.Namespace }}
+spec:
+  {{- if hasKey .Values.nopo11y_health_check "runInterval" }}
+  runInterval: {{ .Values.nopo11y_health_check.runInterval }}
+  {{- else }}
+  runInterval: 10s
+  {{- end }}
+  {{- if hasKey .Values.nopo11y_health_check "timeout" }}
+  timeout: {{ .Values.nopo11y_health_check.timeout }}
+  {{- else }}
+  timeout: 2m
+  {{- end }}
+  podSpec:
+    securityContext:
+      runAsUser: 999
+      fsGroup: 999
+    containers:
+      - env:
+          - name: KH_REPORTING_URL
+            value: "{{ include "kuberhealthy-url" . }}"
+          - name: "PROMETHEUS_ENDPOINT"
+            value: "{{ include "prometheus-url" . }}"
+          {{- if hasKey .Values.nopo11y_health_check "env" }}
+          {{- range $key, $value := .Values.nopo11y_health_check.env }}
+          - name: {{ $key }}
+            value: "{{ $value }}"
+          {{- end }}
+          {{- end }}
+        image: {{ .Values.nopo11y_health_check.image }}
+        imagePullPolicy: {{ .Values.nopo11y_health_check.imagePullPolicy }}
+        name: main
+        {{- if hasKey .Values.nopo11y_health_check "resources" }}
+        resources:
+        {{- toYaml .Values.nopo11y_health_check.resources | nindent 10}}
+        {{- else }}
+        resources:
+          requests:
+            cpu: 10m
+            memory: 50Mi
+        {{- end }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+{{- end }}
