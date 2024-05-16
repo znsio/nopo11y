@@ -32,7 +32,11 @@ dependencies:
 - condition: prom2teams.enabled
   name: prom2teams
   repository: ""
-  version: 0.2.0
+  version: 0.2.
+- condition: kuberhealthy.enabled
+  name: kuberhealthy
+  repository: "https://kuberhealthy.github.io/kuberhealthy/helm-repos"
+  version: "104"
 description: A Helm chart for observability stack
 name: nopo11y-stack
 type: application
