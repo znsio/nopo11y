@@ -32,7 +32,7 @@ dependencies:
 - condition: prom2teams.enabled
   name: prom2teams
   repository: ""
-  version: 0.2.0
+  version: 1.0.0
 - condition: kuberhealthy.enabled
   name: kuberhealthy
   repository: "https://kuberhealthy.github.io/kuberhealthy/helm-repos"
