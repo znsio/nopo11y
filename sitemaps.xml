@@ -1,15 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type="text/xsl" href="https://nopo11y.com/sitemaps_xsl.xsl"?>
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type="text/xsl" href="/sitemaps_xsl.xsl"?>
 <sitemapindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <sitemap>
-<loc>https://nopo11y.com/post-sitemap1.xml</loc>
+<loc>/post-sitemap1.xml</loc>
 </sitemap>
 <sitemap>
-<loc>https://nopo11y.com/page-sitemap1.xml</loc>
+<loc>/page-sitemap1.xml</loc>
 </sitemap>
 <sitemap>
-<loc>https://nopo11y.com/category-sitemap1.xml</loc>
+<loc>/category-sitemap1.xml</loc>
 </sitemap>
 <sitemap>
-<loc>https://nopo11y.com/post_tag-sitemap1.xml</loc>
+<loc>/post_tag-sitemap1.xml</loc>
 </sitemap>
 </sitemapindex>
