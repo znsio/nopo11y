@@ -15682,7 +15682,7 @@ prom2teams:
     # readOnlyRootFilesystem is a flag to enable readOnlyRootFilesystem for the Hazelcast security context
     readOnlyRootFilesystem: true
 
-### 
+### Kuberhealthy
 kuberhealthy:
   enabled: true
   # Default values for kuberhealthy.
