@@ -29,7 +29,15 @@ dependencies:
   name: jaeger
   repository: ""
   version: 1.0.0
+- condition: prom2teams.enabled
+  name: prom2teams
+  repository: ""
+  version: 1.0.0
+- condition: kuberhealthy.enabled
+  name: kuberhealthy
+  repository: "https://kuberhealthy.github.io/kuberhealthy/helm-repos"
+  version: "104"
 description: A Helm chart for observability stack
 name: nopo11y-stack
 type: application
-version: 1.0.0
+version: 1.1.0

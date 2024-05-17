@@ -15618,3 +15618,423 @@ jaeger:
       storageClassName: "default"
       size: 8Gi
     tracesTTL: "168h"
+
+### Prom2teams
+### This Helm chart is taken from here https://github.com/idealista/prom2teams, please check how to configure and use prom2teams.
+prom2teams:
+  enabled: false
+  # Default values for prom2teams.
+  # This is a YAML-formatted file.
+  # Declare variables to be passed into your templates.
+
+  image:
+    repository: idealista/prom2teams
+    tag:
+    pullPolicy: IfNotPresent
+
+  resources:
+    requests:
+      cpu: 15m
+      memory: 105M
+    limits:
+      memory: 105M
+
+  service:
+    type: ClusterIP
+    port: 8089
+    monitoring_port: 9090
+
+  ## To use external secret enable the external secrets config below
+  ##in prom2teams config just set the secret name from azure key vault which contains the MS teams webhook url
+
+  externalSecrets: 
+    enabled: false
+    secretStoreRef:
+        kind: ClusterSecretStore
+        name: azure-backend
+    externalSecretsRefreshInterval: 1h
+
+  prom2teams:
+    host: 0.0.0.0
+    port: 8089
+    monitoring_port: 9090
+    connector: http://dummy-teams-url
+    connectors: {}
+    # group_alerts_by can be one of
+    # ("name" | "description" | "instance" | "severity" | "status" | "summary" | "fingerprint" | "runbook_url")
+    group_alerts_by:
+    # loglevel can be one of (DEBUG | INFO | WARNING | ERROR | CRITICAL)
+    loglevel: INFO
+    templatepath: /opt/prom2teams/helmconfig/teams.j2
+    config: /opt/prom2teams/helmconfig/config.ini
+    extraEnv: {}
+
+  # Security Context properties
+  securityContext:
+    # enabled is a flag to enable Security Context
+    enabled: true
+    # runAsUser is the user ID used to run the container
+    runAsUser: 101
+    # runAsGroup is the primary group ID used to run all processes within any container of the pod
+    runAsGroup: 101
+    # fsGroup is the group ID associated with the container
+    fsGroup: 101
+    # readOnlyRootFilesystem is a flag to enable readOnlyRootFilesystem for the Hazelcast security context
+    readOnlyRootFilesystem: true
+
+### Kuberhealthy
+kuberhealthy:
+  enabled: false
+  # Default values for kuberhealthy.
+  # This is a YAML-formatted file.
+  # Declare variables to be passed into your templates.
+
+  # can be used to globally override the namespace where to deploy all components. By default .Release.namespace is used.
+  #namespace: ""
+
+  checkReaper:
+    logLevel: error
+    maxKHJobAge: 15m # Maximum age of the khjob resource before being reaped. Valid time units: "ns", "us" (or "µs"), "ms", "s", "m", "h"
+    maxCheckPodAge: 72h # Maximum age of khcheck/khjob pods before being reaped. Valid time units: "ns", "us" (or "µs"), "ms", "s", "m", "h"
+    maxCompletedPodCount: 4 # Maximum number of khcheck/khjob pods in Completed state before being reaped. If not set or set to 0, no completed khjob/khcheck pod will remain.
+    maxErrorPodCount: 4 # Maximum number of khcheck/khjob pods in Error state before being reaped. If not set or set to 0, no completed khjob/khcheck pod will remain.
+
+  stateMetadata: {}
+
+  prometheus:
+    enabled: false
+    name: "prometheus"
+
+    grafanaDashboard:
+      enabled: false
+      label: grafana_dashboard
+      labelValue: "1"
+      additionalLabels: {}
+        # env: "dev"
+        # mycustomlabel: "value"
+      annotations: {}
+        # k8s-sidecar-target-directory: "kuberhealthy"
+      # namespace: "" # Alternative namespace to use for grafana dashboard.
+
+    serviceMonitor:
+      enabled: false
+      release: prometheus-operator
+      additionalLabels: {}
+        # env: "dev"
+        # mycustomlabel: "value"
+      endpoints:
+        interval: 15s
+        bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+        # -- ServiceMonitor relabel configs to apply to samples before scraping
+        ## Ref: https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/api.md#relabelconfig
+        relabelings: []
+        # -- ServiceMonitor metric relabel configs to apply to samples before ingestion
+        ## Ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#endpoint
+        metricRelabelings: []
+      # -- ServiceMonitor will add labels from the service to the Prometheus metric
+      ## Ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#servicemonitorspec
+      targetLabels: []
+      namespace: kuberhealthy # prometheus operator must be allowed to scrape serviceMonitor metrics from kuberhealthy namespace or set to namespace of prometheus operator
+      rules: # applies to all PrometheusRule specs
+        additionalAnnotations: {}
+        additionalLabels:
+          severity: critical
+
+    prometheusRule:
+      enabled: false
+      release: prometheus-operator
+      additionalLabels: {}
+        # env: "dev"
+        # mycustomlabel: "value"
+      namespace: kuberhealthy
+
+  # imageRegistry can be used to globally override where check images are pulled from. Individual checks can be overridden below.
+  # By default if no overrides are specified, all images are pulled from Docker Hub.  Do not include a trailing '/'.
+  imageRegistry: ""
+
+  # Global imagePullSecrets setting for all images.
+  # imagePullSecrets:
+  # - name: my-secret-name
+
+  # imageURL allows you to override all other nonsense and just specify the full image URL you want to pull
+  #imageURL: docker.io/kuberhealthy/kuberhealthy:v1.6.0
+
+  image:
+    registry: docker.io
+    repository: kuberhealthy/kuberhealthy
+    # Leave empty to use .Chart.AppVersion
+    tag:
+
+  resources:
+    requests:
+      cpu: 400m
+      memory: 300Mi
+    limits:
+      cpu: 2
+      memory: 1Gi
+
+  ## Only minAvailable or maxUnavailable can be set at the same time.
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+    maxUnavailable:
+
+
+  tolerations:
+    # change to true to tolerate and deploy to masters
+    master: false
+
+  deployment:
+    replicas: 2
+    maxSurge: 0
+    maxUnavailable: 1
+    imagePullPolicy: IfNotPresent
+    nodeSelector: {}
+    podAnnotations: {}
+    # tolerations:
+    # - key: "key"
+    #   operator: "Equal"
+    #   value: "value"
+    #   effect: "NoSchedule"
+    env:
+      CHECK_REAPER_RUN_INTERVAL: "30s" # Interval for how often check pods should get reaped. Default is 30s
+      TARGET_NAMESPACE: "" # leave blank to target all namespaces, or supply a namespace to operate on only a single namespace
+    command:
+    - /app/kuberhealthy
+    # args:
+    # priorityClassName:
+    affinity: {}
+    ## Acceptable values for podAntiAffinity:
+    ## soft: specifies preferences that the scheduler will try to enforce but will not guarantee (Default)
+    ## hard: specifies rules that must be met for a pod to be scheduled onto a node
+    podAntiAffinity: "soft"
+
+  # When enabled equals to true, runAsUser and fsGroup will be
+  # included to all khchecks as specified below.
+  securityContext:
+    enabled: true # if enabled is set to false, securityContext settings will not be applied at all in checker pod custom resources
+    runAsNonRoot: true
+    runAsUser: 999
+    fsGroup: 999
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    #seccompProfile:
+    #  type: RuntimeDefault
+
+  # When enabled kuberhealthy will create a PodSecurityPolicy, Role and Binding to match the specified securityContext
+  # In case you use your own images for tests, you might need to add other PSPs as well on your own
+  podSecurityPolicy:
+    enabled: false
+
+  # Please remember that changing the service type to LoadBalancer
+  # will expose Kuberhealthy to the internet, which could cause
+  # error messages shown by Kuberhealthy to be exposed to the
+  # public internet.  It is recommended to create the service
+  # with ClusterIP, then to manually edit the service in order to
+  # securely expose the port in an appropriate way for your
+  # specific environment.
+  service:
+    externalPort: 80
+    type: ClusterIP
+    annotations: {}
+
+  check:
+    daemonset:
+      # leave blank for the default service account name
+      serviceAccountName:
+      enabled: true
+      runInterval: 15m
+      timeout: 12m
+      image:
+        registry: docker.io
+        repository: kuberhealthy/daemonset-check
+        tag: v3.3.0
+      extraEnvs: {}
+      nodeSelector: {}
+      tolerations:
+      #- key: "key"
+      #  operator: "Equal"
+      #  value: "value"
+      #  effect: "NoSchedule"
+      resources:
+        requests:
+          cpu: 10m
+          memory: 50Mi
+    deployment:
+      enabled: true
+      runInterval: 10m
+      timeout: 15m
+      image:
+        registry: docker.io
+        repository: kuberhealthy/deployment-check
+        tag: v1.9.0
+      extraEnvs:
+        CHECK_DEPLOYMENT_REPLICAS: "4"
+        CHECK_DEPLOYMENT_ROLLING_UPDATE: "true"
+        CHECK_SERVICE_ACCOUNT: "default"
+      nodeSelector: {}
+      tolerations:
+      #- key: "key"
+      #  operator: "Equal"
+      #  value: "value"
+      #  effect: "NoSchedule"
+      resources:
+        requests:
+          cpu: 25m
+          memory: 15Mi
+        limits:
+          cpu: 40m
+    dnsInternal:
+      enabled: true
+      runInterval: 2m
+      timeout: 15m
+      image:
+        registry: docker.io
+        repository: kuberhealthy/dns-resolution-check
+        tag: v1.5.0
+      extraEnvs:
+        HOSTNAME: "kubernetes.default"
+      nodeSelector: {}
+      tolerations:
+      #- key: "key"
+      #  operator: "Equal"
+      #  value: "value"
+      #  effect: "NoSchedule"
+      resources:
+        requests:
+          cpu: 10m
+          memory: 50Mi
+    dnsExternal:
+      enabled: false
+      runInterval: 2m
+      timeout: 15m
+      image:
+        registry: docker.io
+        repository: kuberhealthy/dns-resolution-check
+        tag: v1.5.0
+      extraEnvs:
+        HOSTNAME: "google.com"
+      nodeSelector: {}
+      tolerations:
+      #- key: "key"
+      #  operator: "Equal"
+      #  value: "value"
+      #  effect: "NoSchedule"
+      resources:
+        requests:
+          cpu: 10m
+          memory: 50Mi
+    podRestarts:
+      enabled: false
+      runInterval: 5m
+      timeout: 10m
+      image:
+        registry: docker.io
+        repository: kuberhealthy/pod-restarts-check
+        tag: v2.5.0
+      allNamespaces: false
+      extraEnvs:
+        MAX_FAILURES_ALLOWED: "10"
+      nodeSelector: {}
+      tolerations: []
+      #- key: "key"
+      #  operator: "Equal"
+      #  value: "value"
+      #  effect: "NoSchedule"
+      resources:
+        requests:
+          cpu: 10m
+          memory: 50Mi
+    podStatus:
+      enabled: false
+      runInterval: 5m
+      timeout: 15m
+      image:
+        registry: docker.io
+        repository: kuberhealthy/pod-status-check
+        tag: v1.3.0
+      allNamespaces: false
+      extraEnvs: {}
+      nodeSelector: {}
+      tolerations: []
+      #- key: "key"
+      #  operator: "Equal"
+      #  value: "value"
+      #  effect: "NoSchedule"
+      resources:
+        requests:
+          cpu: 10m
+          memory: 50Mi
+    storage:
+    # external check from registry
+    # https://github.com/ChrisHirsch/kuberhealthy-storage-check
+      enabled: false
+      # empty string indicate default storage class
+      # kubectl get storageclass
+      # or put storage class names into list
+      storageClass: [""]
+      runInterval: 5m
+      timeout: 10m
+      image:
+        registry: docker.io
+        repository: chrishirsch/kuberhealthy-storage-check
+        tag: v0.0.1
+      extraEnvs:
+        CHECK_STORAGE_IMAGE: bitnami/nginx:1.19
+        CHECK_STORAGE_INIT_IMAGE: bitnami/nginx:1.19
+      nodeSelector: {}
+      tolerations: []
+      #- key: "key"
+      #  operator: "Equal"
+      #  value: "value"
+      #  effect: "NoSchedule"
+      resources:
+        requests:
+          cpu: 10m
+          memory: 50Mi
+    networkConnection:
+      enabled: false
+      runInterval: 30m
+      timeout: 10m
+      image:
+        registry: docker.io
+        repository: kuberhealthy/network-connection-check
+        tag: v0.2.0
+      extraEnvs:
+        CONNECTION_TARGET: "tcp://github.com:443"
+      nodeSelector: {}
+      tolerations: []
+      #- key: "key"
+      #  operator: "Equal"
+      #  value: "value"
+      #  effect: "NoSchedule"
+      resources:
+        requests:
+          memory: 5Mi
+          cpu: 10m
+
+### Nopo11y-health-check
+nopo11y_health_check:
+  image: ghcr.io/znsio/nopo11y/system_health_check:1.0
+  imagePullPolicy: "IfNotPresent"
+  runInterval: 1m
+  timeout: 5m
+  resources:
+    requests:
+     cpu: 10m
+     memory: 50Mi
+    limits:
+     cpu: 20m
+     memory: 100Mi
+  ## You can provide the below environment variables to the health check
+  ## NAMESPACE - default is default namespace
+  ## HEALTHY_POD_CPU_UTILIZATION_THRESHOLD - default is 80%
+  ## HEALTHY_POD_MEMORY_UTILIZATION_THRESHOLD - default is 80%
+  ## HEALTHY_PVC_FREE_SPACE - default is 200mb
+  ## HEALTHY_NODE_CPU_UTILIZATION_THRESHOLD - default is 90%
+  ## HEALTHY_NODE_CPU_AVAILABLE - default is 400m
+  ## HEALTHY_NODE_MEMORY_UTILIZATION_THRESHLD - default is 90%
+  ## HEALTHY_NODE_MEMORY_AVAILABLE - default is 1000mb
+  ## HEALTHY_NODE_ROOT_AVAILABEL_SPACE - default is 200mb
+  ## SLOTH_SLO_CRITICAL_ALERT_CHECK - default is true
+  env: {}
