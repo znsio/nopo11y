@@ -8,12 +8,12 @@ spec:
   {{- if hasKey .Values.nopo11y_health_check "runInterval" }}
   runInterval: {{ .Values.nopo11y_health_check.runInterval }}
   {{- else }}
-  runInterval: 10s
+  runInterval: 1m
   {{- end }}
   {{- if hasKey .Values.nopo11y_health_check "timeout" }}
   timeout: {{ .Values.nopo11y_health_check.timeout }}
   {{- else }}
-  timeout: 2m
+  timeout: 5m
   {{- end }}
   podSpec:
     securityContext:
