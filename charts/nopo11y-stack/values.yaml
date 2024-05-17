@@ -15622,7 +15622,7 @@ jaeger:
 ### Prom2teams
 ### This Helm chart is taken from here https://github.com/idealista/prom2teams, please check how to configure and use prom2teams.
 prom2teams:
-  enabled: true
+  enabled: false
   # Default values for prom2teams.
   # This is a YAML-formatted file.
   # Declare variables to be passed into your templates.
@@ -15684,7 +15684,7 @@ prom2teams:
 
 ### Kuberhealthy
 kuberhealthy:
-  enabled: true
+  enabled: false
   # Default values for kuberhealthy.
   # This is a YAML-formatted file.
   # Declare variables to be passed into your templates.
