@@ -388,7 +388,7 @@
               "lastNotNull"
             ],
             "fields": "",
-            "values": false
+            "values": true
           },
           "text": {},
           "textMode": "name"
@@ -587,7 +587,7 @@
               "lastNotNull"
             ],
             "fields": "",
-            "values": false
+            "values": true
           },
           "text": {},
           "textMode": "name"
@@ -658,7 +658,7 @@
               "lastNotNull"
             ],
             "fields": "",
-            "values": false
+            "values": true
           },
           "text": {},
           "textMode": "value_and_name"
@@ -729,7 +729,7 @@
               "lastNotNull"
             ],
             "fields": "",
-            "values": false
+            "values": true
           },
           "text": {},
           "textMode": "value_and_name"
@@ -800,7 +800,7 @@
               "lastNotNull"
             ],
             "fields": "",
-            "values": false
+            "values": true
           },
           "text": {},
           "textMode": "value_and_name"
@@ -1096,7 +1096,7 @@
               "lastNotNull"
             ],
             "fields": "",
-            "values": false
+            "values": true
           },
           "text": {},
           "textMode": "value_and_name"
@@ -1181,7 +1181,7 @@
               "lastNotNull"
             ],
             "fields": "",
-            "values": false
+            "values": true
           },
           "text": {},
           "textMode": "value_and_name"
