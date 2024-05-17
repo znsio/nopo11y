@@ -16015,7 +16015,7 @@ kuberhealthy:
 
 ### Nopo11y-health-check
 nopo11y_health_check:
-  image: shehbazp/health_check_for_tests:4.0
+  image: ghcr.io/znsio/nopo11y/system_health_check:1.0
   imagePullPolicy: "IfNotPresent"
   runInterval: 1m
   timeout: 5m
