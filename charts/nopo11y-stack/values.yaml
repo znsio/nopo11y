@@ -16028,6 +16028,7 @@ nopo11y_health_check:
      memory: 100Mi
   ## You can provide the below environment variables to the health check
   ## NAMESPACE - default is default namespace
+  ## HEALTHY_PODS_PERCENTAGE - default is 30%
   ## HEALTHY_POD_CPU_UTILIZATION_THRESHOLD - default is 80%
   ## HEALTHY_POD_MEMORY_UTILIZATION_THRESHOLD - default is 80%
   ## HEALTHY_PVC_FREE_SPACE - default is 200mb
