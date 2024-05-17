@@ -15620,6 +15620,7 @@ jaeger:
     tracesTTL: "168h"
 
 ### Prom2teams
+### This Helm chart is taken from here https://github.com/idealista/prom2teams, please check how to configure and use prom2teams.
 prom2teams:
   enabled: true
   # Default values for prom2teams.
@@ -16016,8 +16017,8 @@ kuberhealthy:
 nopo11y_health_check:
   image: shehbazp/health_check_for_tests:4.0
   imagePullPolicy: "IfNotPresent"
-  runInterval: 10s
-  timeout: 2m
+  runInterval: 1m
+  timeout: 5m
   resources:
     requests:
      cpu: 10m
