@@ -16030,9 +16030,11 @@ nopo11y_health_check:
   ## NAMESPACE - default is default namespace
   ## HEALTHY_POD_CPU_UTILIZATION_THRESHOLD - default is 80%
   ## HEALTHY_POD_MEMORY_UTILIZATION_THRESHOLD - default is 80%
-  ## HEALTHY_PVC_FRESS_SPACE - default is 200mb
-  ## HEALTHY_NODE_CPU_UTILIZATION_THRESHOLD - default is 90% and 400m available
-  ## HEALTHY_NODE_MEMORY_UTILIZATION_THRESHLD - default is 90% and 1Gi free
-  ## HEALTHY_NODE_ROOT_DISK_UTILIZATION_THRESHOLD - default is 200mb
+  ## HEALTHY_PVC_FREE_SPACE - default is 200mb
+  ## HEALTHY_NODE_CPU_UTILIZATION_THRESHOLD - default is 90%
+  ## HEALTHY_NODE_CPU_AVAILABLE - default is 400m
+  ## HEALTHY_NODE_MEMORY_UTILIZATION_THRESHLD - default is 90%
+  ## HEALTHY_NODE_MEMORY_AVAILABLE - default is 1000mb
+  ## HEALTHY_NODE_ROOT_AVAILABEL_SPACE - default is 200mb
   ## SLOTH_SLO_CRITICAL_ALERT_CHECK - default is true
   env: {}
