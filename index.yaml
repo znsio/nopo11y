@@ -1,0 +1,62 @@
+apiVersion: v1
+entries:
+  nopo11y:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2024-05-17T10:19:15.747396051Z"
+    description: A Helm chart to setup a generic observability for any microservice
+    digest: 4f2932682e52a00c008b2008634ebd65b076b127dfccb4baeeb7b38afd23d237
+    name: nopo11y
+    type: application
+    urls:
+    - https://github.com/znsio/nopo11y/releases/download/nopo11y-1.0.0/nopo11y-1.0.0.tgz
+    version: 1.0.0
+  nopo11y-stack:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2024-05-17T10:19:16.043493163Z"
+    dependencies:
+    - condition: kube-prometheus-stack.enabled
+      name: kube-prometheus-stack
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 58.2.2
+    - condition: thanos.enabled
+      name: thanos
+      repository: https://charts.bitnami.com/bitnami
+      version: 15.4.1
+    - condition: grafana-loki.enabled
+      name: grafana-loki
+      repository: https://charts.bitnami.com/bitnami
+      version: 4.0.0
+    - condition: promtail.enabled
+      name: promtail
+      repository: https://grafana.github.io/helm-charts
+      version: 6.15.5
+    - condition: sloth.enabled
+      name: sloth
+      repository: ""
+      version: 0.7.0
+    - condition: kiali-server.enabled
+      name: kiali-server
+      repository: https://kiali.org/helm-charts
+      version: 1.83.0
+    - condition: jaeger.enabled
+      name: jaeger
+      repository: ""
+      version: 1.0.0
+    - condition: prom2teams.enabled
+      name: prom2teams
+      repository: ""
+      version: 1.0.0
+    - condition: kuberhealthy.enabled
+      name: kuberhealthy
+      repository: https://kuberhealthy.github.io/kuberhealthy/helm-repos
+      version: "104"
+    description: A Helm chart for observability stack
+    digest: f321db56cac450e5c09da5d723ee5a3a83873d2e80227cbf81778818415f8c7f
+    name: nopo11y-stack
+    type: application
+    urls:
+    - https://github.com/znsio/nopo11y/releases/download/nopo11y-stack-1.1.0/nopo11y-stack-1.1.0.tgz
+    version: 1.1.0
+generated: "2024-05-17T10:19:16.043502911Z"
