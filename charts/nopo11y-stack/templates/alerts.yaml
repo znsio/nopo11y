@@ -12,14 +12,10 @@ spec:
     - alert: HighCpuUtilization
       expr: |
         sum(
-                node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate
-              * on(pod)
-                group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel
+              rate(container_cpu_usage_seconds_total{container!=""}[5m])
             ) by (pod)
             /sum(
                 kube_pod_container_resource_limits{resource="cpu"}
-              * on(namespace,pod)
-                group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel
             ) by (pod) * 100 > 75
       for: 5m
       annotations:
@@ -30,14 +26,10 @@ spec:
     - alert: HighCpuUtilization
       expr: |
         sum(
-                node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate
-              * on(pod)
-                group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel
+                rate(container_cpu_usage_seconds_total{container!=""}[5m])
             ) by (pod)
             /sum(
                 kube_pod_container_resource_limits{resource="cpu"}
-              * on(namespace,pod)
-                group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel
             ) by (pod) * 100 > 90
       for: 5m
       annotations:
@@ -49,13 +41,9 @@ spec:
       expr: |
         sum(
                 container_memory_working_set_bytes{container!="", image!=""}
-              * on(pod)
-                group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel
             ) by (pod)
             /sum(
                 kube_pod_container_resource_limits{job="kube-state-metrics", resource="memory"}
-              * on(namespace,pod)
-                group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel
             ) by (pod) * 100 > 75
       for: 5m
       annotations:
@@ -66,13 +54,9 @@ spec:
     - alert: HighMemoryUtilization
       expr: sum(
                 container_memory_working_set_bytes{container!="", image!=""}
-              * on(pod)
-                group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel
             ) by (pod)
             /sum(
                 kube_pod_container_resource_limits{job="kube-state-metrics", resource="memory"}
-              * on(namespace,pod)
-                group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel
             ) by (pod) * 100 > 90
       annotations:
         description: Memory utilization of pod {{ "{{" }} $labels.pod {{ "}}" }} is went above 90%.
