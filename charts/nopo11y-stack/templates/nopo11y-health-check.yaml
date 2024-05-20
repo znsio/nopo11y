@@ -23,11 +23,11 @@ spec:
     containers:
       - env:
           - name: KH_REPORTING_URL
-            value: "{{ include "kuberhealthy-url" . }}"
+            value: "{{ include "kuberhealthy-url" $ }}"
           - name: "PROMETHEUS_ENDPOINT"
-            value: "{{ include "prometheus-url" . }}"
-          {{- if hasKey .Values.nopo11y_health_check "env" }}
-          {{- range $key, $value := .Values.nopo11y_health_check.env }}
+            value: "{{ include "prometheus-url" $ }}"
+          {{- if hasKey . "env" }}
+          {{- range $key, $value := .env }}
           - name: {{ $key }}
             value: "{{ $value }}"
           {{- end }}
@@ -48,6 +48,5 @@ spec:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
 ---
-{{- end }}
 {{- end }}
 {{- end }}
