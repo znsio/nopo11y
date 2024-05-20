@@ -14,6 +14,53 @@ entries:
   nopo11y-stack:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2024-05-20T10:31:03.106650442Z"
+    dependencies:
+    - condition: kube-prometheus-stack.enabled
+      name: kube-prometheus-stack
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 58.2.2
+    - condition: thanos.enabled
+      name: thanos
+      repository: https://charts.bitnami.com/bitnami
+      version: 15.4.1
+    - condition: grafana-loki.enabled
+      name: grafana-loki
+      repository: https://charts.bitnami.com/bitnami
+      version: 4.0.0
+    - condition: promtail.enabled
+      name: promtail
+      repository: https://grafana.github.io/helm-charts
+      version: 6.15.5
+    - condition: sloth.enabled
+      name: sloth
+      repository: ""
+      version: 0.7.0
+    - condition: kiali-server.enabled
+      name: kiali-server
+      repository: https://kiali.org/helm-charts
+      version: 1.83.0
+    - condition: jaeger.enabled
+      name: jaeger
+      repository: ""
+      version: 1.0.0
+    - condition: prom2teams.enabled
+      name: prom2teams
+      repository: ""
+      version: 1.0.0
+    - condition: kuberhealthy.enabled
+      name: kuberhealthy
+      repository: https://kuberhealthy.github.io/kuberhealthy/helm-repos
+      version: "104"
+    description: A Helm chart for observability stack
+    digest: 78e94a10d2a1a1819c417c29d2d85d27894b3a9b175c1648730d93ca273c1271
+    name: nopo11y-stack
+    type: application
+    urls:
+    - https://github.com/znsio/nopo11y/releases/download/nopo11y-stack-1.2.1/nopo11y-stack-1.2.1.tgz
+    version: 1.2.1
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2024-05-17T14:45:36.635547626Z"
     dependencies:
     - condition: kube-prometheus-stack.enabled
@@ -106,4 +153,4 @@ entries:
     urls:
     - https://github.com/znsio/nopo11y/releases/download/nopo11y-stack-1.1.0/nopo11y-stack-1.1.0.tgz
     version: 1.1.0
-generated: "2024-05-17T14:45:36.635559378Z"
+generated: "2024-05-20T10:31:03.106667224Z"
