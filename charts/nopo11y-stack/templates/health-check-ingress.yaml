@@ -1,4 +1,4 @@
-{{- if (lookup "networking.k8s.io/v1" "IngressClass" "nginx")  }}
+{{- if (lookup "networking.k8s.io/v1" "IngressClass" "" "nginx")  }}
 {{- if .Values.nopo11y_health_check.ingress }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
