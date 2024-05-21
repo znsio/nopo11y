@@ -1,17 +1,18 @@
-{{- if and .Values.kuberhealthy.enabled }}
+{{- if and .Values.kuberhealthy.enabled .Values.nopo11y_health_check.checks }}
+{{- range .Values.nopo11y_health_check.checks }}
 apiVersion: comcast.github.io/v1
 kind: KuberhealthyCheck
 metadata:
-  name: nopo11y-health-check
-  namespace: {{ .Release.Namespace }}
+  name: {{ .name }}-nopo11y-health-check
+  namespace: {{ $.Release.Namespace }}
 spec:
-  {{- if hasKey .Values.nopo11y_health_check "runInterval" }}
-  runInterval: {{ .Values.nopo11y_health_check.runInterval }}
+  {{- if hasKey . "runInterval" }}
+  runInterval: {{ .runInterval }}
   {{- else }}
   runInterval: 1m
   {{- end }}
-  {{- if hasKey .Values.nopo11y_health_check "timeout" }}
-  timeout: {{ .Values.nopo11y_health_check.timeout }}
+  {{- if hasKey . "timeout" }}
+  timeout: {{ .timeout }}
   {{- else }}
   timeout: 5m
   {{- end }}
@@ -22,21 +23,21 @@ spec:
     containers:
       - env:
           - name: KH_REPORTING_URL
-            value: "{{ include "kuberhealthy-url" . }}"
+            value: "{{ include "kuberhealthy-url" $ }}"
           - name: "PROMETHEUS_ENDPOINT"
-            value: "{{ include "prometheus-url" . }}"
-          {{- if hasKey .Values.nopo11y_health_check "env" }}
-          {{- range $key, $value := .Values.nopo11y_health_check.env }}
+            value: "{{ include "prometheus-url" $ }}"
+          {{- if hasKey . "env" }}
+          {{- range $key, $value := .env }}
           - name: {{ $key }}
             value: "{{ $value }}"
           {{- end }}
           {{- end }}
-        image: {{ .Values.nopo11y_health_check.image }}
-        imagePullPolicy: {{ .Values.nopo11y_health_check.imagePullPolicy }}
+        image: {{ .image }}
+        imagePullPolicy: {{ .imagePullPolicy }}
         name: main
-        {{- if hasKey .Values.nopo11y_health_check "resources" }}
+        {{- if hasKey . "resources" }}
         resources:
-        {{- toYaml .Values.nopo11y_health_check.resources | nindent 10}}
+        {{- toYaml .resources | nindent 10}}
         {{- else }}
         resources:
           requests:
@@ -46,4 +47,6 @@ spec:
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
+---
+{{- end }}
 {{- end }}

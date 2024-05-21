@@ -1,0 +1,65 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  namespace : {{ .Values.namespace }}
+  name: defaul-resource-utilization-alert-rules
+  labels:
+    release: nopo11y-stack
+spec:
+  groups:
+  - name: default-resource-utilization-alert-rules
+    rules:
+    - alert: HighCpuUtilization
+      expr: |
+        sum(
+              rate(container_cpu_usage_seconds_total{container!=""}[5m])
+            ) by (pod)
+            /sum(
+                kube_pod_container_resource_limits{resource="cpu"}
+            ) by (pod) * 100 > 75
+      for: 5m
+      annotations:
+        description: CPU utilization of pod {{ "{{" }} $labels.pod {{ "}}" }} is went above 75%.
+        summary: CPU Utilization went over 75% for pod {{ "{{" }} $labels.pod {{ "}}" }}.
+      labels:
+            severity: warning
+    - alert: HighCpuUtilization
+      expr: |
+        sum(
+                rate(container_cpu_usage_seconds_total{container!=""}[5m])
+            ) by (pod)
+            /sum(
+                kube_pod_container_resource_limits{resource="cpu"}
+            ) by (pod) * 100 > 90
+      for: 5m
+      annotations:
+        description: CPU utilization of pod {{ "{{" }} $labels.pod {{ "}}" }} is went above 90%.
+        summary: CPU Utilization went over 90% for pod {{ "{{" }} $labels.pod {{ "}}" }}.
+      labels:
+            severity: critical
+    - alert: HighMemoryUtilization
+      expr: |
+        sum(
+                container_memory_working_set_bytes{container!="", image!=""}
+            ) by (pod)
+            /sum(
+                kube_pod_container_resource_limits{job="kube-state-metrics", resource="memory"}
+            ) by (pod) * 100 > 75
+      for: 5m
+      annotations:
+        description: Memory utilization of pod {{ "{{" }} $labels.pod {{ "}}" }} is went above 75%.
+        summary: Memory Utilization went over 75% for pod {{ "{{" }} $labels.pod {{ "}}" }}.
+      labels:
+            severity: warning
+    - alert: HighMemoryUtilization
+      expr: sum(
+                container_memory_working_set_bytes{container!="", image!=""}
+            ) by (pod)
+            /sum(
+                kube_pod_container_resource_limits{job="kube-state-metrics", resource="memory"}
+            ) by (pod) * 100 > 90
+      annotations:
+        description: Memory utilization of pod {{ "{{" }} $labels.pod {{ "}}" }} is went above 90%.
+        summary: Memory Utilization went over 90% for pod {{ "{{" }} $labels.pod {{ "}}" }}.
+      labels:
+            severity: critical
