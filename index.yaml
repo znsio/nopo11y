@@ -2,6 +2,16 @@ apiVersion: v1
 entries:
   nopo11y:
   - apiVersion: v2
+    appVersion: 1.0.1
+    created: "2024-05-22T12:34:17.667498397Z"
+    description: A Helm chart to setup a generic observability for any microservice
+    digest: 96757fc9e24a7714379a139945e3a769cc7888758760f0572e960c1464542dc1
+    name: nopo11y
+    type: application
+    urls:
+    - https://github.com/znsio/nopo11y/releases/download/nopo11y-1.0.1/nopo11y-1.0.1.tgz
+    version: 1.0.1
+  - apiVersion: v2
     appVersion: 1.0.0
     created: "2024-05-17T10:19:15.747396051Z"
     description: A Helm chart to setup a generic observability for any microservice
@@ -153,4 +163,4 @@ entries:
     urls:
     - https://github.com/znsio/nopo11y/releases/download/nopo11y-stack-1.1.0/nopo11y-stack-1.1.0.tgz
     version: 1.1.0
-generated: "2024-05-20T10:31:03.106667224Z"
+generated: "2024-05-22T12:34:17.667517863Z"
