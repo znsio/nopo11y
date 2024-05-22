@@ -1540,7 +1540,7 @@ data:
       "timepicker": {},
       "timezone": "",
       "title": "{{- if .Values.includeReleaseNameInMetricsLabels }}{{ title .Release.Name }}-{{ title .Values.appLabel }}{{- else }}{{ title .Values.appLabel }}{{- end }} Overview - Dashboard",
-      "uid": "{{- if .Values.includeReleaseNameInMetricsLabels }}{{ .Release.Name }}-{{ .Values.appLabel }}{{- else }}{{ .Values.appLabel }}{{- end }}-overview",
+      "uid": "{{ include "dashboard-uid" .}},
       "version": 10,
       "weekStart": ""
     }
