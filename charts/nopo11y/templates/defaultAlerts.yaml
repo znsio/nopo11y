@@ -21,7 +21,7 @@ spec:
         description: {{- if .Values.includeReleaseNameInMetricsLabels }} {{ .Release.Name }}-{{ .Values.appLabel }}{{- else }} {{ .Values.appLabel }}{{- end }} service is experiencing high 5xx errors rate from last 5 minutes.
         summary: {{- if .Values.includeReleaseNameInMetricsLabels }} {{ .Release.Name }}-{{ .Values.appLabel }}{{- else }} {{ .Values.appLabel }}{{- end }} service is experiencing high 5xx error rate.
         {{- if .Values.grafanaURL }}
-        dashboard: {{ .Values.grafanaURL }}/d/{{ include "dashboard-uid" .}}
+        dashboard: {{ .Values.grafanaURL }}/d/{{ include "dashboard-uid" . }}
         {{- end }}
       labels:
             severity: critical
@@ -34,7 +34,7 @@ spec:
       for: 5m
       annotations:
         {{- if .Values.grafanaURL }}
-        dashboard: {{ .Values.grafanaURL }}/d/{{ include "dashboard-uid" .}}
+        dashboard: {{ .Values.grafanaURL }}/d/{{ include "dashboard-uid" . }}
         {{- end }}
         description: {{- if .Values.includeReleaseNameInMetricsLabels }} {{ .Release.Name }}-{{ .Values.appLabel }}{{- else }} {{ .Values.appLabel }}{{- end }} service is experiencing high 4xx errors rate from last 5 minutes.
         summary: {{- if .Values.includeReleaseNameInMetricsLabels }} {{ .Release.Name }}-{{ .Values.appLabel }}{{- else }} {{ .Values.appLabel }}{{- end }} service is experiencing high 4xx error rate.
@@ -48,7 +48,7 @@ spec:
         description: {{ .Values.appLabel }} service is experiencing high 5xx errors rate from last 5 minutes.
         summary: {{ .Values.appLabel }} is experiencing high 5xx error rate.
         {{- if .Values.grafanaURL }}
-        dashboard: {{ .Values.grafanaURL }}/d/{{ include "dashboard-uid" .}}
+        dashboard: {{ .Values.grafanaURL }}/d/{{ include "dashboard-uid" . }}
         {{- end }}
       labels:
             severity: critical
@@ -59,7 +59,7 @@ spec:
         description: {{ .Values.appLabel }} service is experiencing high 4xx errors rate from last 5 minutes.
         summary: {{ .Values.appLabel }} service is experiencing high 4xx error rate.
         {{- if .Values.grafanaURL }}
-        dashboard: {{ .Values.grafanaURL }}/d/{{ include "dashboard-uid" .}}
+        dashboard: {{ .Values.grafanaURL }}/d/{{ include "dashboard-uid" . }}
         {{- end }}
       labels:
             severity: warning
