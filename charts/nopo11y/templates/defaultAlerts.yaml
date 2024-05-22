@@ -10,66 +10,6 @@ spec:
   groups:
   - name: {{ .Values.appLabel }}-default-alert-rules
     rules:
-    - alert: {{ .Values.appLabel }}HighCpuUtilization
-      {{- if .Values.includeReleaseNameInMetricsLabels }}
-      expr: 100 * max(rate(container_cpu_usage_seconds_total{pod=~"{{ .Release.Name }}-{{ .Values.deploymentName }}.*"}[5m])/ on (container, pod) kube_pod_container_resource_requests{resource="cpu"}) by (pod) > 80
-      {{- else }}
-      expr: 100 * max(rate(container_cpu_usage_seconds_total{pod=~"{{ .Values.deploymentName }}.*"}[5m])/ on (container, pod) kube_pod_container_resource_requests{resource="cpu"}) by (pod) > 80
-      {{- end }}
-      for: 10m
-      annotations:
-        description: CPU utilization of pod {{ "{{" }} $labels.pod {{ "}}" }} is above 80% from last 5 minutes .
-        summary: CPU Utilization went over 80% for pod {{ "{{" }} $labels.pod {{ "}}" }}.
-        {{- if .Values.grafanaURL }}
-        dashboard: {{ .Values.grafanaURL }}/d/{{- if .Values.includeReleaseNameInMetricsLabels }}{{ .Release.Name }}-{{ .Values.appLabel }}{{- else }}{{ .Values.appLabel }}{{- end }}-overview
-        {{- end }}
-      labels:
-            severity: warning
-    - alert: {{ .Values.appLabel }}HighCpuUtilization
-      {{- if .Values.includeReleaseNameInMetricsLabels }}
-      expr: 100 * max(rate(container_cpu_usage_seconds_total{pod=~"{{ .Release.Name }}-{{ .Values.deploymentName }}.*"}[5m])/ on (container, pod) kube_pod_container_resource_requests{resource="cpu"}) by (pod) > 90
-      {{- else }}
-      expr: 100 * max(rate(container_cpu_usage_seconds_total{pod=~"{{ .Values.deploymentName }}.*"}[5m])/ on (container, pod) kube_pod_container_resource_requests{resource="cpu"}) by (pod) > 90
-      {{- end }}
-      for: 10m
-      annotations:
-        description: CPU utilization of pod {{ "{{" }} $labels.pod {{ "}}" }} is above 90% from last 5 minutes.
-        summary: CPU Utilization went over 90% for pod {{ "{{" }} $labels.pod {{ "}}" }}.
-        {{- if .Values.grafanaURL }}
-        dashboard: {{ .Values.grafanaURL }}/d/{{- if .Values.includeReleaseNameInMetricsLabels }}{{ .Release.Name }}-{{ .Values.appLabel }}{{- else }}{{ .Values.appLabel }}{{- end }}-overview
-        {{- end }}
-      labels:
-            severity: critical
-    - alert: {{ .Values.appLabel }}HighMemoryUtilization
-      {{- if .Values.includeReleaseNameInMetricsLabels }}
-      expr: 100 * max( container_memory_working_set_bytes{pod=~"{{ .Release.Name }}-{{ .Values.deploymentName }}.*"} / on (container, pod) kube_pod_container_resource_limits{resource="memory"}) by (pod) > 80
-      {{- else }}
-      expr: 100 * max( container_memory_working_set_bytes{pod=~"{{ .Values.deploymentName }}.*"} / on (container, pod) kube_pod_container_resource_limits{resource="memory"}) by (pod) > 80
-      {{- end }}
-      for: 10m
-      annotations:
-        description: Memory utilization of pod {{ "{{" }} $labels.pod {{ "}}" }} is above 80% from last 5 minutes.
-        summary: Memory Utilization went over 80% for pod {{ "{{" }} $labels.pod {{ "}}" }}.
-        {{- if .Values.grafanaURL }}
-        dashboard: {{ .Values.grafanaURL }}/d/{{- if .Values.includeReleaseNameInMetricsLabels }}{{ .Release.Name }}-{{ .Values.appLabel }}{{- else }}{{ .Values.appLabel }}{{- end }}-overview
-        {{- end }}
-      labels:
-            severity: warning
-    - alert: {{ .Values.appLabel }}HighMemoryUtilization
-      {{- if .Values.includeReleaseNameInMetricsLabels }}
-      expr: 100 * max( container_memory_working_set_bytes{pod=~"{{ .Release.Name }}-{{ .Values.deploymentName }}.*"} / on (container, pod) kube_pod_container_resource_limits{resource="memory"}) by (pod) > 90
-      {{- else }}
-      expr: 100 * max( container_memory_working_set_bytes{pod=~"{{ .Values.deploymentName }}.*"} / on (container, pod) kube_pod_container_resource_limits{resource="memory"}) by (pod) > 90
-      {{- end }}
-      for: 10m
-      annotations:
-        description: Memory utilization of pod {{ "{{" }} $labels.pod {{ "}}" }} is above 90% from last 5 minutes.
-        summary: Memory Utilization went over 90% for pod {{ "{{" }} $labels.pod {{ "}}" }}.
-        {{- if .Values.grafanaURL }}
-        dashboard: {{ .Values.grafanaURL }}/d/{{- if .Values.includeReleaseNameInMetricsLabels }}{{ .Release.Name }}-{{ .Values.appLabel }}{{- else }}{{ .Values.appLabel }}{{- end }}-overview
-        {{- end }}
-      labels:
-            severity: critical
     {{- if .Values.istioMetrics.enabled }}
     - alert: {{ .Values.appLabel }}High5xxErrorRate
       {{- if .Values.includeReleaseNameInMetricsLabels }}
@@ -81,7 +21,7 @@ spec:
         description: {{- if .Values.includeReleaseNameInMetricsLabels }} {{ .Release.Name }}-{{ .Values.appLabel }}{{- else }} {{ .Values.appLabel }}{{- end }} service is experiencing high 5xx errors rate from last 5 minutes.
         summary: {{- if .Values.includeReleaseNameInMetricsLabels }} {{ .Release.Name }}-{{ .Values.appLabel }}{{- else }} {{ .Values.appLabel }}{{- end }} service is experiencing high 5xx error rate.
         {{- if .Values.grafanaURL }}
-        dashboard: {{ .Values.grafanaURL }}/d/{{- if .Values.includeReleaseNameInMetricsLabels }}{{ .Release.Name }}-{{ .Values.appLabel }}{{- else }}{{ .Values.appLabel }}{{- end }}-overview
+        dashboard: {{ .Values.grafanaURL }}/d/{{ include "dashboard-uid" .}}
         {{- end }}
       labels:
             severity: critical
@@ -94,7 +34,7 @@ spec:
       for: 5m
       annotations:
         {{- if .Values.grafanaURL }}
-        dashboard: {{ .Values.grafanaURL }}/d/{{- if .Values.includeReleaseNameInMetricsLabels }}{{ .Release.Name }}-{{ .Values.appLabel }}{{- else }}{{ .Values.appLabel }}{{- end }}-overview
+        dashboard: {{ .Values.grafanaURL }}/d/{{ include "dashboard-uid" .}}
         {{- end }}
         description: {{- if .Values.includeReleaseNameInMetricsLabels }} {{ .Release.Name }}-{{ .Values.appLabel }}{{- else }} {{ .Values.appLabel }}{{- end }} service is experiencing high 4xx errors rate from last 5 minutes.
         summary: {{- if .Values.includeReleaseNameInMetricsLabels }} {{ .Release.Name }}-{{ .Values.appLabel }}{{- else }} {{ .Values.appLabel }}{{- end }} service is experiencing high 4xx error rate.
@@ -108,7 +48,7 @@ spec:
         description: {{ .Values.appLabel }} service is experiencing high 5xx errors rate from last 5 minutes.
         summary: {{ .Values.appLabel }} is experiencing high 5xx error rate.
         {{- if .Values.grafanaURL }}
-        dashboard: {{ .Values.grafanaURL }}/d/{{ .Values.appLabel }}-overview
+        dashboard: {{ .Values.grafanaURL }}/d/{{ include "dashboard-uid" .}}
         {{- end }}
       labels:
             severity: critical
@@ -119,7 +59,7 @@ spec:
         description: {{ .Values.appLabel }} service is experiencing high 4xx errors rate from last 5 minutes.
         summary: {{ .Values.appLabel }} service is experiencing high 4xx error rate.
         {{- if .Values.grafanaURL }}
-        dashboard: {{ .Values.grafanaURL }}/d/{{ .Values.appLabel }}-overview
+        dashboard: {{ .Values.grafanaURL }}/d/{{ include "dashboard-uid" .}}
         {{- end }}
       labels:
             severity: warning
