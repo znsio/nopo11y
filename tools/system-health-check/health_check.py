@@ -3,10 +3,17 @@ import json
 import kh_client
 import os
 import logging
+import sys
 
+logger = logging.getLogger()
 
-logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+handler = logging.StreamHandler(stream=sys.stdout)
+formatter = logging.Formatter('%(asctime)s.%(msecs)03d - %(levelname)s - %(message)s', datefmt='%d-%m-%y %I:%M:%S')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.setLevel(logging.INFO)
 
+logger.info("Starting health check")
 
 prometheus = os.getenv("PROMETHEUS_ENDPOINT", "http://nopo11y-stack-kube-prometh-prometheus:9090")
 namespace = os.getenv("NAMESPACE","default")
@@ -140,7 +147,7 @@ def pod_check():
               failed.append(str(result['metric']['deployment']))
           return failed
     except Exception as e:
-        logging.error("%s Exception occured while checking pods health", str(e))
+        logger.error("%s Exception occured while checking pods health", str(e))
 
 def pvc_check():
     failed = []
@@ -154,7 +161,7 @@ def pvc_check():
               failed.append("PVC - "+str(result['metric']['persistentvolumeclaim'])+" has less than 200MB available space")
           return failed
     except Exception as e:
-        logging.error("%s Exception occured while checking pvc health", str(e))
+        logger.error("%s Exception occured while checking pvc health", str(e))
 
 def node_check():
     failed = []
@@ -168,7 +175,7 @@ def node_check():
               failed.append("Node - "+ result['metric']['instance'] + " is not healthy")
           return failed
     except Exception as e:
-        logging.error("%s Exception occured while checking nodes health", str(e))
+        logger.error("%s Exception occured while checking nodes health", str(e))
         
 
 def slo_check():
@@ -183,7 +190,7 @@ def slo_check():
               failed.append("SLO - "+ result['metric']['sloth_slo'] + " is having active critical alert")
           return failed
     except Exception as e:
-        logging.error("%s Exception occured while checking SLO alerts", str(e))
+        logger.error("%s Exception occured while checking SLO alerts", str(e))
 
 def pods_details():
     failed = []
@@ -205,7 +212,7 @@ def pods_details():
       else:
           return failed
     except Exception as e:
-        logging.error("%s Exception occured while SLO alerts", str(e))
+        logger.error("%s Exception occured while SLO alerts", str(e))
   
 
 
@@ -214,17 +221,17 @@ def main():
     for failures in [pods_details(), pvc_check(), node_check(), slo_check()]:
         for error in failures:
             errors.append(error)
-    logging.info("health check errors %s",  str(errors))
+    logger.info("health check errors %s",  str(errors))
 
     if len(errors) > 0:
-        logging.info("reporting failure")
+        logger.info("reporting failure")
         try:
             kh_client.report_failure(errors)
         except Exception as e:
             print(f"Error when reporting failure: {e}")
             exit(1)
     else:
-        logging.info("reporting success")
+        logger.info("reporting success")
         try:
             kh_client.report_success()
         except Exception as e:
