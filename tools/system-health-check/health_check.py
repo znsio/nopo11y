@@ -2,6 +2,11 @@ import requests
 import json
 import kh_client
 import os
+import logging
+
+
+logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+
 
 prometheus = os.getenv("PROMETHEUS_ENDPOINT", "http://nopo11y-stack-kube-prometh-prometheus:9090")
 namespace = os.getenv("NAMESPACE","default")
@@ -14,6 +19,9 @@ node_cpu_available = os.getenv("HEALTHY_NODE_CPU_AVAILABLE","400")
 node_memory_threshold = os.getenv("HEALTHY_NODE_MEMORY_UTILIZATION_THRESHOLD","90")
 node_memory_available = os.getenv("HEALTHY_NODE_MEMORY_AVAILABLE", "1000")
 node_disk_available = os.getenv("HEALTHY_NODE_ROOT_DISK_AVAILABLR_SPACE", "200")
+
+prometheus_url = prometheus + '/api/v1/query?'
+
 pods_health_query = '''
 ( 
   (
@@ -122,66 +130,83 @@ pods_details_query = '''
 
 def pod_check():
     failed = []
-    response = requests.get(prometheus + '/api/v1/query?', params={'query': pods_health_query})
-    response_json = json.loads(response.text)
-    if len(response_json['data']['result']) < 1:
-        return failed
-    else:
-        for result in response_json['data']['result']:
-            failed.append(str(result['metric']['deployment']))
-        return failed
+    try:
+      response = requests.get(prometheus_url, params={'query': pods_health_query})
+      response_json = json.loads(response.text)
+      if not response_json['data']['result']:
+          return failed
+      else:
+          for result in response_json['data']['result']:
+              failed.append(str(result['metric']['deployment']))
+          return failed
+    except Exception as e:
+        logging.error("%s Exception occured while checking pods health", str(e))
 
 def pvc_check():
     failed = []
-    response = requests.get(prometheus + '/api/v1/query?', params={'query': pvc_health_query})
-    response_json = json.loads(response.text)
-    if len(response_json['data']['result']) < 1:
-        return failed
-    else:
-        for result in response_json['data']['result']:
-            failed.append("PVC - "+str(result['metric']['persistentvolumeclaim'])+" has less than 200MB available space")
-        return failed
+    try:
+      response = requests.get(prometheus_url, params={'query': pvc_health_query})
+      response_json = json.loads(response.text)
+      if not response_json['data']['result']:
+          return failed
+      else:
+          for result in response_json['data']['result']:
+              failed.append("PVC - "+str(result['metric']['persistentvolumeclaim'])+" has less than 200MB available space")
+          return failed
+    except Exception as e:
+        logging.error("%s Exception occured while checking pvc health", str(e))
 
 def node_check():
     failed = []
-    response = requests.get(prometheus + '/api/v1/query?', params={'query': node_health_query})
-    response_json = json.loads(response.text)
-    if len(response_json['data']['result']) < 1:
-        return failed
-    else:
-        for result in response_json['data']['result']:
-            failed.append("Node - "+ result['metric']['instance'] + " is not healthy")
-        return failed
+    try:
+      response = requests.get(prometheus_url, params={'query': node_health_query})
+      response_json = json.loads(response.text)
+      if not response_json['data']['result']:
+          return failed
+      else:
+          for result in response_json['data']['result']:
+              failed.append("Node - "+ result['metric']['instance'] + " is not healthy")
+          return failed
+    except Exception as e:
+        logging.error("%s Exception occured while checking nodes health", str(e))
+        
 
 def slo_check():
     failed = []
-    response = requests.get(prometheus + '/api/v1/query?', params={'query': 'ALERTS{alertname=~".*availability.*|.*requests.*|.*latency.*|.*response time.*", severity="critical"}'})
-    response_json = json.loads(response.text)
-    if len(response_json['data']['result']) < 1:
-        return failed
-    else:
-        for result in response_json['data']['result']:
-            failed.append("SLO - "+ result['metric']['sloth_slo'] + " is having active critical alert")
-        return failed
+    try:
+      response = requests.get(prometheus_url, params={'query': 'ALERTS{alertname=~".*availability.*|.*requests.*|.*latency.*|.*response time.*", severity="critical"}'})
+      response_json = json.loads(response.text)
+      if not response_json['data']['result']:
+          return failed
+      else:
+          for result in response_json['data']['result']:
+              failed.append("SLO - "+ result['metric']['sloth_slo'] + " is having active critical alert")
+          return failed
+    except Exception as e:
+        logging.error("%s Exception occured while checking SLO alerts", str(e))
 
 def pods_details():
     failed = []
     failed_deploys = pod_check()
-    if len(failed_deploys) > 0:
-        response = requests.get(prometheus + '/api/v1/query?', params={'query': pods_details_query})
-        response_json = json.loads(response.text)
-        if len(response_json['data']['result']) < 1:
-            return failed
-        else:
-            for deploy in failed_deploys:
-                pods = []
-                for result in response_json['data']['result']:
-                    if str(result['metric']['pod']).startswith(str(deploy)):
-                        pods.append(str(result['metric']['pod']))
-                failed.append("Deployment - "+ str(deploy) +" does not have "+ healthy_pods +"% pods ready, failing pods are "+str(pods))
-            return failed
-    else:
-        return failed
+    try:
+      if failed_deploys:
+          response = requests.get(prometheus_url, params={'query': pods_details_query})
+          response_json = json.loads(response.text)
+          if not response_json['data']['result']:
+              return failed
+          else:
+              for deploy in failed_deploys:
+                  pods = []
+                  for result in response_json['data']['result']:
+                      if str(result['metric']['pod']).startswith(str(deploy)):
+                          pods.append(str(result['metric']['pod']))
+                  failed.append("Deployment - "+ str(deploy) +" does not have "+ healthy_pods +"% pods ready, failing pods are "+str(pods))
+              return failed
+      else:
+          return failed
+    except Exception as e:
+        logging.error("%s Exception occured while SLO alerts", str(e))
+  
 
 
 def main():
@@ -189,17 +214,17 @@ def main():
     for failures in [pods_details(), pvc_check(), node_check(), slo_check()]:
         for error in failures:
             errors.append(error)
-    print(errors)
+    logging.info("health check errors %s",  str(errors))
 
     if len(errors) > 0:
-        print("Reporting failure.")
+        logging.info("reporting failure")
         try:
             kh_client.report_failure(errors)
         except Exception as e:
             print(f"Error when reporting failure: {e}")
             exit(1)
     else:
-        print("Reporting success.")
+        logging.info("reporting success")
         try:
             kh_client.report_success()
         except Exception as e:
