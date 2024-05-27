@@ -138,81 +138,74 @@ pods_details_query = '''
 def pod_check():
     failed = []
     try:
-      response = requests.get(prometheus_url, params={'query': pods_health_query})
-      response_json = json.loads(response.text)
-      if not response_json['data']['result']:
-          return failed
-      else:
-          for result in response_json['data']['result']:
-              failed.append(str(result['metric']['deployment']))
-          return failed
+        response = requests.get(prometheus_url, params={'query': pods_health_query})
+        response_json = json.loads(response.text)
+        if response_json['data']['result']:
+            for result in response_json['data']['result']:
+                failed.append(str(result['metric']['deployment']))
+            return failed
     except Exception as e:
         logger.error("%s Exception occured while checking pods health", str(e))
+    return failed
 
 def pvc_check():
     failed = []
     try:
-      response = requests.get(prometheus_url, params={'query': pvc_health_query})
-      response_json = json.loads(response.text)
-      if not response_json['data']['result']:
-          return failed
-      else:
-          for result in response_json['data']['result']:
-              failed.append("PVC - "+str(result['metric']['persistentvolumeclaim'])+" has less than 200MB available space")
-          return failed
+        response = requests.get(prometheus_url, params={'query': pvc_health_query})
+        response_json = json.loads(response.text)
+        if response_json['data']['result']:
+            for result in response_json['data']['result']:
+                failed.append("PVC - "+str(result['metric']['persistentvolumeclaim'])+" has less than 200MB available space")
+            return failed
     except Exception as e:
         logger.error("%s Exception occured while checking pvc health", str(e))
+    return failed
 
 def node_check():
     failed = []
     try:
-      response = requests.get(prometheus_url, params={'query': node_health_query})
-      response_json = json.loads(response.text)
-      if not response_json['data']['result']:
-          return failed
-      else:
-          for result in response_json['data']['result']:
-              failed.append("Node - "+ result['metric']['instance'] + " is not healthy")
-          return failed
+        response = requests.get(prometheus_url, params={'query': node_health_query})
+        response_json = json.loads(response.text)
+        if response_json['data']['result']:
+            for result in response_json['data']['result']:
+                failed.append("Node - "+ result['metric']['instance'] + " is not healthy")
+            return failed
     except Exception as e:
         logger.error("%s Exception occured while checking nodes health", str(e))
+    return failed
         
 
 def slo_check():
     failed = []
     try:
-      response = requests.get(prometheus_url, params={'query': 'ALERTS{alertname=~".*availability.*|.*requests.*|.*latency.*|.*response time.*", severity="critical"}'})
-      response_json = json.loads(response.text)
-      if not response_json['data']['result']:
-          return failed
-      else:
-          for result in response_json['data']['result']:
-              failed.append("SLO - "+ result['metric']['sloth_slo'] + " is having active critical alert")
-          return failed
+        response = requests.get(prometheus_url, params={'query': 'ALERTS{alertname=~".*availability.*|.*requests.*|.*latency.*|.*response time.*", severity="critical"}'})
+        response_json = json.loads(response.text)
+        if response_json['data']['result']:
+            for result in response_json['data']['result']:
+                failed.append("SLO - "+ result['metric']['sloth_slo'] + " is having active critical alert")
+            return failed
     except Exception as e:
         logger.error("%s Exception occured while checking SLO alerts", str(e))
+    return failed
 
 def pods_details():
     failed = []
     failed_deploys = pod_check()
     try:
-      if failed_deploys:
-          response = requests.get(prometheus_url, params={'query': pods_details_query})
-          response_json = json.loads(response.text)
-          if not response_json['data']['result']:
-              return failed
-          else:
-              for deploy in failed_deploys:
-                  pods = []
-                  for result in response_json['data']['result']:
-                      if str(result['metric']['pod']).startswith(str(deploy)):
-                          pods.append(str(result['metric']['pod']))
-                  failed.append("Deployment - "+ str(deploy) +" does not have "+ healthy_pods +"% pods ready, failing pods are "+str(pods))
-              return failed
-      else:
-          return failed
+        if failed_deploys:
+            response = requests.get(prometheus_url, params={'query': pods_details_query})
+            response_json = json.loads(response.text)
+            if response_json['data']['result']:
+                for deploy in failed_deploys:
+                    pods = []
+                    for result in response_json['data']['result']:
+                        if str(result['metric']['pod']).startswith(str(deploy)):
+                            pods.append(str(result['metric']['pod']))
+                    failed.append("Deployment - "+ str(deploy) +" does not have "+ healthy_pods +"% pods ready, failing pods are "+str(pods))
+                return failed
     except Exception as e:
         logger.error("%s Exception occured while SLO alerts", str(e))
+    return failed
   
 
 
