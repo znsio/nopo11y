@@ -30,7 +30,7 @@ node_disk_available = os.getenv("HEALTHY_NODE_ROOT_DISK_AVAILABLR_SPACE", "200")
 prometheus_url = prometheus + '/api/v1/query?'
 
 pods_with_resources = ""
-pods_with_resources_query = 'sum(kube_pod_container_resource_limits{namespace="'+ namespace +'",container!~"istio-proxy|"}) by (pod)'
+pods_with_resources_query = 'sum(kube_pod_container_resource_limits{namespace="'+ namespace +'",container!~"istio-proxy|", resource="cpu"}) by (pod) AND sum(kube_pod_container_resource_limits{namespace="'+ namespace +'",container!~"istio-proxy|", resource=memory}) by (pod)'
 
 def check_pods_with_resources():
     failed = ""
