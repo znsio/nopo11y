@@ -5,19 +5,19 @@ kind: PrometheusServiceLevel
 metadata:
   labels:
     release: {{ .Values.prometheusReleaseLabel }}
-  name: {{- if .Values.includeReleaseNameInMetricsLabels }} {{ .Release.Name }}-{{ .Values.appLabel }}{{- else }} {{ .Values.appLabel }}{{- end }}-availability-slo
+  name: {{ include "app.label" . }}-availability-slo
   namespace: {{ .Values.namespace }}
 spec:
   labels:
     app: sloth
     role: alert-rules
-    component: {{- if .Values.includeReleaseNameInMetricsLabels }} {{ .Release.Name }}-{{ .Values.appLabel }}{{- else }} {{ .Values.appLabel }}{{- end }}-availability-SLO-rules
-  service: {{- if .Values.includeReleaseNameInMetricsLabels }} {{ .Release.Name }}-{{ .Values.appLabel }}{{- else }} {{ .Values.appLabel }}{{- end }}
+    component: {{ include "app.label" . }}-availability-SLO-rules
+  service: {{ include "app.label" . }}
   slos:
   - alerting:
       annotations:
         {{- if .Values.grafanaURL }}
-        dashboard: {{ .Values.grafanaURL }}/d/slo-detail?var-service={{- if .Values.includeReleaseNameInMetricsLabels }}{{ .Release.Name }}-{{ .Values.appLabel }}{{- else }}{{ .Values.appLabel }}{{- end }}
+        dashboard: {{ .Values.grafanaURL }}/d/slo-detail?var-service={{ include "app.label" . }}
         {{- end }}
         summary: SLO to measure success vs errors - {{ .Values.availabilitySLO }}% of the time requests should
           be succesfully served (non 5xx). When you receive this alert it means that
@@ -27,7 +27,7 @@ spec:
           be succesfully served (non 5xx). When you receive this alert it means that the
           SLO is at risk as your error budget is getting exhausted. To know more about
           ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
-      name: {{- if .Values.includeReleaseNameInMetricsLabels }} {{ .Release.Name }}-{{ .Values.appLabel }}{{- else }} {{ .Values.appLabel }}{{- end }} - availability SLO is at RISK 
+      name: {{ include "app.label" . }} - availability SLO is at RISK 
       pageAlert:
         labels:
           alert_type: symptom
@@ -40,36 +40,31 @@ spec:
       be succesfully served (non 5xx). When you receive this alert it means that the
       SLO is at risk as your error budget is getting exhausted. To know more about
       ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
-    name: availability-{{- if .Values.includeReleaseNameInMetricsLabels }}{{ .Release.Name }}-{{ .Values.appLabel }}{{- else }}{{ .Values.appLabel }}{{- end }}
+    name: availability-{{- if .Values.includeReleaseNameInMetricsLabels }}{{ .Release.Name }}-{{ include "app.label" . }}{{- else }}{{ include "app.label" . }}{{- end }}
     objective: {{ .Values.availabilitySLO }}
     sli:
       events:
-        {{- if .Values.includeReleaseNameInMetricsLabels }}
-        errorQuery: sum(rate(istio_requests_total{app="{{ .Release.Name }}-{{ .Values.appLabel}}", destination_app=~"{{ .Release.Name }}-{{ .Values.appLabel}}", response_code=~"5.."}[{{ printf "{{.window}}" }}]))
-        totalQuery: sum(rate(istio_requests_total{app="{{ .Release.Name }}-{{ .Values.appLabel}}", destination_app=~"{{ .Release.Name }}-{{ .Values.appLabel}}"}[{{ printf "{{.window}}" }}]))
-        {{- else }}
-        errorQuery: sum(rate(istio_requests_total{app="{{ .Values.appLabel }}", destination_app=~"{{ .Values.appLabel }}", response_code=~"5.."}[{{ printf "{{.window}}" }}]))
-        totalQuery: sum(rate(istio_requests_total{app="{{ .Values.appLabel }}", destination_app=~"{{ .Values.appLabel }}"}[{{ printf "{{.window}}" }}]))
-        {{- end }}
+        errorQuery: sum(rate(istio_requests_total{app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}", response_code=~"5.."}[{{ printf "{{.window}}" }}]))
+        totalQuery: sum(rate(istio_requests_total{app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}"}[{{ printf "{{.window}}" }}]))
 ---
 apiVersion: sloth.slok.dev/v1
 kind: PrometheusServiceLevel
 metadata:
   labels:
     release: {{ .Values.prometheusReleaseLabel }}
-  name: {{- if .Values.includeReleaseNameInMetricsLabels }} {{ .Release.Name }}-{{ .Values.appLabel }}{{- else }} {{ .Values.appLabel }}{{- end }}-latency-slo
+  name: {{ include "app.label" . }}-latency-slo
   namespace: {{ .Values.namespace }}
 spec:
   labels:
     app: sloth
     role: alert-rules
-    component: {{- if .Values.includeReleaseNameInMetricsLabels }} {{ .Release.Name }}-{{ .Values.appLabel }}{{- else }} {{ .Values.appLabel }}{{- end }}-latency-SLO-rules
-  service: {{- if .Values.includeReleaseNameInMetricsLabels }} {{ .Release.Name }}-{{ .Values.appLabel }}{{- else }} {{ .Values.appLabel }}{{- end }}
+    component: {{ include "app.label" . }}-latency-SLO-rules
+  service: {{ include "app.label" . }}
   slos:
   - alerting:
       annotations:
         {{- if .Values.grafanaURL }}
-        dashboard: {{ .Values.grafanaURL }}/d/slo-detail?var-service={{- if .Values.includeReleaseNameInMetricsLabels }}{{ .Release.Name }}-{{ .Values.appLabel }}{{- else }}{{ .Values.appLabel }}{{- end }}
+        dashboard: {{ .Values.grafanaURL }}/d/slo-detail?var-service={{ include "app.label" . }}
         {{- end }}
         summary: SLO to measure response time - {{ .Values.latencySLO }}% of the time requests should
           be succesfully served in < {{ .Values.latency }}ms. When you receive this alert it means that
@@ -79,7 +74,7 @@ spec:
           be succesfully served in < {{ .Values.latency }}ms. When you receive this alert it means that
           the SLO is at risk as your error budget is getting exhausted. To know more
           about ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
-      name: {{- if .Values.includeReleaseNameInMetricsLabels }} {{ .Release.Name }}-{{ .Values.appLabel }}{{- else }} {{ .Values.appLabel }}{{- end }} - latency SLO is at RISK
+      name: {{ include "app.label" . }} - latency SLO is at RISK
       pageAlert:
         labels:
           alert_type: symptom
@@ -92,17 +87,12 @@ spec:
           be succesfully served in < {{ .Values.latency }}ms. When you receive this alert it means that the
       SLO is at risk as your error budget is getting exhausted. To know more about
       ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
-    name: latency-{{- if .Values.includeReleaseNameInMetricsLabels }}{{ .Release.Name }}-{{ .Values.appLabel }}{{- else }}{{ .Values.appLabel }}{{- end }}
+    name: latency-{{- if .Values.includeReleaseNameInMetricsLabels }}{{ .Release.Name }}-{{ include "app.label" . }}{{- else }}{{ include "app.label" . }}{{- end }}
     objective: {{ .Values.latencySLO }}
     sli:
       events:
-        {{- if .Values.includeReleaseNameInMetricsLabels }}
-        errorQuery: (sum(rate(istio_request_duration_milliseconds_bucket{app="{{ .Release.Name }}-{{ .Values.appLabel}}", destination_app=~"{{ .Release.Name }}-{{ .Values.appLabel}}", le="+Inf"}[{{ printf "{{.window}}" }}])) - sum(rate(istio_request_duration_milliseconds_bucket{app="{{ .Release.Name }}-{{ .Values.appLabel}}", destination_app=~"{{ .Release.Name }}-{{ .Values.appLabel}}", le="{{ .Values.latency }}"}[{{ printf "{{.window}}" }}])))
-        totalQuery: sum(rate(istio_request_duration_milliseconds_bucket{app="{{ .Release.Name }}-{{ .Values.appLabel}}", destination_app=~"{{ .Release.Name }}-{{ .Values.appLabel}}", le="+Inf"}[{{ printf "{{.window}}" }}]))
-        {{- else }}
-        errorQuery: (sum(rate(istio_request_duration_milliseconds_bucket{app="{{ .Values.appLabel }}", destination_app=~"{{ .Values.appLabel }}", le="+Inf"}[{{ printf "{{.window}}" }}])) - sum(rate(istio_request_duration_milliseconds_bucket{app="{{ .Values.appLabel }}", destination_app=~"{{ .Values.appLabel }}", le="{{ .Values.latency }}"}[{{ printf "{{.window}}" }}])))
-        totalQuery: sum(rate(istio_request_duration_milliseconds_bucket{app="{{ .Values.appLabel }}", destination_app=~"{{ .Values.appLabel }}", le="+Inf"}[{{ printf "{{.window}}" }}]))
-        {{- end }}
+        errorQuery: (sum(rate(istio_request_duration_milliseconds_bucket{app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}", le="+Inf"}[{{ printf "{{.window}}" }}])) - sum(rate(istio_request_duration_milliseconds_bucket{app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}", le="{{ .Values.latency }}"}[{{ printf "{{.window}}" }}])))
+        totalQuery: sum(rate(istio_request_duration_milliseconds_bucket{app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}", le="+Inf"}[{{ printf "{{.window}}" }}]))
 {{- end }}
 {{- end }}
 ---
@@ -113,19 +103,19 @@ kind: PrometheusServiceLevel
 metadata:
   labels:
     release: {{ .Values.prometheusReleaseLabel }}
-  name: {{ .Values.appLabel }}-ingress-availability-slo
+  name: {{ include "app.label" . }}-ingress-availability-slo
   namespace: {{ .Values.namespace }}
 spec:
   labels:
     app: sloth
     role: alert-rules
-    component: {{ .Values.appLabel }}-ingress-availability-SLO-rules
-  service: {{ .Values.appLabel }}-ingress
+    component: {{ include "app.label" . }}-ingress-availability-SLO-rules
+  service: {{ include "app.label" . }}-ingress
   slos:
   - alerting:
       annotations:
         {{- if .Values.grafanaURL }}
-        dashboard: {{ .Values.grafanaURL }}/d/slo-detail?var-service={{ .Values.appLabel }}
+        dashboard: {{ .Values.grafanaURL }}/d/slo-detail?var-service={{ include "app.label" . }}
         {{- end }}
         summary: SLO to measure success vs errors - {{ .Values.availabilitySLO }}% of the time requests should
           be succesfully served (non 5xx). When you receive this alert it means that
@@ -135,7 +125,7 @@ spec:
           be succesfully served (non 5xx). When you receive this alert it means that
           the SLO is at risk as your error budget is getting exhausted. To know more
           about ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
-      name: {{ .Values.appLabel }}-ingress - availability SLO is at RISK
+      name: {{ include "app.label" . }}-ingress - availability SLO is at RISK
       pageAlert:
         labels:
           alert_type: symptom
@@ -148,7 +138,7 @@ spec:
       be succesfully served (non 5xx). When you receive this alert it means that the
       SLO is at risk as your error budget is getting exhausted. To know more about
       ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
-    name: availability-{{ .Values.appLabel }}-ingress
+    name: availability-{{ include "app.label" . }}-ingress
     objective: {{ .Values.availabilitySLO }}
     sli:
       events:
@@ -160,19 +150,19 @@ kind: PrometheusServiceLevel
 metadata:
   labels:
     release: {{ .Values.prometheusReleaseLabel }}
-  name: {{ .Values.appLabel }}-ingress-latency-slo
+  name: {{ include "app.label" . }}-ingress-latency-slo
   namespace: {{ .Values.namespace }}
 spec:
   labels:
     app: sloth
     role: alert-rules
-    component: {{ .Values.appLabel }}-ingress-latency-SLO-rules
-  service: {{ .Values.appLabel }}-ingress
+    component: {{ include "app.label" . }}-ingress-latency-SLO-rules
+  service: {{ include "app.label" . }}-ingress
   slos:
   - alerting:
       annotations:
         {{- if .Values.grafanaURL }}
-        dashboard: {{ .Values.grafanaURL }}/d/slo-detail?var-service={{ .Values.appLabel }}
+        dashboard: {{ .Values.grafanaURL }}/d/slo-detail?var-service={{ include "app.label" . }}
         {{- end }}
         summary: SLO to measure response time - {{ .Values.latencySLO }}% of the time requests should
           be succesfully served in < 1s. When you receive this alert it means that
@@ -182,7 +172,7 @@ spec:
           be succesfully served in < 1s. When you receive this alert it means that
           the SLO is at risk as your error budget is getting exhausted. To know more
           about ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
-      name: {{ .Values.appLabel }}-ingress - latency SLO is at RISK
+      name: {{ include "app.label" . }}-ingress - latency SLO is at RISK
       pageAlert:
         labels:
           alert_type: symptom
@@ -195,7 +185,7 @@ spec:
           be succesfully served in < 1s.. When you receive this alert it means that the
       SLO is at risk as your error budget is getting exhausted. To know more about
       ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
-    name: latency-{{ .Values.appLabel }}-ingress
+    name: latency-{{ include "app.label" . }}-ingress
     objective: {{ .Values.latencySLO }}
     sli:
       events:
