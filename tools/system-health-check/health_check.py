@@ -246,7 +246,7 @@ def pods_details():
                     for result in response_json['data']['result']:
                         if str(result['metric']['pod']).startswith(str(deploy)):
                             pods.append(str(result['metric']['pod']))
-                    failed.append("Deployment - "+ str(deploy) +" does not have "+ healthy_pods +"% pods ready, failing pods are "+str(pods))
+                    failed.append("Deployment - "+ str(deploy) +" does not have "+ healthy_pods +"% healthy pods, unhealthy pods are "+str(pods))
                 return failed
     except Exception as e:
         logger.error("%s Exception occured while checking pods details", str(e))
