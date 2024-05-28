@@ -12,12 +12,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: "{{- if .Values.includeReleaseNameInMetricsLabels }}{{ .Release.Name }}-{{ .Values.appLabel }}{{- else }}{{ .Values.appLabel }}{{- end }}-service-overview-dashboard" 
+  name: "{{ include "app.label" . }}-service-overview-dashboard" 
   namespace: {{ .Values.namespace }}
   labels:
     grafana_dashboard: "1"
 data:
-  {{ .Values.appLabel }}-overview-dashboard.json: |-
+  {{ include "app.label" . }}-overview-dashboard.json: |-
     {
       "annotations": {
         "list": [
@@ -639,11 +639,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              {{- if .Values.includeReleaseNameInMetricsLabels }}
-              "expr": "sum(rate(istio_requests_total{app=~\"{{ .Release.Name }}-{{ .Values.appLabel }}\", destination_app=~\"{{ .Release.Name }}-{{ .Values.appLabel }}\"}[$__rate_interval]))",
-              {{- else }}
-              "expr": "sum(rate(istio_requests_total{app=~\"{{ .Values.appLabel }}\", destination_app=~\"{{ .Values.appLabel }}\"}[$__rate_interval]))",
-              {{- end }}
+              "expr": "sum(rate(istio_requests_total{app=~\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\"}[$__rate_interval]))",
               "legendFormat": "Requests/sec",
               "range": true,
               "refId": "A"
@@ -737,11 +733,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              {{- if .Values.includeReleaseNameInMetricsLabels }}
-              "expr": "sum(rate(istio_request_duration_milliseconds_sum{app=~\"{{ .Release.Name }}-{{ .Values.appLabel }}\", destination_app=~\"{{ .Release.Name }}-{{ .Values.appLabel }}\"}[$__rate_interval])) / sum(rate(istio_request_duration_milliseconds_count{app=\"{{ .Release.Name }}-{{ .Values.appLabel }}\", destination_app=~\"{{ .Release.Name }}-{{ .Values.appLabel }}\"}[$__rate_interval]))",
-              {{- else }}
-              "expr": "sum(rate(istio_request_duration_milliseconds_sum{app=~\"{{ .Values.appLabel }}\", destination_app=~\"{{ .Values.appLabel }}\"}[$__rate_interval])) / sum(rate(istio_request_duration_milliseconds_count{app=\"{{ .Values.appLabel }}\", destination_app=~\"{{ .Values.appLabel }}\"}[$__rate_interval]))",
-              {{- end }}
+              "expr": "sum(rate(istio_request_duration_milliseconds_sum{app=~\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\"}[$__rate_interval])) / sum(rate(istio_request_duration_milliseconds_count{app=\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\"}[$__rate_interval]))",
               "legendFormat": "Latency",
               "range": true,
               "refId": "A"
@@ -835,11 +827,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              {{- if .Values.includeReleaseNameInMetricsLabels }}
-              "expr": "sum(rate(istio_requests_total{app=~\"{{ .Release.Name }}-{{ .Values.appLabel }}\", destination_app=~\"{{ .Release.Name }}-{{ .Values.appLabel }}\", response_code=~\"5..\"}[$__rate_interval])) / sum(rate(istio_requests_total{app=~\"{{ .Release.Name }}-{{ .Values.appLabel }}\", destination_app=~\"{{ .Release.Name }}-{{ .Values.appLabel }}\"}[$__rate_interval])) * 100",
-              {{- else }}
-              "expr": "sum(rate(istio_requests_total{app=~\"{{ .Values.appLabel }}\", destination_app=~\"{{ .Values.appLabel }}\", response_code=~\"5..\"}[$__rate_interval])) / sum(rate(istio_requests_total{app=~\"{{ .Values.appLabel }}\", destination_app=~\"{{ .Values.appLabel }}\"}[$__rate_interval])) * 100",
-              {{- end }}
+              "expr": "sum(rate(istio_requests_total{app=~\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\", response_code=~\"5..\"}[$__rate_interval])) / sum(rate(istio_requests_total{app=~\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\"}[$__rate_interval])) * 100",
               "legendFormat": "5xx error rate",
               "range": true,
               "refId": "A"
@@ -933,11 +921,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              {{- if .Values.includeReleaseNameInMetricsLabels }}
-              "expr": "sum(rate(istio_requests_total{app=~\"{{ .Release.Name }}-{{ .Values.appLabel }}\", destination_app=~\"{{ .Release.Name }}-{{ .Values.appLabel }}\", response_code=~\"2..|4..\"}[$__rate_interval])) / sum(rate(istio_requests_total{app=~\"{{ .Release.Name }}-{{ .Values.appLabel }}\", destination_app=~\"{{ .Release.Name }}-{{ .Values.appLabel }}\"}[$__rate_interval])) * 100",
-              {{- else }}
-              "expr": "sum(rate(istio_requests_total{app=~\"{{ .Values.appLabel }}\", destination_app=~\"{{ .Values.appLabel }}\", response_code=~\"2..|4..\"}[$__rate_interval])) / sum(rate(istio_requests_total{app=~\"{{ .Values.appLabel }}\", destination_app=~\"{{ .Values.appLabel }}\"}[$__rate_interval])) * 100",
-              {{- end }}
+              "expr": "sum(rate(istio_requests_total{app=~\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\", response_code=~\"2..|4..\"}[$__rate_interval])) / sum(rate(istio_requests_total{app=~\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\"}[$__rate_interval])) * 100",
               "legendFormat": "Success ",
               "range": true,
               "refId": "A"
@@ -948,11 +932,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              {{- if .Values.includeReleaseNameInMetricsLabels }}
-              "expr": "sum(rate(istio_requests_total{app=~\"{{ .Release.Name }}-{{ .Values.appLabel }}\", destination_app=~\"{{ .Release.Name }}-{{ .Values.appLabel }}\", response_code=~\"5..\"}[$__rate_interval])) / sum(rate(istio_requests_total{app=~\"{{ .Release.Name }}-{{ .Values.appLabel }}\", destination_app=~\"{{ .Release.Name }}-{{ .Values.appLabel }}\"}[$__rate_interval])) * 100",
-              {{- else }}
-              "expr": "sum(rate(istio_requests_total{app=~\"{{ .Values.appLabel }}\", destination_app=~\"{{ .Values.appLabel }}\", response_code=~\"5..\"}[$__rate_interval])) / sum(rate(istio_requests_total{app=~\"{{ .Values.appLabel }}\", destination_app=~\"{{ .Values.appLabel }}\"}[$__rate_interval])) * 100",
-              {{- end }}
+              "expr": "sum(rate(istio_requests_total{app=~\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\", response_code=~\"5..\"}[$__rate_interval])) / sum(rate(istio_requests_total{app=~\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\"}[$__rate_interval])) * 100",
               "hide": false,
               "legendFormat": "Error",
               "range": true,
@@ -1048,11 +1028,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              {{- if .Values.includeReleaseNameInMetricsLabels }}
-              "expr": "sum(rate(istio_response_bytes_sum{app=\"{{ .Release.Name }}-{{ .Values.appLabel }}\", destination_app=~\"{{ .Release.Name }}-{{ .Values.appLabel }}\"}[$__rate_interval])) / sum(rate(istio_response_bytes_count{app=\"{{ .Release.Name }}-{{ .Values.appLabel }}\", destination_app=~\"{{ .Release.Name }}-{{ .Values.appLabel }}\"}[$__rate_interval]))",
-              {{- else }}
-              "expr": "sum(rate(istio_response_bytes_sum{app=\"{{ .Values.appLabel }}\", destination_app=~\"{{ .Values.appLabel }}\"}[$__rate_interval])) / sum(rate(istio_response_bytes_count{app=\"{{ .Values.appLabel }}\", destination_app=~\"{{ .Values.appLabel }}\"}[$__rate_interval]))",
-              {{- end }}
+              "expr": "sum(rate(istio_response_bytes_sum{app=\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\"}[$__rate_interval])) / sum(rate(istio_response_bytes_count{app=\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\"}[$__rate_interval]))",
               "legendFormat": "Response Size",
               "range": true,
               "refId": "A"
@@ -1160,11 +1136,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              {{- if .Values.includeReleaseNameInMetricsLabels }}
-              "expr": "sum(\r\n    container_memory_working_set_bytes{namespace=\"{{ .Release.Namespace }}\", container!=\"\", image!=\"\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ .Release.Name }}-{{ .Values.deploymentName }}\", workload_type=\"deployment\"}\r\n) by (pod)\r\n/sum(\r\n    kube_pod_container_resource_requests{job=\"kube-state-metrics\", namespace=\"{{ .Release.Namespace }}\", resource=\"memory\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ .Release.Name }}-{{ .Values.deploymentName }}\", workload_type=\"deployment\"}\r\n) by (pod) * 100",
-              {{- else }}
-              "expr": "sum(\r\n    container_memory_working_set_bytes{namespace=\"{{ .Release.Namespace }}\", container!=\"\", image!=\"\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ .Values.deploymentName }}\", workload_type=\"deployment\"}\r\n) by (pod)\r\n/sum(\r\n    kube_pod_container_resource_requests{job=\"kube-state-metrics\", namespace=\"{{ .Release.Namespace }}\", resource=\"memory\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ .Values.deploymentName }}\", workload_type=\"deployment\"}\r\n) by (pod) * 100",
-              {{- end }}
+              "expr": "sum(\r\n    container_memory_working_set_bytes{namespace=\"{{ .Release.Namespace }}\", container!=\"\", image!=\"\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ include "deployment.name" . }}\", workload_type=\"deployment\"}\r\n) by (pod)\r\n/sum(\r\n    kube_pod_container_resource_requests{job=\"kube-state-metrics\", namespace=\"{{ .Release.Namespace }}\", resource=\"memory\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ include "deployment.name" . }}\", workload_type=\"deployment\"}\r\n) by (pod) * 100",
               "legendFormat": "__auto",
               "range": true,
               "refId": "A"
@@ -1258,11 +1230,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              {{- if .Values.includeReleaseNameInMetricsLabels }}
-              "expr": "sum(\r\n    container_memory_working_set_bytes{namespace=\"{{ .Release.Namespace }}\", container!=\"\", image!=\"\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ .Release.Name }}-{{ .Values.deploymentName }}\", workload_type=\"deployment\"}\r\n) by (pod)\r\n/sum(\r\n    kube_pod_container_resource_limits{job=\"kube-state-metrics\", namespace=\"{{ .Release.Namespace }}\", resource=\"memory\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ .Release.Name }}-{{ .Values.deploymentName }}\", workload_type=\"deployment\"}\r\n) by (pod) * 100",
-              {{- else }}
-              "expr": "sum(\r\n    container_memory_working_set_bytes{namespace=\"{{ .Release.Namespace }}\", container!=\"\", image!=\"\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ .Values.deploymentName }}\", workload_type=\"deployment\"}\r\n) by (pod)\r\n/sum(\r\n    kube_pod_container_resource_limits{job=\"kube-state-metrics\", namespace=\"{{ .Release.Namespace }}\", resource=\"memory\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ .Values.deploymentName }}\", workload_type=\"deployment\"}\r\n) by (pod) * 100",
-              {{- end }}
+              "expr": "sum(\r\n    container_memory_working_set_bytes{namespace=\"{{ .Release.Namespace }}\", container!=\"\", image!=\"\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ include "deployment.name" . }}\", workload_type=\"deployment\"}\r\n) by (pod)\r\n/sum(\r\n    kube_pod_container_resource_limits{job=\"kube-state-metrics\", namespace=\"{{ .Release.Namespace }}\", resource=\"memory\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ include "deployment.name" . }}\", workload_type=\"deployment\"}\r\n) by (pod) * 100",
               "legendFormat": "__auto",
               "range": true,
               "refId": "A"
@@ -1356,11 +1324,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              {{- if .Values.includeReleaseNameInMetricsLabels }}
-              "expr": "sum(\r\n    node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{namespace=\"{{ .Release.Namespace }}\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ .Release.Name }}-{{ .Values.deploymentName }}\", workload_type=\"deployment\"}\r\n) by (pod)\r\n/sum(\r\n    kube_pod_container_resource_requests{job=\"kube-state-metrics\", namespace=\"{{ .Release.Namespace }}\", resource=\"cpu\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ .Release.Name }}-{{ .Values.deploymentName }}\", workload_type=\"deployment\"}\r\n) by (pod) * 100",
-              {{- else }}
-              "expr": "sum(\r\n    node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{namespace=\"{{ .Release.Namespace }}\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ .Values.deploymentName }}\", workload_type=\"deployment\"}\r\n) by (pod)\r\n/sum(\r\n    kube_pod_container_resource_requests{job=\"kube-state-metrics\", namespace=\"{{ .Release.Namespace }}\", resource=\"cpu\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ .Values.deploymentName }}\", workload_type=\"deployment\"}\r\n) by (pod) * 100",
-              {{- end }}
+              "expr": "sum(\r\n    node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{namespace=\"{{ .Release.Namespace }}\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ include "deployment.name" . }}\", workload_type=\"deployment\"}\r\n) by (pod)\r\n/sum(\r\n    kube_pod_container_resource_requests{job=\"kube-state-metrics\", namespace=\"{{ .Release.Namespace }}\", resource=\"cpu\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ include "deployment.name" . }}\", workload_type=\"deployment\"}\r\n) by (pod) * 100",
               "legendFormat": "__auto",
               "range": true,
               "refId": "A"
@@ -1454,11 +1418,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              {{- if .Values.includeReleaseNameInMetricsLabels }}
-              "expr": "sum(\r\n    node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{namespace=\"{{ .Release.Namespace }}\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ .Release.Name }}-{{ .Values.deploymentName }}\", workload_type=\"deployment\"}\r\n) by (pod)\r\n/sum(\r\n    kube_pod_container_resource_limits{job=\"kube-state-metrics\", namespace=\"{{ .Release.Namespace }}\", resource=\"cpu\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ .Release.Name }}-{{ .Values.deploymentName }}\", workload_type=\"deployment\"}\r\n) by (pod) * 100",
-              {{- else }}
-              "expr": "sum(\r\n    node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{namespace=\"{{ .Release.Namespace }}\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ .Values.deploymentName }}\", workload_type=\"deployment\"}\r\n) by (pod)\r\n/sum(\r\n    kube_pod_container_resource_limits{job=\"kube-state-metrics\", namespace=\"{{ .Release.Namespace }}\", resource=\"cpu\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ .Values.deploymentName }}\", workload_type=\"deployment\"}\r\n) by (pod) * 100",
-              {{- end }}
+              "expr": "sum(\r\n    node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{namespace=\"{{ .Release.Namespace }}\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ include "deployment.name" . }}\", workload_type=\"deployment\"}\r\n) by (pod)\r\n/sum(\r\n    kube_pod_container_resource_limits{job=\"kube-state-metrics\", namespace=\"{{ .Release.Namespace }}\", resource=\"cpu\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ include "deployment.name" . }}\", workload_type=\"deployment\"}\r\n) by (pod) * 100",
               "legendFormat": "__auto",
               "range": true,
               "refId": "A"
@@ -1511,11 +1471,7 @@ data:
                 "uid": "P8E80F9AEF21F6940"
               },
               "editorMode": "code",
-              {{- if .Values.includeReleaseNameInMetricsLabels }}
-              "expr": "{ app=\"{{ .Release.Name }}-{{ .Values.appLabel }}\", container!=\"istio-proxy\"} |= ``",
-              {{- else }}
-              "expr": "{ {{- if and .Values.logLabel .Values.logLabelValue }} {{ .Values.logLabel }}=\"{{ .Values.logLabelValue }}\"{{- else }} app=\"{{ .Values.appLabel }}\"{{- end }}, container!=\"istio-proxy\"} |= ``",
-              {{- end }}
+              "expr": "{ {{- if and .Values.logLabel .Values.logLabelValue }} {{ .Values.logLabel }}=\"{{ .Values.logLabelValue }}\"{{- else }} app=\"{{ include "app.label" . }}\"{{- end }}, container!=\"istio-proxy\"} |= ``",
               "queryType": "range",
               "refId": "A"
             }
@@ -1539,8 +1495,8 @@ data:
       },
       "timepicker": {},
       "timezone": "",
-      "title": "{{- if .Values.includeReleaseNameInMetricsLabels }}{{ title .Release.Name }}-{{ title .Values.appLabel }}{{- else }}{{ title .Values.appLabel }}{{- end }} Overview - Dashboard",
-      "uid": "{{ include "dashboard-uid" . }}",
+      "title": "{{ title ( include "app.label" . ) }} Overview - Dashboard",
+      "uid": "{{ include "dashboard-uid" .}}",
       "version": 10,
       "weekStart": ""
     }
