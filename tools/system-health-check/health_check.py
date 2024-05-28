@@ -29,24 +29,22 @@ node_disk_available = os.getenv("HEALTHY_NODE_ROOT_DISK_AVAILABLR_SPACE", "200")
 
 prometheus_url = prometheus + '/api/v1/query?'
 
-pods_with_resources = ""
 pods_with_resources_query = 'sum(kube_pod_container_resource_limits{namespace="'+ namespace +'",container!~"istio-proxy|", resource="cpu"}) by (pod) AND sum(kube_pod_container_resource_limits{namespace="'+ namespace +'",container!~"istio-proxy|", resource="memory"}) by (pod)'
 
 def check_pods_with_resources():
-    failed = ""
+    pods = ""
     try:
         response = requests.get(prometheus_url, params={'query': pods_with_resources_query})
         response_json = json.loads(response.text)
         if response_json['data']['result']:
             for result in response_json['data']['result']:
                 failed += "|"+ result['metric']['pod']
-            return failed
+            return pods
     except Exception as e:
         logger.error("%s Exception occured while checking pods with resources", str(e))
-    return failed
+    return pods
 
 pods_with_resources = check_pods_with_resources()
-
 
 pods_health_query = '''
 sum
