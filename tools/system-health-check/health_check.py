@@ -29,42 +29,72 @@ node_disk_available = os.getenv("HEALTHY_NODE_ROOT_DISK_AVAILABLR_SPACE", "200")
 
 prometheus_url = prometheus + '/api/v1/query?'
 
+pods_with_resources_query = 'sum(kube_pod_container_resource_limits{namespace="'+ namespace +'",container!~"istio-proxy|", resource="cpu"}) by (pod) AND sum(kube_pod_container_resource_limits{namespace="'+ namespace +'",container!~"istio-proxy|", resource="memory"}) by (pod)'
+
+def check_pods_with_resources():
+    pods = ""
+    try:
+        response = requests.get(prometheus_url, params={'query': pods_with_resources_query})
+        response_json = json.loads(response.text)
+        if response_json['data']['result']:
+            for result in response_json['data']['result']:
+                pods += "|"+ result['metric']['pod']
+            return pods
+    except Exception as e:
+        logger.error("%s Exception occured while checking pods with resources", str(e))
+    return pods
+
+pods_with_resources = check_pods_with_resources()
+
 pods_health_query = '''
-( 
-  (
-    sum 
+sum
     (
-      (
-        (sum(kube_pod_info{created_by_kind!="Job",namespace="''' +namespace+ '''"} * on (pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' +namespace+ '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) by (pod, namespace, deployment)) AND ON (pod, namespace) kube_pod_status_ready{namespace="''' +namespace+ '''", condition="false"} == 0
-      ) 
-      AND 
-      (
-        sum(rate(container_cpu_usage_seconds_total{container!="",namespace="''' +namespace+ '''"}[30m]) * on (pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' +namespace+ '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) by (pod, namespace, deployment) / sum(kube_pod_container_resource_limits{container!="", namespace="''' +namespace+ '''", resource="cpu"} * on (pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' +namespace+ '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) by (pod, namespace, deployment) * 100 <= ''' + str(pod_cpu_threshold) + '''
-      ) 
-      AND
-      (
-        sum by (pod, namespace, deployment) (container_memory_working_set_bytes{container!="", namespace="''' +namespace+ '''", image!=""} * on (pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' +namespace+ '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) / sum by (pod, namespace, deployment) (kube_pod_container_resource_limits{container!="", namespace="''' +namespace+ '''", resource="memory"} * on (namespace, pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' +namespace+ '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) * 100 <= ''' + str(pod_memory_threshold) + '''
-      )
-      OR
-      ( 
-        (
-          sum(kube_pod_status_ready{namespace="''' +namespace+ '''", condition="false"} * on (pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' +namespace+ '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) by (pod, namespace, deployment) == 0 AND ON (pod) kube_pod_info{namespace="''' +namespace+ '''", created_by_kind!="Job"}
+        ( 
+            (
+                sum 
+                (
+                    (
+                        (sum(kube_pod_info{pod=~"''' + pods_with_resources + '''", created_by_kind!="Job",namespace="''' + namespace + '''"} * on (pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' + namespace + '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) by (pod, namespace, deployment)) AND ON (pod, namespace) kube_pod_status_ready{pod=~"''' + pods_with_resources + '''", namespace="''' + namespace + '''", condition="false"} == 0
+                    )
+                    AND 
+                    (
+                        sum(rate(container_cpu_usage_seconds_total{pod=~"''' + pods_with_resources + '''", container!~"istio-proxy|",namespace="''' + namespace + '''"}[30m]) * on (pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' + namespace + '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) by (pod, namespace, deployment) / sum(kube_pod_container_resource_limits{pod=~"''' + pods_with_resources + '''", container!~"istio-proxy|", namespace="''' + namespace + '''", resource="cpu"} * on (pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' + namespace + '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) by (pod, namespace, deployment) * 100 <= ''' + str(pod_cpu_threshold) + '''
+                    ) 
+                    AND
+                    (
+                        sum by (pod, namespace, deployment) (container_memory_working_set_bytes{pod=~"''' + pods_with_resources + '''", container!~"istio-proxy|", namespace="''' + namespace + '''", image!=""} * on (pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' + namespace + '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) / sum by (pod, namespace, deployment) (kube_pod_container_resource_limits{pod=~"''' + pods_with_resources + '''", container!~"istio-proxy|", namespace="''' + namespace + '''", resource="memory"} * on (namespace, pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' + namespace + '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) * 100 <= ''' + str(pod_memory_threshold) + '''
+                    )
+                    OR
+                    ( 
+                        (
+                        sum(kube_pod_status_ready{pod=~"''' + pods_with_resources + '''", namespace="''' + namespace + '''", condition="false"} * on (pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' + namespace + '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) by (pod, namespace, deployment) == 0 AND ON (pod) kube_pod_info{pod=~"''' + pods_with_resources + '''", namespace="''' + namespace + '''", created_by_kind!="Job"}
+                        )
+                        OR
+                        (
+                        sum(kube_pod_status_ready{pod=~"''' + pods_with_resources + '''", namespace="''' + namespace + '''", condition="true"} * on (pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' + namespace + '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) by (pod, namespace, deployment) == 0 AND ON (pod) kube_pod_info{pod=~"''' + pods_with_resources + '''", namespace="''' + namespace + '''", created_by_kind!="Job"}
+                        )
+                    )
+                ) by (pod, namespace, deployment)
+            ) 
         )
         OR
         (
-          sum(kube_pod_status_ready{namespace="''' +namespace+ '''", condition="true"} * on (pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' +namespace+ '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) by (pod, namespace, deployment) == 0 AND ON (pod) kube_pod_info{namespace="''' +namespace+ '''", created_by_kind!="Job"}
-        )
-      )
-    ) by (deployment)
-  )
-  /
-  (
-    sum(kube_deployment_status_replicas{namespace="''' +namespace+ '''"} != 0) by (deployment)
-  ) 
-  * 
-  100
-)
-< 
+            (
+                sum(kube_pod_status_ready{namespace="''' + namespace + '''", condition="true"} * on (pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' + namespace + '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) by (pod, namespace, deployment) == 1 AND ON (pod) kube_pod_info{namespace="''' + namespace + '''", created_by_kind!="Job"}
+            )
+            OR
+            (
+                sum(kube_pod_status_ready{namespace="''' + namespace + '''", condition="true"} * on (pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' + namespace + '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) by (pod, namespace, deployment) == 0 AND ON (pod) kube_pod_info{namespace="''' + namespace + '''", created_by_kind!="Job"}
+            )
+        ) 
+) by (deployment)
+/
+(
+ sum(kube_deployment_status_replicas{namespace="''' +namespace+ '''"} != 0) by (deployment)
+) 
+* 
+100
+<
 ''' + str(healthy_pods)
 
 pvc_health_query = '(sum(kubelet_volume_stats_available_bytes{namespace="' +namespace+ '"} / 1024 / 1024) by (persistentvolumeclaim)) < '+ str(pvc_threshold)
@@ -84,7 +114,7 @@ node_health_query = """
         avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) by (instance) * (count (node_cpu_seconds_total{mode="idle"}) by (instance) * 1000) >= """ + str(node_cpu_available) + """
     )
     ) 
-    AND 
+    AND
     (
     (
         100 * avg(1 - ((avg_over_time(node_memory_MemFree_bytes[5m]) + avg_over_time(node_memory_Cached_bytes[5m]) + avg_over_time(node_memory_Buffers_bytes[5m])) / avg_over_time(node_memory_MemTotal_bytes[5m] ))) by (instance) <= """ + str(node_memory_threshold) + """
@@ -107,32 +137,47 @@ node_health_query = """
 """
 
 pods_details_query = '''
-(
-    sum 
+sum
     (
-      (
-        (sum(kube_pod_info{created_by_kind!="Job",namespace="''' +namespace+ '''"} * on (pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' +namespace+ '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) by (pod, namespace, deployment)) AND ON (pod, namespace) kube_pod_status_ready{namespace="''' +namespace+ '''", condition="false"} == 0
-      ) 
-      AND 
-      (
-        sum(rate(container_cpu_usage_seconds_total{container!="",namespace="''' +namespace+ '''"}[30m]) * on (pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' +namespace+ '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) by (pod, namespace, deployment) / sum(kube_pod_container_resource_limits{container!="", namespace="''' +namespace+ '''", resource="cpu"} * on (pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' +namespace+ '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) by (pod, namespace, deployment) * 100 <= ''' + str(pod_cpu_threshold) + '''
-      ) 
-      AND
-      (
-        sum by (pod, namespace, deployment) (container_memory_working_set_bytes{container!="", namespace="''' +namespace+ '''", image!=""} * on (pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' +namespace+ '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) / sum by (pod, namespace, deployment) (kube_pod_container_resource_limits{container!="", namespace="''' +namespace+ '''", resource="memory"} * on (namespace, pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' +namespace+ '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) * 100 <= ''' + str(pod_memory_threshold) + '''
-      )
-      OR
-      ( 
-        (
-          sum(kube_pod_status_ready{namespace="''' +namespace+ '''", condition="false"} * on (pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' +namespace+ '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) by (pod, namespace, deployment) == 0 AND ON (pod) kube_pod_info{namespace="''' +namespace+ '''", created_by_kind!="Job"}
-        )
+        ( 
+            (
+                sum 
+                (
+                    (
+                        (sum(kube_pod_info{pod=~"''' + pods_with_resources + '''", created_by_kind!="Job",namespace="''' + namespace + '''"} * on (pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' + namespace + '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) by (pod, namespace, deployment)) AND ON (pod, namespace) kube_pod_status_ready{pod=~"''' + pods_with_resources + '''", namespace="''' + namespace + '''", condition="false"} == 0
+                    )
+                    AND 
+                    (
+                        sum(rate(container_cpu_usage_seconds_total{pod=~"''' + pods_with_resources + '''", container!~"istio-proxy|",namespace="''' + namespace + '''"}[30m]) * on (pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' + namespace + '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) by (pod, namespace, deployment) / sum(kube_pod_container_resource_limits{pod=~"''' + pods_with_resources + '''", container!~"istio-proxy|", namespace="''' + namespace + '''", resource="cpu"} * on (pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' + namespace + '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) by (pod, namespace, deployment) * 100 <= ''' + str(pod_cpu_threshold) + '''
+                    ) 
+                    AND
+                    (
+                        sum by (pod, namespace, deployment) (container_memory_working_set_bytes{pod=~"''' + pods_with_resources + '''", container!~"istio-proxy|", namespace="''' + namespace + '''", image!=""} * on (pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' + namespace + '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) / sum by (pod, namespace, deployment) (kube_pod_container_resource_limits{pod=~"''' + pods_with_resources + '''", container!~"istio-proxy|", namespace="''' + namespace + '''", resource="memory"} * on (namespace, pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' + namespace + '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) * 100 <= ''' + str(pod_memory_threshold) + '''
+                    )
+                    OR
+                    ( 
+                        (
+                        sum(kube_pod_status_ready{pod=~"''' + pods_with_resources + '''", namespace="''' + namespace + '''", condition="false"} * on (pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' + namespace + '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) by (pod, namespace, deployment) == 0 AND ON (pod) kube_pod_info{pod=~"''' + pods_with_resources + '''", namespace="''' + namespace + '''", created_by_kind!="Job"}
+                        )
+                        OR
+                        (
+                        sum(kube_pod_status_ready{pod=~"''' + pods_with_resources + '''", namespace="''' + namespace + '''", condition="true"} * on (pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' + namespace + '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) by (pod, namespace, deployment) == 0 AND ON (pod) kube_pod_info{pod=~"''' + pods_with_resources + '''", namespace="''' + namespace + '''", created_by_kind!="Job"}
+                        )
+                    )
+                ) by (pod, namespace, deployment)
+            ) 
+        ) == 0
         OR
         (
-          sum(kube_pod_status_ready{namespace="''' +namespace+ '''", condition="true"} * on (pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' +namespace+ '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) by (pod, namespace, deployment) == 0 AND ON (pod) kube_pod_info{namespace="''' +namespace+ '''", created_by_kind!="Job"}
-        )
-      )
-    ) by (pod)
-  )
+            (
+                sum(kube_pod_status_ready{namespace="''' + namespace + '''", condition="true"} * on (pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' + namespace + '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) by (pod, namespace, deployment) == 1 AND ON (pod) kube_pod_info{namespace="''' + namespace + '''", created_by_kind!="Job"}
+            )
+            OR
+            (
+                sum(kube_pod_status_ready{namespace="''' + namespace + '''", condition="true"} * on (pod) group_left (deployment, workload, workload_type) label_replace(namespace_workload_pod:kube_pod_owner:relabel{namespace="''' + namespace + '''", workload_type="deployment"},"deployment", "$1", "workload", "(.*)")) by (pod, namespace, deployment) == 0 AND ON (pod) kube_pod_info{namespace="''' + namespace + '''", created_by_kind!="Job"}
+            )
+        ) == 0
+) by (pod)
 '''
 
 def pod_check():
@@ -201,10 +246,10 @@ def pods_details():
                     for result in response_json['data']['result']:
                         if str(result['metric']['pod']).startswith(str(deploy)):
                             pods.append(str(result['metric']['pod']))
-                    failed.append("Deployment - "+ str(deploy) +" does not have "+ healthy_pods +"% pods ready, failing pods are "+str(pods))
+                    failed.append("Deployment - "+ str(deploy) +" does not have "+ healthy_pods +"% healthy pods, unhealthy pods are "+str(pods))
                 return failed
     except Exception as e:
-        logger.error("%s Exception occured while SLO alerts", str(e))
+        logger.error("%s Exception occured while checking pods details", str(e))
     return failed
   
 
