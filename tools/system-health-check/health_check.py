@@ -38,7 +38,7 @@ def check_pods_with_resources():
         response_json = json.loads(response.text)
         if response_json['data']['result']:
             for result in response_json['data']['result']:
-                failed += "|"+ result['metric']['pod']
+                pods += "|"+ result['metric']['pod']
             return pods
     except Exception as e:
         logger.error("%s Exception occured while checking pods with resources", str(e))
