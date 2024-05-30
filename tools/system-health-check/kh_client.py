@@ -19,7 +19,7 @@ def report_success():
     try:
         send_report(report)
     except Exception as e:
-        raise Exception(f"failed to send report: {e}")
+        print(f"failed to send report: {e}")
 
 
 def report_failure(error_messages: List[str]):
@@ -27,14 +27,14 @@ def report_failure(error_messages: List[str]):
     try:
         send_report(report)
     except Exception as e:
-        raise Exception(f"failed to send report: {e}")
+        print(f"failed to send report: {e}")
 
 
 def get_kuberhealthy_url():
     try:
         reporting_url_env = os.environ["KH_REPORTING_URL"]
     except:
-        raise Exception("fetched KH_REPORTING_URL environment variable but it was blank")
+        print("fetched KH_REPORTING_URL environment variable but it was blank")
     return reporting_url_env
 
 
@@ -42,18 +42,18 @@ def send_report(status_report: StatusReport):
     try:
         data = json.dumps(dataclasses.asdict(status_report))
     except Exception as e:
-        raise Exception(f"failed to convert status report to json string: {e}")
+        print(f"failed to convert status report to json string: {e}")
 
     try:
         kh_url = get_kuberhealthy_url()
     except Exception as e:
-        raise Exception(f"failed to fetch the kuberhealthy url: {e}")
+        print(f"failed to fetch the kuberhealthy url: {e}")
 
     response = requests.post(kh_url, data=data, headers={"Content-Type": "application/json"})
     try:
         response.raise_for_status()
     except HTTPError as e:
-        raise Exception(f"got a bad status code from kuberhealthy: {response.status_code}")
+        print(f"got a bad status code from kuberhealthy: {response.status_code}")
 
 
 if __name__ == '__main__':
