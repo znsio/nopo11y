@@ -17,3 +17,4 @@ istioMetrics:
 nginxIngressMetrics:
   enabled: false
   ingressName: "sample-ingress"
+  path: "/"
