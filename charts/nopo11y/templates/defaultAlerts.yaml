@@ -6,13 +6,14 @@ metadata:
   name: {{ include "app.label" . }}-default-alert-rules
   labels:
     release: {{ .Values.prometheusReleaseLabel }}
+    managedby: nopo11y
 spec:
   groups:
   - name: {{ include "app.label" . }}-default-alert-rules
     rules:
     {{- if .Values.istioMetrics.enabled }}
     - alert: {{ include "app.label" . }}High5xxErrorRate
-      expr: sum(rate(istio_requests_total{app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}", response_code=~"5.."}[5m])) by (instance) / sum(rate(istio_requests_total{app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}"}[5m])) by (instance) * 100 > {{ .Values.errorRate5xx }}
+      expr: sum(rate(istio_requests_total{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}", response_code=~"5.."}[5m])) by (instance) / sum(rate(istio_requests_total{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}"}[5m])) by (instance) * 100 > {{ .Values.errorRate5xx }}
       annotations:
         description: {{ include "app.label" . }} service is experiencing high 5xx errors rate from last 5 minutes.
         summary: {{ include "app.label" . }} service is experiencing high 5xx error rate.
@@ -22,7 +23,7 @@ spec:
       labels:
             severity: critical
     - alert: {{ include "app.label" . }}High4xxErrorRate
-      expr: sum(rate(istio_requests_total{app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}", response_code=~"4.."}[5m])) by (instance) / sum(rate(istio_requests_total{app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}"}[5m])) by (instance) * 100 > {{ .Values.errorRate4xx }}
+      expr: sum(rate(istio_requests_total{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}", response_code=~"4.."}[5m])) by (instance) / sum(rate(istio_requests_total{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}"}[5m])) by (instance) * 100 > {{ .Values.errorRate4xx }}
       for: 5m
       annotations:
         {{- if .Values.grafanaURL }}
@@ -35,7 +36,7 @@ spec:
     {{- end }}
     {{- if .Values.nginxIngressMetrics.enabled }}
     - alert: {{ include "app.label" . }}IngressHigh5xxErrorRate
-      expr: sum(rate(nginx_ingress_controller_requests{ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}",status=~"5.."}[5m])) / sum(rate(nginx_ingress_controller_requests{ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}"}[5m])) * 100 > {{ .Values.errorRate5xx }}
+      expr: sum(rate(nginx_ingress_controller_requests{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}",status=~"5..", path="{{ .Values.nginxIngressMetrics.path }}"}[5m])) / sum(rate(nginx_ingress_controller_requests{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}", path="{{ .Values.nginxIngressMetrics.path }}"}[5m])) * 100 > {{ .Values.errorRate5xx }}
       annotations:
         description: {{ include "app.label" . }} service is experiencing high 5xx errors rate from last 5 minutes.
         summary: {{ include "app.label" . }} is experiencing high 5xx error rate.
@@ -45,7 +46,7 @@ spec:
       labels:
             severity: critical
     - alert: {{ include "app.label" . }}IngressHigh4xxErrorRate
-      expr: sum(rate(nginx_ingress_controller_requests{ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}",status=~"4.."}[5m])) / sum(rate(nginx_ingress_controller_requests{ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}"}[5m])) * 100 > {{ .Values.rrorRate4xx }}
+      expr: sum(rate(nginx_ingress_controller_requests{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}",status=~"4..", path="{{ .Values.nginxIngressMetrics.path }}"}[5m])) / sum(rate(nginx_ingress_controller_requests{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}", path="{{ .Values.nginxIngressMetrics.path }}"}[5m])) * 100 > {{ .Values.errorRate4xx }}
       for: 10m
       annotations:
         description: {{ include "app.label" . }} service is experiencing high 4xx errors rate from last 5 minutes.

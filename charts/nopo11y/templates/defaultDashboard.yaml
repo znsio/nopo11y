@@ -147,7 +147,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(rate(nginx_ingress_controller_requests{ingress=\"{{ .Values.nginxIngressMetrics.ingressName }}\"}[$__rate_interval]))",
+              "expr": "sum(rate(nginx_ingress_controller_requests{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}ingress=\"{{ .Values.nginxIngressMetrics.ingressName }}\", path=\"{{ .Values.nginxIngressMetrics.path }}\"}[$__rate_interval]))",
               "legendFormat": "Requests/sec",
               "range": true,
               "refId": "A"
@@ -241,7 +241,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(rate(nginx_ingress_controller_request_duration_seconds_sum{ingress=~\"{{ .Values.nginxIngressMetrics.ingressName }}\"}[$__rate_interval])) / sum(rate(nginx_ingress_controller_request_duration_seconds_count{ingress=~\"{{ .Values.nginxIngressMetrics.ingressName }}\"}[$__rate_interval]))",
+              "expr": "sum(rate(nginx_ingress_controller_request_duration_seconds_sum{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}ingress=~\"{{ .Values.nginxIngressMetrics.ingressName }}\", path=\"{{ .Values.nginxIngressMetrics.path }}\"}[$__rate_interval])) / sum(rate(nginx_ingress_controller_request_duration_seconds_count{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}ingress=~\"{{ .Values.nginxIngressMetrics.ingressName }}\", path=\"{{ .Values.nginxIngressMetrics.path }}\"}[$__rate_interval]))",
               "legendFormat": "Latency",
               "range": true,
               "refId": "A"
@@ -335,7 +335,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(rate(nginx_ingress_controller_requests{ingress=~\"{{ .Values.nginxIngressMetrics.ingressName }}\",status=~\"5..\"}[$__rate_interval])) / sum(rate(nginx_ingress_controller_requests{ingress=~\"{{ .Values.nginxIngressMetrics.ingressName }}\"}[$__rate_interval])) * 100",
+              "expr": "sum(rate(nginx_ingress_controller_requests{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}ingress=~\"{{ .Values.nginxIngressMetrics.ingressName }}\",status=~\"5..\", path=\"{{ .Values.nginxIngressMetrics.path }}\"}[$__rate_interval])) / sum(rate(nginx_ingress_controller_requests{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}ingress=~\"{{ .Values.nginxIngressMetrics.ingressName }}\", path=\"{{ .Values.nginxIngressMetrics.path }}\"}[$__rate_interval])) * 100",
               "legendFormat": "5xx error rate",
               "range": true,
               "refId": "A"
@@ -429,7 +429,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(rate(nginx_ingress_controller_requests{ingress=~\"{{ .Values.nginxIngressMetrics.ingressName }}\",status=~\"2..|4..\"}[$__rate_interval])) / sum(rate(nginx_ingress_controller_requests{ingress=~\"{{ .Values.nginxIngressMetrics.ingressName }}\"}[$__rate_interval])) * 100",
+              "expr": "sum(rate(nginx_ingress_controller_requests{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}ingress=~\"{{ .Values.nginxIngressMetrics.ingressName }}\",status=~\"2..|4..\", path=\"{{ .Values.nginxIngressMetrics.path }}\"}[$__rate_interval])) / sum(rate(nginx_ingress_controller_requests{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}ingress=~\"{{ .Values.nginxIngressMetrics.ingressName }}\", path=\"{{ .Values.nginxIngressMetrics.path }}\"}[$__rate_interval])) * 100",
               "legendFormat": "Success ",
               "range": true,
               "refId": "A"
@@ -440,7 +440,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(rate(nginx_ingress_controller_requests{ingress=~\"{{ .Values.nginxIngressMetrics.ingressName }}\",status=~\"5..\"}[$__rate_interval])) / sum(rate(nginx_ingress_controller_requests{ingress=~\"{{ .Values.nginxIngressMetrics.ingressName }}\"}[$__rate_interval])) * 100",
+              "expr": "sum(rate(nginx_ingress_controller_requests{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}ingress=~\"{{ .Values.nginxIngressMetrics.ingressName }}\",status=~\"5..\", path=\"{{ .Values.nginxIngressMetrics.path }}\"}[$__rate_interval])) / sum(rate(nginx_ingress_controller_requests{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}ingress=~\"{{ .Values.nginxIngressMetrics.ingressName }}\", path=\"{{ .Values.nginxIngressMetrics.path }}\"}[$__rate_interval])) * 100",
               "hide": false,
               "legendFormat": "Error",
               "range": true,
@@ -535,7 +535,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum (rate(nginx_ingress_controller_response_size_sum{ingress=~\"{{ .Values.nginxIngressMetrics.ingressName }}\"}[$__rate_interval]))/sum(rate(nginx_ingress_controller_response_size_count{ingress=~\"{{ .Values.nginxIngressMetrics.ingressName }}\"}[$__rate_interval]))",
+              "expr": "sum (rate(nginx_ingress_controller_response_size_sum{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}ingress=~\"{{ .Values.nginxIngressMetrics.ingressName }}\", path=\"{{ .Values.nginxIngressMetrics.path }}\"}[$__rate_interval]))/sum(rate(nginx_ingress_controller_response_size_count{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}ingress=~\"{{ .Values.nginxIngressMetrics.ingressName }}\", path=\"{{ .Values.nginxIngressMetrics.path }}\"}[$__rate_interval]))",
               "legendFormat": "Response Size",
               "range": true,
               "refId": "A"
@@ -639,7 +639,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(rate(istio_requests_total{app=~\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\"}[$__rate_interval]))",
+              "expr": "sum(rate(istio_requests_total{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}app=~\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\"}[$__rate_interval]))",
               "legendFormat": "Requests/sec",
               "range": true,
               "refId": "A"
@@ -733,7 +733,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(rate(istio_request_duration_milliseconds_sum{app=~\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\"}[$__rate_interval])) / sum(rate(istio_request_duration_milliseconds_count{app=\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\"}[$__rate_interval]))",
+              "expr": "sum(rate(istio_request_duration_milliseconds_sum{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}app=~\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\"}[$__rate_interval])) / sum(rate(istio_request_duration_milliseconds_count{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}app=\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\"}[$__rate_interval]))",
               "legendFormat": "Latency",
               "range": true,
               "refId": "A"
@@ -827,7 +827,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(rate(istio_requests_total{app=~\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\", response_code=~\"5..\"}[$__rate_interval])) / sum(rate(istio_requests_total{app=~\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\"}[$__rate_interval])) * 100",
+              "expr": "sum(rate(istio_requests_total{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}app=~\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\", response_code=~\"5..\"}[$__rate_interval])) / sum(rate(istio_requests_total{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}app=~\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\"}[$__rate_interval])) * 100",
               "legendFormat": "5xx error rate",
               "range": true,
               "refId": "A"
@@ -921,7 +921,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(rate(istio_requests_total{app=~\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\", response_code=~\"2..|4..\"}[$__rate_interval])) / sum(rate(istio_requests_total{app=~\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\"}[$__rate_interval])) * 100",
+              "expr": "sum(rate(istio_requests_total{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}app=~\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\", response_code=~\"2..|4..\"}[$__rate_interval])) / sum(rate(istio_requests_total{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}app=~\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\"}[$__rate_interval])) * 100",
               "legendFormat": "Success ",
               "range": true,
               "refId": "A"
@@ -932,7 +932,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(rate(istio_requests_total{app=~\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\", response_code=~\"5..\"}[$__rate_interval])) / sum(rate(istio_requests_total{app=~\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\"}[$__rate_interval])) * 100",
+              "expr": "sum(rate(istio_requests_total{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}app=~\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\", response_code=~\"5..\"}[$__rate_interval])) / sum(rate(istio_requests_total{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}app=~\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\"}[$__rate_interval])) * 100",
               "hide": false,
               "legendFormat": "Error",
               "range": true,
@@ -1028,7 +1028,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(rate(istio_response_bytes_sum{app=\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\"}[$__rate_interval])) / sum(rate(istio_response_bytes_count{app=\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\"}[$__rate_interval]))",
+              "expr": "sum(rate(istio_response_bytes_sum{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}app=\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\"}[$__rate_interval])) / sum(rate(istio_response_bytes_count{app=\"{{ include "app.label" . }}\", destination_app=~\"{{ include "app.label" . }}\"}[$__rate_interval]))",
               "legendFormat": "Response Size",
               "range": true,
               "refId": "A"
@@ -1136,7 +1136,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(\r\n    container_memory_working_set_bytes{namespace=\"{{ .Release.Namespace }}\", container!=\"\", image!=\"\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ include "deployment.name" . }}\", workload_type=\"deployment\"}\r\n) by (pod)\r\n/sum(\r\n    kube_pod_container_resource_requests{job=\"kube-state-metrics\", namespace=\"{{ .Release.Namespace }}\", resource=\"memory\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ include "deployment.name" . }}\", workload_type=\"deployment\"}\r\n) by (pod) * 100",
+              "expr": "sum(\r\n    container_memory_working_set_bytes{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}namespace=\"{{ .Release.Namespace }}\", container!=\"\", image!=\"\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}namespace=\"{{ .Release.Namespace }}\", workload=\"{{ include "deployment.name" . }}\", workload_type=\"deployment\"}\r\n) by (pod)\r\n/sum(\r\n    kube_pod_container_resource_requests{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}job=\"kube-state-metrics\", namespace=\"{{ .Release.Namespace }}\", resource=\"memory\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}namespace=\"{{ .Release.Namespace }}\", workload=\"{{ include "deployment.name" . }}\", workload_type=\"deployment\"}\r\n) by (pod) * 100",
               "legendFormat": "__auto",
               "range": true,
               "refId": "A"
@@ -1230,7 +1230,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(\r\n    container_memory_working_set_bytes{namespace=\"{{ .Release.Namespace }}\", container!=\"\", image!=\"\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ include "deployment.name" . }}\", workload_type=\"deployment\"}\r\n) by (pod)\r\n/sum(\r\n    kube_pod_container_resource_limits{job=\"kube-state-metrics\", namespace=\"{{ .Release.Namespace }}\", resource=\"memory\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ include "deployment.name" . }}\", workload_type=\"deployment\"}\r\n) by (pod) * 100",
+              "expr": "sum(\r\n    container_memory_working_set_bytes{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}namespace=\"{{ .Release.Namespace }}\", container!=\"\", image!=\"\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}namespace=\"{{ .Release.Namespace }}\", workload=\"{{ include "deployment.name" . }}\", workload_type=\"deployment\"}\r\n) by (pod)\r\n/sum(\r\n    kube_pod_container_resource_limits{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}job=\"kube-state-metrics\", namespace=\"{{ .Release.Namespace }}\", resource=\"memory\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}namespace=\"{{ .Release.Namespace }}\", workload=\"{{ include "deployment.name" . }}\", workload_type=\"deployment\"}\r\n) by (pod) * 100",
               "legendFormat": "__auto",
               "range": true,
               "refId": "A"
@@ -1324,7 +1324,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(\r\n    node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{namespace=\"{{ .Release.Namespace }}\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ include "deployment.name" . }}\", workload_type=\"deployment\"}\r\n) by (pod)\r\n/sum(\r\n    kube_pod_container_resource_requests{job=\"kube-state-metrics\", namespace=\"{{ .Release.Namespace }}\", resource=\"cpu\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ include "deployment.name" . }}\", workload_type=\"deployment\"}\r\n) by (pod) * 100",
+              "expr": "sum(\r\n    rate(container_cpu_usage_seconds_total{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}namespace=\"{{ .Release.Namespace }}\"}[5m])\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}namespace=\"{{ .Release.Namespace }}\", workload=\"{{ include "deployment.name" . }}\", workload_type=\"deployment\"}\r\n) by (pod)\r\n/sum(\r\n    kube_pod_container_resource_requests{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}job=\"kube-state-metrics\", namespace=\"{{ .Release.Namespace }}\", resource=\"cpu\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}namespace=\"{{ .Release.Namespace }}\", workload=\"{{ include "deployment.name" . }}\", workload_type=\"deployment\"}\r\n) by (pod) * 100",
               "legendFormat": "__auto",
               "range": true,
               "refId": "A"
@@ -1418,7 +1418,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(\r\n    node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{namespace=\"{{ .Release.Namespace }}\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ include "deployment.name" . }}\", workload_type=\"deployment\"}\r\n) by (pod)\r\n/sum(\r\n    kube_pod_container_resource_limits{job=\"kube-state-metrics\", namespace=\"{{ .Release.Namespace }}\", resource=\"cpu\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace=\"{{ .Release.Namespace }}\", workload=\"{{ include "deployment.name" . }}\", workload_type=\"deployment\"}\r\n) by (pod) * 100",
+              "expr": "sum(\r\n    rate(container_cpu_usage_seconds_total{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}namespace=\"{{ .Release.Namespace }}\"}[5m])\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}namespace=\"{{ .Release.Namespace }}\", workload=\"{{ include "deployment.name" . }}\", workload_type=\"deployment\"}\r\n) by (pod)\r\n/sum(\r\n    kube_pod_container_resource_limits{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}job=\"kube-state-metrics\", namespace=\"{{ .Release.Namespace }}\", resource=\"cpu\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}namespace=\"{{ .Release.Namespace }}\", workload=\"{{ include "deployment.name" . }}\", workload_type=\"deployment\"}\r\n) by (pod) * 100",
               "legendFormat": "__auto",
               "range": true,
               "refId": "A"
@@ -1471,7 +1471,7 @@ data:
                 "uid": "P8E80F9AEF21F6940"
               },
               "editorMode": "code",
-              "expr": "{ {{- if and .Values.logLabel .Values.logLabelValue }} {{ .Values.logLabel }}=\"{{ .Values.logLabelValue }}\"{{- else }} app=\"{{ include "app.label" . }}\"{{- end }}, container!=\"istio-proxy\"} |= ``",
+              "expr": "{ {{- if hasKey .Values "cluster" }}cluster=\"{{ .Values.cluster }}\", {{- end }}{{- if and .Values.logLabel .Values.logLabelValue }} {{ .Values.logLabel }}=\"{{ .Values.logLabelValue }}\"{{- else }} app=\"{{ include "app.label" . }}\"{{- end }}, container!=\"istio-proxy\"} |= ``",
               "queryType": "range",
               "refId": "A"
             }
