@@ -5,6 +5,7 @@ kind: PrometheusServiceLevel
 metadata:
   labels:
     release: {{ .Values.prometheusReleaseLabel }}
+    managedby: nopo11y
   name: {{ include "app.label" . }}-availability-slo
   namespace: {{ .Values.namespace }}
 spec:
@@ -44,14 +45,15 @@ spec:
     objective: {{ .Values.availabilitySLO }}
     sli:
       events:
-        errorQuery: sum(rate(istio_requests_total{app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}", response_code=~"5.."}[{{ printf "{{.window}}" }}]))
-        totalQuery: sum(rate(istio_requests_total{app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}"}[{{ printf "{{.window}}" }}]))
+        errorQuery: sum(rate(istio_requests_total{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}", response_code=~"5.."}[{{ printf "{{.window}}" }}]))
+        totalQuery: sum(rate(istio_requests_total{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}"}[{{ printf "{{.window}}" }}]))
 ---
 apiVersion: sloth.slok.dev/v1
 kind: PrometheusServiceLevel
 metadata:
   labels:
     release: {{ .Values.prometheusReleaseLabel }}
+    managedby: nopo11y
   name: {{ include "app.label" . }}-latency-slo
   namespace: {{ .Values.namespace }}
 spec:
@@ -91,8 +93,8 @@ spec:
     objective: {{ .Values.latencySLO }}
     sli:
       events:
-        errorQuery: (sum(rate(istio_request_duration_milliseconds_bucket{app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}", le="+Inf"}[{{ printf "{{.window}}" }}])) - sum(rate(istio_request_duration_milliseconds_bucket{app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}", le="{{ .Values.latency }}"}[{{ printf "{{.window}}" }}])))
-        totalQuery: sum(rate(istio_request_duration_milliseconds_bucket{app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}", le="+Inf"}[{{ printf "{{.window}}" }}]))
+        errorQuery: (sum(rate(istio_request_duration_milliseconds_bucket{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}", le="+Inf"}[{{ printf "{{.window}}" }}])) - sum(rate(istio_request_duration_milliseconds_bucket{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}", le="{{ .Values.latency }}"}[{{ printf "{{.window}}" }}])))
+        totalQuery: sum(rate(istio_request_duration_milliseconds_bucket{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}", le="+Inf"}[{{ printf "{{.window}}" }}]))
 {{- end }}
 {{- end }}
 ---
@@ -103,6 +105,7 @@ kind: PrometheusServiceLevel
 metadata:
   labels:
     release: {{ .Values.prometheusReleaseLabel }}
+    managedby: nopo11y
   name: {{ include "app.label" . }}-ingress-availability-slo
   namespace: {{ .Values.namespace }}
 spec:
@@ -142,14 +145,15 @@ spec:
     objective: {{ .Values.availabilitySLO }}
     sli:
       events:
-        errorQuery: sum(rate(nginx_ingress_controller_requests{ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}",status=~"5.."}[{{ printf "{{.window}}" }}]))
-        totalQuery: sum(rate(nginx_ingress_controller_requests{ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}"}[{{ printf "{{.window}}" }}]))
+        errorQuery: sum(rate(nginx_ingress_controller_requests{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}",status=~"5..", path="{{ .Values.nginxIngressMetrics.path }}"}[{{ printf "{{.window}}" }}]))
+        totalQuery: sum(rate(nginx_ingress_controller_requests{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}", path="{{ .Values.nginxIngressMetrics.path }}"}[{{ printf "{{.window}}" }}]))
 ---
 apiVersion: sloth.slok.dev/v1
 kind: PrometheusServiceLevel
 metadata:
   labels:
     release: {{ .Values.prometheusReleaseLabel }}
+    managedby: nopo11y
   name: {{ include "app.label" . }}-ingress-latency-slo
   namespace: {{ .Values.namespace }}
 spec:
@@ -165,11 +169,11 @@ spec:
         dashboard: {{ .Values.grafanaURL }}/d/slo-detail?var-service={{ include "app.label" . }}
         {{- end }}
         summary: SLO to measure response time - {{ .Values.latencySLO }}% of the time requests should
-          be succesfully served in < 1s. When you receive this alert it means that
+          be succesfully served in < {{ .Values.latency }}ms. When you receive this alert it means that
           the SLO is at risk as your error budget is getting exhausted. To know more
           about ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
         description: SLO to measure response time - {{ .Values.latencySLO }}% of the time requests should
-          be succesfully served in < 1s. When you receive this alert it means that
+          be succesfully served in < {{ .Values.latency }}ms. When you receive this alert it means that
           the SLO is at risk as your error budget is getting exhausted. To know more
           about ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
       name: {{ include "app.label" . }}-ingress - latency SLO is at RISK
@@ -182,14 +186,14 @@ spec:
           alert_type: symptom
           severity: warning
     description: SLO to measure response time - {{ .Values.latencySLO }}% of the time requests should
-          be succesfully served in < 1s.. When you receive this alert it means that the
+          be succesfully served in < {{ .Values.latency }}ms. When you receive this alert it means that the
       SLO is at risk as your error budget is getting exhausted. To know more about
       ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
     name: latency-{{ include "app.label" . }}-ingress
     objective: {{ .Values.latencySLO }}
     sli:
       events:
-        errorQuery: (sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}",le="+Inf"}[{{ printf "{{.window}}" }}])) - sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}",le="1"}[{{ printf "{{.window}}" }}])))
-        totalQuery: sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}",le="+Inf"}[{{ printf "{{.window}}" }}]))
+        errorQuery: (sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}",le="+Inf", path="{{ .Values.nginxIngressMetrics.path }}"}[{{ printf "{{.window}}" }}])) - sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}",le="{{ divf .Values.latency 1000 }}", path="{{ .Values.nginxIngressMetrics.path }}"}[{{ printf "{{.window}}" }}])))
+        totalQuery: sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}",le="+Inf", path="{{ .Values.nginxIngressMetrics.path }}"}[{{ printf "{{.window}}" }}]))
 {{- end }}
 {{- end }}
