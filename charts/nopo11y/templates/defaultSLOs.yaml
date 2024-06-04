@@ -146,7 +146,7 @@ spec:
     sli:
       events:
         errorQuery: sum(rate(nginx_ingress_controller_requests{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}",status=~"5..", path="{{ .Values.nginxIngressMetrics.path }}"}[{{ printf "{{.window}}" }}]))
-        totalQuery: sum(rate({{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}nginx_ingress_controller_requests{ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}", path="{{ .Values.nginxIngressMetrics.path }}"}[{{ printf "{{.window}}" }}]))
+        totalQuery: sum(rate(nginx_ingress_controller_requests{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}", path="{{ .Values.nginxIngressMetrics.path }}"}[{{ printf "{{.window}}" }}]))
 ---
 apiVersion: sloth.slok.dev/v1
 kind: PrometheusServiceLevel
