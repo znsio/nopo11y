@@ -169,11 +169,11 @@ spec:
         dashboard: {{ .Values.grafanaURL }}/d/slo-detail?var-service={{ include "app.label" . }}
         {{- end }}
         summary: SLO to measure response time - {{ .Values.latencySLO }}% of the time requests should
-          be succesfully served in < {{ .Values.latency }}s. When you receive this alert it means that
+          be succesfully served in < {{ .Values.latency }}ms. When you receive this alert it means that
           the SLO is at risk as your error budget is getting exhausted. To know more
           about ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
         description: SLO to measure response time - {{ .Values.latencySLO }}% of the time requests should
-          be succesfully served in < {{ .Values.latency }}s. When you receive this alert it means that
+          be succesfully served in < {{ .Values.latency }}ms. When you receive this alert it means that
           the SLO is at risk as your error budget is getting exhausted. To know more
           about ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
       name: {{ include "app.label" . }}-ingress - latency SLO is at RISK
@@ -186,14 +186,14 @@ spec:
           alert_type: symptom
           severity: warning
     description: SLO to measure response time - {{ .Values.latencySLO }}% of the time requests should
-          be succesfully served in < {{ .Values.latency }}s. When you receive this alert it means that the
+          be succesfully served in < {{ .Values.latency }}ms. When you receive this alert it means that the
       SLO is at risk as your error budget is getting exhausted. To know more about
       ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
     name: latency-{{ include "app.label" . }}-ingress
     objective: {{ .Values.latencySLO }}
     sli:
       events:
-        errorQuery: (sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}",le="+Inf", path="{{ .Values.nginxIngressMetrics.path }}"}[{{ printf "{{.window}}" }}])) - sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}",le="{{ .Values.latency }}", path="{{ .Values.nginxIngressMetrics.path }}"}[{{ printf "{{.window}}" }}])))
+        errorQuery: (sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}",le="+Inf", path="{{ .Values.nginxIngressMetrics.path }}"}[{{ printf "{{.window}}" }}])) - sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}",le="{{ divf .Values.latency 1000 }}", path="{{ .Values.nginxIngressMetrics.path }}"}[{{ printf "{{.window}}" }}])))
         totalQuery: sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}",le="+Inf", path="{{ .Values.nginxIngressMetrics.path }}"}[{{ printf "{{.window}}" }}]))
 {{- end }}
 {{- end }}
