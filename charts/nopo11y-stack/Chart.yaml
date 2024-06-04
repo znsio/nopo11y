@@ -4,7 +4,7 @@ dependencies:
 - condition: kube-prometheus-stack.enabled
   name: kube-prometheus-stack
   repository: https://prometheus-community.github.io/helm-charts
-  version: 58.2.2
+  version: 58.5.2
 - condition: thanos.enabled
   name: thanos
   repository: https://charts.bitnami.com/bitnami
@@ -40,4 +40,4 @@ dependencies:
 description: A Helm chart for observability stack
 name: nopo11y-stack
 type: application
-version: 1.2.1
+version: 1.2.2
