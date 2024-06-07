@@ -6,19 +6,19 @@ metadata:
   labels:
     release: {{ .Values.prometheusReleaseLabel }}
     managedby: nopo11y
-  name: {{ include "app.label" . }}-availability-slo
+  name: {{ include "deployment.name" . }}-availability-slo
   namespace: {{ .Values.namespace }}
 spec:
   labels:
     app: sloth
     role: alert-rules
-    component: {{ include "app.label" . }}-availability-SLO-rules
-  service: {{ include "app.label" . }}
+    component: {{ include "deployment.name" . }}-availability-SLO-rules
+  service: {{ include "deployment.name" . }}
   slos:
   - alerting:
       annotations:
         {{- if .Values.grafanaURL }}
-        dashboard: {{ .Values.grafanaURL }}/d/slo-detail?var-service={{ include "app.label" . }}
+        dashboard: {{ .Values.grafanaURL }}/d/slo-detail?var-service={{ include "deployment.name" . }}
         {{- end }}
         summary: SLO to measure success vs errors - {{ .Values.availabilitySLO }}% of the time requests should
           be succesfully served (non 5xx). When you receive this alert it means that
@@ -28,7 +28,7 @@ spec:
           be succesfully served (non 5xx). When you receive this alert it means that the
           SLO is at risk as your error budget is getting exhausted. To know more about
           ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
-      name: {{ include "app.label" . }} - availability SLO is at RISK 
+      name: {{ include "deployment.name" . }} - availability SLO is at RISK 
       pageAlert:
         labels:
           alert_type: symptom
@@ -41,12 +41,12 @@ spec:
       be succesfully served (non 5xx). When you receive this alert it means that the
       SLO is at risk as your error budget is getting exhausted. To know more about
       ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
-    name: availability-{{- if .Values.includeReleaseNameInMetricsLabels }}{{ .Release.Name }}-{{ include "app.label" . }}{{- else }}{{ include "app.label" . }}{{- end }}
+    name: availability-{{ include "deployment.name" . }}
     objective: {{ .Values.availabilitySLO }}
     sli:
       events:
-        errorQuery: sum(rate(istio_requests_total{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}", response_code=~"5.."}[{{ printf "{{.window}}" }}]))
-        totalQuery: sum(rate(istio_requests_total{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}"}[{{ printf "{{.window}}" }}]))
+        errorQuery: sum(rate(istio_requests_total{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_workload="{{ include "deployment.name" . }}", response_code=~"5.."}[{{ printf "{{.window}}" }}]))
+        totalQuery: sum(rate(istio_requests_total{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_workload="{{ include "deployment.name" . }}"}[{{ printf "{{.window}}" }}]))
 ---
 apiVersion: sloth.slok.dev/v1
 kind: PrometheusServiceLevel
@@ -54,19 +54,19 @@ metadata:
   labels:
     release: {{ .Values.prometheusReleaseLabel }}
     managedby: nopo11y
-  name: {{ include "app.label" . }}-latency-slo
+  name: {{ include "deployment.name" . }}-latency-slo
   namespace: {{ .Values.namespace }}
 spec:
   labels:
     app: sloth
     role: alert-rules
-    component: {{ include "app.label" . }}-latency-SLO-rules
-  service: {{ include "app.label" . }}
+    component: {{ include "deployment.name" . }}-latency-SLO-rules
+  service: {{ include "deployment.name" . }}
   slos:
   - alerting:
       annotations:
         {{- if .Values.grafanaURL }}
-        dashboard: {{ .Values.grafanaURL }}/d/slo-detail?var-service={{ include "app.label" . }}
+        dashboard: {{ .Values.grafanaURL }}/d/slo-detail?var-service={{ include "deployment.name" . }}
         {{- end }}
         summary: SLO to measure response time - {{ .Values.latencySLO }}% of the time requests should
           be succesfully served in < {{ .Values.latency }}ms. When you receive this alert it means that
@@ -76,7 +76,7 @@ spec:
           be succesfully served in < {{ .Values.latency }}ms. When you receive this alert it means that
           the SLO is at risk as your error budget is getting exhausted. To know more
           about ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
-      name: {{ include "app.label" . }} - latency SLO is at RISK
+      name: {{ include "deployment.name" . }} - latency SLO is at RISK
       pageAlert:
         labels:
           alert_type: symptom
@@ -89,12 +89,12 @@ spec:
           be succesfully served in < {{ .Values.latency }}ms. When you receive this alert it means that the
       SLO is at risk as your error budget is getting exhausted. To know more about
       ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
-    name: latency-{{- if .Values.includeReleaseNameInMetricsLabels }}{{ .Release.Name }}-{{ include "app.label" . }}{{- else }}{{ include "app.label" . }}{{- end }}
+    name: latency-{{ include "deployment.name" . }}
     objective: {{ .Values.latencySLO }}
     sli:
       events:
-        errorQuery: (sum(rate(istio_request_duration_milliseconds_bucket{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}", le="+Inf"}[{{ printf "{{.window}}" }}])) - sum(rate(istio_request_duration_milliseconds_bucket{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}", le="{{ .Values.latency }}"}[{{ printf "{{.window}}" }}])))
-        totalQuery: sum(rate(istio_request_duration_milliseconds_bucket{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}", le="+Inf"}[{{ printf "{{.window}}" }}]))
+        errorQuery: (sum(rate(istio_request_duration_milliseconds_bucket{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_workload="{{ include "deployment.name" . }}", le="+Inf"}[{{ printf "{{.window}}" }}])) - sum(rate(istio_request_duration_milliseconds_bucket{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_workload="{{ include "deployment.name" . }}", le="{{ .Values.latency }}"}[{{ printf "{{.window}}" }}])))
+        totalQuery: sum(rate(istio_request_duration_milliseconds_bucket{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_workload="{{ include "deployment.name" . }}", le="+Inf"}[{{ printf "{{.window}}" }}]))
 {{- end }}
 {{- end }}
 ---
@@ -106,19 +106,19 @@ metadata:
   labels:
     release: {{ .Values.prometheusReleaseLabel }}
     managedby: nopo11y
-  name: {{ include "app.label" . }}-ingress-availability-slo
+  name: {{ include "deployment.name" . }}-availability-slo
   namespace: {{ .Values.namespace }}
 spec:
   labels:
     app: sloth
     role: alert-rules
-    component: {{ include "app.label" . }}-ingress-availability-SLO-rules
-  service: {{ include "app.label" . }}-ingress
+    component: {{ include "deployment.name" . }}-availability-SLO-rules
+  service: {{ include "deployment.name" . }}
   slos:
   - alerting:
       annotations:
         {{- if .Values.grafanaURL }}
-        dashboard: {{ .Values.grafanaURL }}/d/slo-detail?var-service={{ include "app.label" . }}
+        dashboard: {{ .Values.grafanaURL }}/d/slo-detail?var-service={{ include "deployment.name" . }}
         {{- end }}
         summary: SLO to measure success vs errors - {{ .Values.availabilitySLO }}% of the time requests should
           be succesfully served (non 5xx). When you receive this alert it means that
@@ -128,7 +128,7 @@ spec:
           be succesfully served (non 5xx). When you receive this alert it means that
           the SLO is at risk as your error budget is getting exhausted. To know more
           about ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
-      name: {{ include "app.label" . }}-ingress - availability SLO is at RISK
+      name: {{ include "deployment.name" . }}-ingress - availability SLO is at RISK
       pageAlert:
         labels:
           alert_type: symptom
@@ -141,12 +141,12 @@ spec:
       be succesfully served (non 5xx). When you receive this alert it means that the
       SLO is at risk as your error budget is getting exhausted. To know more about
       ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
-    name: availability-{{ include "app.label" . }}-ingress
+    name: availability-{{ include "deployment.name" . }}
     objective: {{ .Values.availabilitySLO }}
     sli:
       events:
-        errorQuery: sum(rate(nginx_ingress_controller_requests{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}",status=~"5..", path="{{ .Values.nginxIngressMetrics.path }}"}[{{ printf "{{.window}}" }}]))
-        totalQuery: sum(rate(nginx_ingress_controller_requests{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}", path="{{ .Values.nginxIngressMetrics.path }}"}[{{ printf "{{.window}}" }}]))
+        errorQuery: sum(rate(nginx_ingress_controller_requests{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}",status=~"5..", exported_service="{{ .Values.nginxIngressMetrics.serviceName }}"}[{{ printf "{{.window}}" }}]))
+        totalQuery: sum(rate(nginx_ingress_controller_requests{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}", exported_service="{{ .Values.nginxIngressMetrics.serviceName }}"}[{{ printf "{{.window}}" }}]))
 ---
 apiVersion: sloth.slok.dev/v1
 kind: PrometheusServiceLevel
@@ -154,19 +154,19 @@ metadata:
   labels:
     release: {{ .Values.prometheusReleaseLabel }}
     managedby: nopo11y
-  name: {{ include "app.label" . }}-ingress-latency-slo
+  name: {{ include "deployment.name" . }}-latency-slo
   namespace: {{ .Values.namespace }}
 spec:
   labels:
     app: sloth
     role: alert-rules
-    component: {{ include "app.label" . }}-ingress-latency-SLO-rules
-  service: {{ include "app.label" . }}-ingress
+    component: {{ include "deployment.name" . }}-latency-SLO-rules
+  service: {{ include "deployment.name" . }}
   slos:
   - alerting:
       annotations:
         {{- if .Values.grafanaURL }}
-        dashboard: {{ .Values.grafanaURL }}/d/slo-detail?var-service={{ include "app.label" . }}
+        dashboard: {{ .Values.grafanaURL }}/d/slo-detail?var-service={{ include "deployment.name" . }}
         {{- end }}
         summary: SLO to measure response time - {{ .Values.latencySLO }}% of the time requests should
           be succesfully served in < {{ .Values.latency }}ms. When you receive this alert it means that
@@ -176,7 +176,7 @@ spec:
           be succesfully served in < {{ .Values.latency }}ms. When you receive this alert it means that
           the SLO is at risk as your error budget is getting exhausted. To know more
           about ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
-      name: {{ include "app.label" . }}-ingress - latency SLO is at RISK
+      name: {{ include "deployment.name" . }} - latency SLO is at RISK
       pageAlert:
         labels:
           alert_type: symptom
@@ -189,11 +189,11 @@ spec:
           be succesfully served in < {{ .Values.latency }}ms. When you receive this alert it means that the
       SLO is at risk as your error budget is getting exhausted. To know more about
       ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
-    name: latency-{{ include "app.label" . }}-ingress
+    name: latency-{{ include "deployment.name" . }}
     objective: {{ .Values.latencySLO }}
     sli:
       events:
-        errorQuery: (sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}",le="+Inf", path="{{ .Values.nginxIngressMetrics.path }}"}[{{ printf "{{.window}}" }}])) - sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}",le="{{ divf .Values.latency 1000 }}", path="{{ .Values.nginxIngressMetrics.path }}"}[{{ printf "{{.window}}" }}])))
-        totalQuery: sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}",le="+Inf", path="{{ .Values.nginxIngressMetrics.path }}"}[{{ printf "{{.window}}" }}]))
+        errorQuery: (sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}",le="+Inf", exported_service="{{ .Values.nginxIngressMetrics.serviceName }}"}[{{ printf "{{.window}}" }}])) - sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}",le="{{ divf .Values.latency 1000 }}", exported_service="{{ .Values.nginxIngressMetrics.serviceName }}"}[{{ printf "{{.window}}" }}])))
+        totalQuery: sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}",le="+Inf", exported_service="{{ .Values.nginxIngressMetrics.serviceName }}"}[{{ printf "{{.window}}" }}]))
 {{- end }}
 {{- end }}

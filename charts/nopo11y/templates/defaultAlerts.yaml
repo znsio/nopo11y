@@ -3,54 +3,54 @@ apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
   namespace: {{ .Values.namespace }}
-  name: {{ include "app.label" . }}-default-alert-rules
+  name: {{ include "deployment.name" . }}-default-alert-rules
   labels:
     release: {{ .Values.prometheusReleaseLabel }}
     managedby: nopo11y
 spec:
   groups:
-  - name: {{ include "app.label" . }}-default-alert-rules
+  - name: {{ include "deployment.name" . }}-default-alert-rules
     rules:
     {{- if .Values.istioMetrics.enabled }}
-    - alert: {{ include "app.label" . }}High5xxErrorRate
-      expr: sum(rate(istio_requests_total{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}", response_code=~"5.."}[5m])) by (instance) / sum(rate(istio_requests_total{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}"}[5m])) by (instance) * 100 > {{ .Values.errorRate5xx }}
+    - alert: {{ include "deployment.name" . }}High5xxErrorRate
+      expr: sum(rate(istio_requests_total{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_workload="{{ include "deployment.name" . }}", response_code=~"5.."}[5m])) by (instance) / sum(rate(istio_requests_total{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_workload="{{ include "deployment.name" . }}"}[5m])) by (instance) * 100 > {{ .Values.errorRate5xx }}
       annotations:
-        description: {{ include "app.label" . }} service is experiencing high 5xx errors rate from last 5 minutes.
-        summary: {{ include "app.label" . }} service is experiencing high 5xx error rate.
+        description: {{ include "deployment.name" . }} service is experiencing high 5xx errors rate from last 5 minutes.
+        summary: {{ include "deployment.name" . }} service is experiencing high 5xx error rate.
         {{- if .Values.grafanaURL }}
         dashboard: {{ .Values.grafanaURL }}/d/{{ include "dashboard-uid" .}}
         {{- end }}
       labels:
             severity: critical
-    - alert: {{ include "app.label" . }}High4xxErrorRate
-      expr: sum(rate(istio_requests_total{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}", response_code=~"4.."}[5m])) by (instance) / sum(rate(istio_requests_total{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}app="{{ include "app.label" . }}", destination_app=~"{{ include "app.label" . }}"}[5m])) by (instance) * 100 > {{ .Values.errorRate4xx }}
+    - alert: {{ include "deployment.name" . }}High4xxErrorRate
+      expr: sum(rate(istio_requests_total{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_workload="{{ include "deployment.name" . }}", response_code=~"4.."}[5m])) by (instance) / sum(rate(istio_requests_total{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_workload="{{ include "deployment.name" . }}"}[5m])) by (instance) * 100 > {{ .Values.errorRate4xx }}
       for: 5m
       annotations:
         {{- if .Values.grafanaURL }}
         dashboard: {{ .Values.grafanaURL }}/d/{{ include "dashboard-uid" .}}
         {{- end }}
-        description: {{ include "app.label" . }} service is experiencing high 4xx errors rate from last 5 minutes.
-        summary: {{ include "app.label" . }} service is experiencing high 4xx error rate.
+        description: {{ include "deployment.name" . }} service is experiencing high 4xx errors rate from last 5 minutes.
+        summary: {{ include "deployment.name" . }} service is experiencing high 4xx error rate.
       labels:
             severity: warning
     {{- end }}
     {{- if .Values.nginxIngressMetrics.enabled }}
-    - alert: {{ include "app.label" . }}IngressHigh5xxErrorRate
-      expr: sum(rate(nginx_ingress_controller_requests{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}",status=~"5..", path="{{ .Values.nginxIngressMetrics.path }}"}[5m])) / sum(rate(nginx_ingress_controller_requests{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}", path="{{ .Values.nginxIngressMetrics.path }}"}[5m])) * 100 > {{ .Values.errorRate5xx }}
+    - alert: {{ include "deployment.name" . }}IngressHigh5xxErrorRate
+      expr: sum(rate(nginx_ingress_controller_requests{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}",status=~"5..", exported_service="{{ .Values.nginxIngressMetrics.serviceName }}"}[5m])) / sum(rate(nginx_ingress_controller_requests{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}", exported_service="{{ .Values.nginxIngressMetrics.serviceName }}"}[5m])) * 100 > {{ .Values.errorRate5xx }}
       annotations:
-        description: {{ include "app.label" . }} service is experiencing high 5xx errors rate from last 5 minutes.
-        summary: {{ include "app.label" . }} is experiencing high 5xx error rate.
+        description: {{ include "deployment.name" . }} service is experiencing high 5xx errors rate from last 5 minutes.
+        summary: {{ include "deployment.name" . }} is experiencing high 5xx error rate.
         {{- if .Values.grafanaURL }}
         dashboard: {{ .Values.grafanaURL }}/d/{{ include "dashboard-uid" .}}
         {{- end }}
       labels:
             severity: critical
-    - alert: {{ include "app.label" . }}IngressHigh4xxErrorRate
-      expr: sum(rate(nginx_ingress_controller_requests{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}",status=~"4..", path="{{ .Values.nginxIngressMetrics.path }}"}[5m])) / sum(rate(nginx_ingress_controller_requests{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}", path="{{ .Values.nginxIngressMetrics.path }}"}[5m])) * 100 > {{ .Values.errorRate4xx }}
+    - alert: {{ include "deployment.name" . }}IngressHigh4xxErrorRate
+      expr: sum(rate(nginx_ingress_controller_requests{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}",status=~"4..", exported_service="{{ .Values.nginxIngressMetrics.serviceName }}"}[5m])) / sum(rate(nginx_ingress_controller_requests{ {{- if hasKey .Values "cluster" }}cluster="{{ .Values.cluster }}", {{- end }}ingress=~"{{ .Values.nginxIngressMetrics.ingressName }}", exported_service="{{ .Values.nginxIngressMetrics.serviceName }}"}[5m])) * 100 > {{ .Values.errorRate4xx }}
       for: 10m
       annotations:
-        description: {{ include "app.label" . }} service is experiencing high 4xx errors rate from last 5 minutes.
-        summary: {{ include "app.label" . }} service is experiencing high 4xx error rate.
+        description: {{ include "deployment.name" . }} service is experiencing high 4xx errors rate from last 5 minutes.
+        summary: {{ include "deployment.name" . }} service is experiencing high 4xx error rate.
         {{- if .Values.grafanaURL }}
         dashboard: {{ .Values.grafanaURL }}/d/{{ include "dashboard-uid" .}}
         {{- end }}

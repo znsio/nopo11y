@@ -1,6 +1,5 @@
 enabled: false
 namespace: observability
-appLabel: "sample"
 includeReleaseNameInMetricsLabels: false
 deploymentName: "sample"
 prometheusReleaseLabel: "nopo11y-stack"
@@ -10,11 +9,9 @@ latency: 1000
 errorRate5xx: 0.05
 errorRate4xx: 5
 grafanaURL: ""
-logLabel: ""
-logLabelValue: ""
 istioMetrics:
   enabled: true
 nginxIngressMetrics:
   enabled: false
   ingressName: "sample-ingress"
-  path: "/"
+  serviceName: "sample"
