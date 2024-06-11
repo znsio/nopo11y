@@ -1,0 +1,201 @@
+{{- if .Values.enabled }}
+{{ $services := (include "nopo11y.services" . |fromJsonArray) }}
+{{- range $services }}
+{{ $deployment:= .deployment }}
+{{- if $.Values.prependReleaseNameToDeployment }}
+{{ $deployment = printf "%s-%s" $.Release.Name .deployment }}
+{{- end }}
+{{- if $.Values.istioMetrics.enabled }}
+apiVersion: sloth.slok.dev/v1
+kind: PrometheusServiceLevel
+metadata:
+  labels:
+    managedby: nopo11y
+  name: {{ $deployment }}-availability-slo
+  namespace: {{ $.Values.namespace }}
+spec:
+  labels:
+    app: sloth
+    role: alert-rules
+    component: {{ $deployment }}-availability-SLO-rules
+  service: {{ $deployment }}
+  slos:
+  - alerting:
+      annotations:
+        {{- if $.Values.grafanaURL }}
+        dashboard: {{ $.Values.grafanaURL }}/d/slo-detail?var-service={{ $deployment }}
+        {{- end }}
+        summary: SLO to measure success vs errors - {{ .availability }}% of the time requests should
+          be succesfully served (non 5xx). When you receive this alert it means that
+          the SLO is at risk as your error budget is getting exhausted. To know more
+          about ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
+        description: SLO to measure success vs errors - {{ .availability }}% of the time requests should
+          be succesfully served (non 5xx). When you receive this alert it means that the
+          SLO is at risk as your error budget is getting exhausted. To know more about
+          ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
+      name: {{ $deployment }} - availability SLO is at RISK 
+      pageAlert:
+        labels:
+          alert_type: symptom
+          severity: critical
+      ticketAlert:
+        labels:
+          alert_type: symptom
+          severity: warning
+    description: SLO to measure success vs errors - {{ .availability }}% of the time requests should
+      be succesfully served (non 5xx). When you receive this alert it means that the
+      SLO is at risk as your error budget is getting exhausted. To know more about
+      ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
+    name: availability-{{ $deployment }}
+    objective: {{ .availability }}
+    sli:
+      events:
+        errorQuery: sum(rate(istio_requests_total{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_workload="{{ $deployment }}", response_code=~"5.."}[{{ printf "{{.window}}" }}]))
+        totalQuery: sum(rate(istio_requests_total{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_workload="{{ $deployment }}"}[{{ printf "{{.window}}" }}]))
+---
+apiVersion: sloth.slok.dev/v1
+kind: PrometheusServiceLevel
+metadata:
+  labels:
+    managedby: nopo11y
+  name: {{ $deployment }}-latency-slo
+  namespace: {{ $.Values.namespace }}
+spec:
+  labels:
+    app: sloth
+    role: alert-rules
+    component: {{ $deployment }}-latency-SLO-rules
+  service: {{ $deployment }}
+  slos:
+  - alerting:
+      annotations:
+        {{- if $.Values.grafanaURL }}
+        dashboard: {{ $.Values.grafanaURL }}/d/slo-detail?var-service={{ $deployment }}
+        {{- end }}
+        summary: SLO to measure response time - {{ .latency }}% of the time requests should
+          be succesfully served in < {{ .latencyThreshold }}ms. When you receive this alert it means that
+          the SLO is at risk as your error budget is getting exhausted. To know more
+          about ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
+        description: SLO to measure response time - {{ .latency }}% of the time requests should
+          be succesfully served in < {{ .latencyThreshold }}ms. When you receive this alert it means that
+          the SLO is at risk as your error budget is getting exhausted. To know more
+          about ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
+      name: {{ $deployment }} - latency SLO is at RISK
+      pageAlert:
+        labels:
+          alert_type: symptom
+          severity: critical
+      ticketAlert:
+        labels:
+          alert_type: symptom
+          severity: warning
+    description: SLO to measure response time - {{ .latency }}% of the time requests should
+          be succesfully served in < {{ .latencyThreshold }}ms. When you receive this alert it means that the
+      SLO is at risk as your error budget is getting exhausted. To know more about
+      ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
+    name: latency-{{ $deployment }}
+    objective: {{ .latency }}
+    sli:
+      events:
+        errorQuery: (sum(rate(istio_request_duration_milliseconds_bucket{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_workload="{{ $deployment }}", le="+Inf"}[{{ printf "{{.window}}" }}])) - sum(rate(istio_request_duration_milliseconds_bucket{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_workload="{{ $deployment }}", le="{{ .latencyThreshold }}"}[{{ printf "{{.window}}" }}])))
+        totalQuery: sum(rate(istio_request_duration_milliseconds_bucket{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_workload="{{ $deployment }}", le="+Inf"}[{{ printf "{{.window}}" }}]))
+---
+{{- end }}
+{{- if $.Values.nginxIngressMetrics.enabled }}
+apiVersion: sloth.slok.dev/v1
+kind: PrometheusServiceLevel
+metadata:
+  labels:
+    managedby: nopo11y
+  name: {{ $deployment }}-ingress-availability-slo
+  namespace: {{ $.Values.namespace }}
+spec:
+  labels:
+    app: sloth
+    role: alert-rules
+    component: {{ $deployment }}-ingress-availability-SLO-rules
+  service: {{ $deployment }}
+  slos:
+  - alerting:
+      annotations:
+        {{- if $.Values.grafanaURL }}
+        dashboard: {{ $.Values.grafanaURL }}/d/slo-detail?var-service={{ $deployment }}
+        {{- end }}
+        summary: SLO to measure success vs errors - {{ .availability }}% of the time requests should
+          be succesfully served (non 5xx). When you receive this alert it means that
+          the SLO is at risk as your error budget is getting exhausted. To know more
+          about ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
+        description: SLO to measure success vs errors - {{ .availability }}% of the time requests should
+          be succesfully served (non 5xx). When you receive this alert it means that
+          the SLO is at risk as your error budget is getting exhausted. To know more
+          about ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
+      name: {{ $deployment }}-ingress - availability SLO is at RISK
+      pageAlert:
+        labels:
+          alert_type: symptom
+          severity: critical
+      ticketAlert:
+        labels:
+          alert_type: symptom
+          severity: warning
+    description: SLO to measure success vs errors - {{ .availability }}% of the time requests should
+      be succesfully served (non 5xx). When you receive this alert it means that the
+      SLO is at risk as your error budget is getting exhausted. To know more about
+      ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
+    name: availability-{{ $deployment }}-ingress
+    objective: {{ .availability }}
+    sli:
+      events:
+        errorQuery: sum(rate(nginx_ingress_controller_requests{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}ingress=~"{{ .ingressName }}",status=~"5..", exported_service="{{ .serviceName }}"}[{{ printf "{{.window}}" }}]))
+        totalQuery: sum(rate(nginx_ingress_controller_requests{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}ingress=~"{{ .ingressName }}", exported_service="{{ .serviceName }}"}[{{ printf "{{.window}}" }}]))
+---
+apiVersion: sloth.slok.dev/v1
+kind: PrometheusServiceLevel
+metadata:
+  labels:
+    managedby: nopo11y
+  name: {{ $deployment }}-ingress-latency-slo
+  namespace: {{ $.Values.namespace }}
+spec:
+  labels:
+    app: sloth
+    role: alert-rules
+    component: {{ $deployment }}-ingress-latency-SLO-rules
+  service: {{ $deployment }}
+  slos:
+  - alerting:
+      annotations:
+        {{- if $.Values.grafanaURL }}
+        dashboard: {{ $.Values.grafanaURL }}/d/slo-detail?var-service={{ $deployment }}
+        {{- end }}
+        summary: SLO to measure response time - {{ .latency }}% of the time requests should
+          be succesfully served in < {{ .latencyThreshold }}ms. When you receive this alert it means that
+          the SLO is at risk as your error budget is getting exhausted. To know more
+          about ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
+        description: SLO to measure response time - {{ .latency }}% of the time requests should
+          be succesfully served in < {{ .latencyThreshold }}ms. When you receive this alert it means that
+          the SLO is at risk as your error budget is getting exhausted. To know more
+          about ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
+      name: {{ $deployment }} - latency SLO is at RISK
+      pageAlert:
+        labels:
+          alert_type: symptom
+          severity: critical
+      ticketAlert:
+        labels:
+          alert_type: symptom
+          severity: warning
+    description: SLO to measure response time - {{ .latency }}% of the time requests should
+          be succesfully served in < {{ .latencyThreshold }}ms. When you receive this alert it means that the
+      SLO is at risk as your error budget is getting exhausted. To know more about
+      ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
+    name: latency-{{ $deployment }}-ingress
+    objective: {{ .latency }}
+    sli:
+      events:
+        errorQuery: (sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}ingress=~"{{ .ingressName }}",le="+Inf", exported_service="{{ .serviceName }}"}[{{ printf "{{.window}}" }}])) - sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}ingress=~"{{ .ingressName }}",le="{{ divf .latencyThreshold 1000 }}", exported_service="{{ .serviceName }}"}[{{ printf "{{.window}}" }}])))
+        totalQuery: sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}ingress=~"{{ .ingressName }}",le="+Inf", exported_service="{{ .serviceName }}"}[{{ printf "{{.window}}" }}]))
+---
+{{- end }}
+{{- end }}
+{{- end }}
