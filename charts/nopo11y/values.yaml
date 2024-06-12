@@ -1,43 +1,27 @@
 enabled: false
 
-## This is the namespace where you wish to install the dashboards, prometheusrules and SLOs
 namespace: observability
 
-## This flag allows you to prepend helm release name to the deployment of each of your service.
 prependReleaseNameToDeployment: false
 
-## Grafana URL to include in Alerts
 grafanaURL: ""
 
-## This lets you to create dashboards, alerts and SLOs using metrics exported by istio sidecar of your service, by default it is set to default.
 istioMetrics:
   enabled: true
 
-## This lets you create dashboards, alerts and SLOs using metrics exported by nginx ingress controller for your service.
-## If you want use nginx ingress metrics and you don't have istio metrics available for your service then disable the istioMetrics and enble this one.
 nginxIngressMetrics:
   enabled: false
 services: []
 # - deploymentName: "sample"
-    ## Set it to true if you want to prepend helm release name to the deployment name, if you don't then default is false.
-#   prependReleaseNameToDeployment: false
-#   ## Availability and Latency objective for service, latencyThreshold latency SLO of your service.
-#   ## If you keep it empty then the default SLO objectives and latency threshold would get pciked which is
-#   ## availability: 99.9
-#   ## latency: 99
-#   ## latencyThreshold: 100
+
 #   slo: {}
 #     # availability: 99.9
 #     # latency: 99
 #     # latencyThreshold: 100
-#   ## Error rate for 5xx and 4xx aler, if you keep it empty then the default 5xx and 4xx error rate value would get picked
-#   ## 4xx: 5
-#   ## 5xx: 0.05
+ 
 #   errorRate: {}
 #     # rate4xx: 5
 #     # rate5xx: 0.05
   
-#   ## Ingress name and backend service name
-#   ## if you set nginxIngressMetrics.enabled to true then you have to provide the ingress name and backend service name for each of your service otherwise helm installation will fail.
 #   ingressName: "smaple-ingress"
 #   serviceName: "sample-service"
