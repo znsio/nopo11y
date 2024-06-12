@@ -1,5 +1,13 @@
 enabled: false
 
+global:
+  defaults:
+    availability: 99.9
+    latency: 99
+    latencyThreshold: 100
+    rate5xx: 0.05
+    rate4xx: 5
+
 namespace: observability
 
 prependReleaseNameToDeployment: false

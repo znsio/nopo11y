@@ -1,16 +1,23 @@
-{{- define "generate.list" -}}
+{{- define "nopo11y.services" -}}
+{{- $servicesList:= list }}
+{{- $defaulAvailability:= .Values.global.defaults.availability -}}
+{{- $defaulLatency:= .Values.global.defaults.latency -}}
+{{- $defaulLatencyThreshold:= .Values.global.defaults.latencyThreshold -}}
+{{- $defaul5xx:= .Values.global.defaults.rate5xx -}}
+{{- $default4xx:= .Values.global.defaults.rate4xx -}}
+{{- $release:= "" }}
+{{- if .Values.prependReleaseNameToDeployment -}}
+{{- $release = printf "%s-" .Release.Name }}
+{{- end }}
+{{- $namespace:= .Release.Namespace }}
+{{- range .Values.services }}
 {{- $service:= dict }}
-{{- $defaulAvailability:= 99.9 -}}
-{{- $defaulLatency:= 99 -}}
-{{- $defaulLatencyThreshold:= 100 -}}
-{{- $defaul5xx:= 0.05 -}}
-{{- $default4xx:= 5 -}}
 {{- if not (hasKey . "deploymentName") -}}
 {{- fail "deploymentName is required for each service" -}}
 {{- else if eq .deploymentName "" -}}
 {{- fail "deploymentName is required for each service" -}}
 {{- end -}}
-{{ $service = set $service "deployment" .deploymentName }}
+{{ $service = set $service "deployment" (printf "%s%s" $release .deploymentName) }}
 {{- if not (hasKey . "slo") }}
 {{ $service = set $service "availability" $defaulAvailability }}
 {{ $service = set $service "latency" $defaulLatency }}
@@ -61,13 +68,8 @@
 {{ $service = set $service "ingressName" .ingressName }}
 {{ $service = set $service "serviceName" .serviceName }}
 {{- end }}
-{{ toJson $service }}
+{{ $service = set $service "dashboarduid" (printf "%s-%s" .deploymentName $namespace) }}
+{{ $servicesList = append $servicesList $service }}
 {{- end }}
-
-{{- define "nopo11y.services" -}}
-{{ $servicesList := list }}
-{{ range .Values.services }}
-{{ $servicesList = append $servicesList (include "generate.list" . |fromJson ) }}
-{{- end -}}
-{{ toJson $servicesList }}
-{{- end -}}
+{{- toJson $servicesList }}
+{{- end }}
