@@ -6,7 +6,7 @@ defaults:
     availability: 99.9
     latency: 
   alertThresholds:
-    latency: 100
+    latencyMS: 100
     rate5xx: 0.05
     rate4xx: 5
 
@@ -30,9 +30,6 @@ services: []
 #     # latency: 99
  
 #   alertThresholds: {}
-#     # latency: 100
+#     # latencyMS: 100
 #     # rate4xx: 5
 #     # rate5xx: 0.05
-  
-#   ingressName: "smaple-ingress"
-#   serviceName: "sample-service"

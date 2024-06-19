@@ -2,7 +2,7 @@
 {{- $servicesList:= list }}
 {{- $defaulAvailability:= .Values.defaults.slo.availability -}}
 {{- $defaulLatency:= .Values.defaults.slo.latency -}}
-{{- $defaulLatencyThreshold:= .Values.defaults.alertThresholds.latency -}}
+{{- $defaulLatencyThreshold:= .Values.defaults.alertThresholds.latencyMS -}}
 {{- $defaul5xx:= .Values.defaults.alertThresholds.rate5xx -}}
 {{- $default4xx:= .Values.defaults.alertThresholds.rate4xx -}}
 {{- $release:= "" }}
@@ -57,12 +57,12 @@
 {{- else }}
 {{ $service = set $service "rate4xx" .alertThresholds.rate4xx }}
 {{- end -}}
-{{- if not (hasKey .alertThresholds "latency") }}
+{{- if not (hasKey .alertThresholds "latencyMS") }}
 {{ $service = set $service "latencyThreshold" $defaulLatencyThreshold }}
-{{- else if not .alertThresholds.latency }}
+{{- else if not .alertThresholds.latencyMS }}
 {{ $service = set $service "latencyThreshold" $defaulLatencyThreshold }}
 {{- else }}
-{{ $service = set $service "latencyThreshold" .alertThresholds.latency }}
+{{ $service = set $service "latencyThreshold" .alertThresholds.latencyMS }}
 {{- end }}
 {{- end }}
 {{ $service = set $service "dashboarduid" (printf "%s-%s" .serviceName $namespace) }}
