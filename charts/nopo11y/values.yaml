@@ -1,10 +1,12 @@
 enabled: false
 
-global:
-  defaults:
+
+defaults:
+  slo:
     availability: 99.9
-    latency: 99
-    latencyThreshold: 100
+    latency: 
+  alertThresholds:
+    latency: 100
     rate5xx: 0.05
     rate4xx: 5
 
@@ -20,14 +22,15 @@ istioMetrics:
 nginxIngressMetrics:
   enabled: false
 services: []
-# - deploymentName: "sample"
+# - serviceName: "sample"
+#   deploymentName: "sample"
 
 #   slo: {}
 #     # availability: 99.9
 #     # latency: 99
-#     # latencyThreshold: 100
  
-#   errorRate: {}
+#   alertThresholds: {}
+#     # latency: 100
 #     # rate4xx: 5
 #     # rate5xx: 0.05
   

@@ -10,16 +10,16 @@ apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
   namespace: {{ $.Values.namespace }}
-  name: {{ .deployment }}-nopo11y-alert-rules
+  name: {{ .service }}-nopo11y-alert-rules
   labels:
     managedby: nopo11y
 spec:
   groups:
-  - name: {{ .deployment }}-nopo11y-alert-rules
+  - name: {{ .service }}-nopo11y-alert-rules
     rules:
     {{- if $.Values.istioMetrics.enabled }}
-    - alert: {{ .deployment }}High5xxErrorRate
-      expr: sum(rate(istio_requests_total{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_workload="{{ .deployment }}", response_code=~"5.."}[5m])) by (instance) / sum(rate(istio_requests_total{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_workload="{{ .deployment }}"}[5m])) by (instance) * 100 > {{ .rate5xx }}
+    - alert: {{ .service }}High5xxErrorRate
+      expr: sum(rate(istio_requests_total{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_service_name="{{ .service }}", response_code=~"5.."}[5m])) by (instance) / sum(rate(istio_requests_total{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_service_name="{{ .service }}"}[5m])) by (instance) * 100 > {{ .rate5xx }}
       annotations:
         description: {{ .deployment }} service is experiencing high 5xx errors rate from last 5 minutes.
         summary: {{ .deployment }} service is experiencing high 5xx error rate.
@@ -29,7 +29,7 @@ spec:
       labels:
             severity: critical
     - alert: {{ .deployment }}High4xxErrorRate
-      expr: sum(rate(istio_requests_total{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_workload="{{ .deployment }}", response_code=~"4.."}[5m])) by (instance) / sum(rate(istio_requests_total{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_workload="{{ .deployment }}"}[5m])) by (instance) * 100 > {{ .rate4xx }}
+      expr: sum(rate(istio_requests_total{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_service_name="{{ .service }}", response_code=~"4.."}[5m])) by (instance) / sum(rate(istio_requests_total{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_service_name="{{ .service }}"}[5m])) by (instance) * 100 > {{ .rate4xx }}
       for: 5m
       annotations:
         {{- if $.Values.grafanaURL }}
@@ -41,13 +41,8 @@ spec:
             severity: warning
     {{- end }}
     {{- if $.Values.nginxIngressMetrics.enabled }}
-    {{- if or (not (hasKey . "ingressName")) (not (hasKey . "serviceName")) }}
-    {{ fail "If you set values.nginxIngressMetrics to true then you have to provide ingressName and serviceName for each of your service" }}
-    {{- else if or (eq .ingressName "") (eq .serviceName "")}}
-    {{ fail "If you set values.nginxIngressMetrics to true then you have to provide ingressName and serviceName for each of your service" }}
-    {{- end }}
     - alert: {{ .deployment }}High5xxErrorRate-NginxIngress
-      expr: sum(rate(nginx_ingress_controller_requests{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}ingress=~"{{ .ingressName }}",status=~"5..", exported_service="{{ .serviceName }}"}[5m])) / sum(rate(nginx_ingress_controller_requests{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}ingress=~"{{ .ingressName }}", exported_service="{{ .serviceName }}"}[5m])) * 100 > {{ .rate5xx }}
+      expr: sum(rate(nginx_ingress_controller_requests{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}status=~"5..", exported_service="{{ .service }}"}[5m])) / sum(rate(nginx_ingress_controller_requests{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}exported_service="{{ .service }}"}[5m])) * 100 > {{ .rate5xx }}
       annotations:
         description: {{ .deployment }} service is experiencing high 5xx errors rate from last 5 minutes.
         summary: {{ .deployment }} is experiencing high 5xx error rate.
@@ -57,7 +52,7 @@ spec:
       labels:
             severity: critical
     - alert: {{ .deployment }}High4xxErrorRate-NginxIngress
-      expr: sum(rate(nginx_ingress_controller_requests{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}ingress=~"{{ .ingressName }}",status=~"4..", exported_service="{{ .serviceName }}"}[5m])) / sum(rate(nginx_ingress_controller_requests{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}ingress=~"{{ .ingressName }}", exported_service="{{ .serviceName }}"}[5m])) * 100 > {{ .rate4xx }}
+      expr: sum(rate(nginx_ingress_controller_requests{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}status=~"4..", exported_service="{{ .service }}"}[5m])) / sum(rate(nginx_ingress_controller_requests{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}exported_service="{{ .service }}"}[5m])) * 100 > {{ .rate4xx }}
       for: 10m
       annotations:
         description: {{ .deployment }} service is experiencing high 4xx errors rate from last 5 minutes.
