@@ -6,7 +6,7 @@
 {{- $defaul5xx:= .Values.defaults.alertThresholds.rate5xx -}}
 {{- $default4xx:= .Values.defaults.alertThresholds.rate4xx -}}
 {{- $release:= "" }}
-{{- if .Values.prependReleaseNameToDeployment -}}
+{{- if .Values.prependReleaseName -}}
 {{- $release = printf "%s-" .Release.Name }}
 {{- end }}
 {{- $namespace:= .Release.Namespace }}

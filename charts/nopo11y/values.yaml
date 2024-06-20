@@ -1,6 +1,5 @@
 enabled: false
 
-
 defaults:
   slo:
     availability: 99.9
@@ -12,7 +11,7 @@ defaults:
 
 namespace: observability
 
-prependReleaseNameToDeployment: false
+prependReleaseName: false
 
 grafanaURL: ""
 
