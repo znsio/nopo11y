@@ -18,7 +18,7 @@
 {{- fail "deploymentName and ServiceName are required for each service" -}}
 {{- end -}}
 {{ $service = set $service "deployment" (printf "%s%s" $release .deploymentName) }}
-{{ $service = set $service "service" (printf "%s%s" $release .deploymentName) }}
+{{ $service = set $service "service" (printf "%s%s" $release .serviceName) }}
 {{- if not (hasKey . "slo") }}
 {{ $service = set $service "availability" $defaulAvailability }}
 {{ $service = set $service "latency" $defaulLatency }}

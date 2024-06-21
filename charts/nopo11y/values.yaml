@@ -3,7 +3,7 @@ enabled: false
 defaults:
   slo:
     availability: 99.9
-    latency: 
+    latency: 99
   alertThresholds:
     latencyMS: 100
     rate5xx: 0.05
