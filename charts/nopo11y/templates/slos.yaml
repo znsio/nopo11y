@@ -45,8 +45,8 @@ spec:
     objective: {{ .availability }}
     sli:
       events:
-        errorQuery: sum(rate(istio_requests_total{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_service_name="{{ .service }}", response_code=~"5..", destination_service_namespace="{{ $.Release.Namespace }}"}[{{ printf "{{.window}}" }}]))
-        totalQuery: sum(rate(istio_requests_total{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_service_name="{{ .service }}", destination_service_namespace="{{ $.Release.Namespace }}"}[{{ printf "{{.window}}" }}]))
+        errorQuery: sum(rate(istio_requests_total{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_service_name="{{ .service }}", response_code=~"5..", destination_service_namespace="{{ .namespace }}"}[{{ printf "{{.window}}" }}]))
+        totalQuery: sum(rate(istio_requests_total{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_service_name="{{ .service }}", destination_service_namespace="{{ .namespace }}"}[{{ printf "{{.window}}" }}]))
 ---
 apiVersion: sloth.slok.dev/v1
 kind: PrometheusServiceLevel
@@ -92,8 +92,8 @@ spec:
     objective: {{ .latency }}
     sli:
       events:
-        errorQuery: (sum(rate(istio_request_duration_milliseconds_bucket{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_service_name="{{ .service }}", le="+Inf", destination_service_namespace="{{ $.Release.Namespace }}"}[{{ printf "{{.window}}" }}])) - sum(rate(istio_request_duration_milliseconds_bucket{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_service_name="{{ .service }}", le="{{ .latencyThreshold }}", destination_service_namespace="{{ $.Release.Namespace }}"}[{{ printf "{{.window}}" }}])))
-        totalQuery: sum(rate(istio_request_duration_milliseconds_bucket{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_service_name="{{ .service }}", le="+Inf", destination_service_namespace="{{ $.Release.Namespace }}"}[{{ printf "{{.window}}" }}]))
+        errorQuery: (sum(rate(istio_request_duration_milliseconds_bucket{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_service_name="{{ .service }}", le="+Inf", destination_service_namespace="{{ .namespace }}"}[{{ printf "{{.window}}" }}])) - sum(rate(istio_request_duration_milliseconds_bucket{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_service_name="{{ .service }}", le="{{ .latencyThreshold }}", destination_service_namespace="{{ .namespace }}"}[{{ printf "{{.window}}" }}])))
+        totalQuery: sum(rate(istio_request_duration_milliseconds_bucket{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_service_name="{{ .service }}", le="+Inf", destination_service_namespace="{{ .namespace }}"}[{{ printf "{{.window}}" }}]))
 ---
 {{- end }}
 {{- if eq $.Values.apiGateway "nginx" }}
@@ -141,8 +141,8 @@ spec:
     objective: {{ .availability }}
     sli:
       events:
-        errorQuery: sum(rate(nginx_ingress_controller_requests{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}status=~"5..", exported_service="{{ .service }}", exported_namespace="{{ $.Release.Namespace }}"}[{{ printf "{{.window}}" }}]))
-        totalQuery: sum(rate(nginx_ingress_controller_requests{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}exported_service="{{ .service }}", exported_namespace="{{ $.Release.Namespace }}"}[{{ printf "{{.window}}" }}]))
+        errorQuery: sum(rate(nginx_ingress_controller_requests{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}status=~"5..", exported_service="{{ .service }}", exported_namespace="{{ .namespace }}"}[{{ printf "{{.window}}" }}]))
+        totalQuery: sum(rate(nginx_ingress_controller_requests{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}exported_service="{{ .service }}", exported_namespace="{{ .namespace }}"}[{{ printf "{{.window}}" }}]))
 ---
 apiVersion: sloth.slok.dev/v1
 kind: PrometheusServiceLevel
@@ -188,8 +188,8 @@ spec:
     objective: {{ .latency }}
     sli:
       events:
-        errorQuery: (sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}le="+Inf", exported_service="{{ .service }}", exported_namespace="{{ $.Release.Namespace }}"}[{{ printf "{{.window}}" }}])) - sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}le="{{ divf .latencyThreshold 1000 }}", exported_service="{{ .service }}", exported_namespace="{{ $.Release.Namespace }}"}[{{ printf "{{.window}}" }}])))
-        totalQuery: sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}le="+Inf", exported_service="{{ .service }}", exported_namespace="{{ $.Release.Namespace }}"}[{{ printf "{{.window}}" }}]))
+        errorQuery: (sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}le="+Inf", exported_service="{{ .service }}", exported_namespace="{{ .namespace }}"}[{{ printf "{{.window}}" }}])) - sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}le="{{ divf .latencyThreshold 1000 }}", exported_service="{{ .service }}", exported_namespace="{{ .namespace }}"}[{{ printf "{{.window}}" }}])))
+        totalQuery: sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}le="+Inf", exported_service="{{ .service }}", exported_namespace="{{ .namespace }}"}[{{ printf "{{.window}}" }}]))
 ---
 {{- end }}
 {{- end }}

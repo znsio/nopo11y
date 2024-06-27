@@ -20,6 +20,7 @@ apiGateway: "istio"
 services: []
 # - serviceName: "sample"
 #   deploymentName: "sample"
+#   namespace: "sample"
 
 #   slo: {}
 #     # availability: 99.9
