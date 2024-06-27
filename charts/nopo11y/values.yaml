@@ -15,11 +15,8 @@ prependReleaseName: false
 
 grafanaURL: ""
 
-istioMetrics:
-  enabled: true
+apiGateway: "istio"
 
-nginxIngressMetrics:
-  enabled: false
 services: []
 # - serviceName: "sample"
 #   deploymentName: "sample"
