@@ -1,20 +1,34 @@
 enabled: false
+
+defaults:
+  slo:
+    availability: 99.9
+    latency: 99
+  alertThresholds:
+    latencyMS: 100
+    rate5xx: 0.05
+    rate4xx: 5
+
 namespace: observability
-appLabel: "sample"
-includeReleaseNameInMetricsLabels: false
-deploymentName: "sample"
-prometheusReleaseLabel: "nopo11y-stack"
-availabilitySLO: 99.9
-latencySLO: 99
-latency: 1000
-errorRate5xx: 0.05
-errorRate4xx: 5
+
+prependReleaseName: false
+
 grafanaURL: ""
-logLabel: ""
-logLabelValue: ""
+
 istioMetrics:
   enabled: true
+
 nginxIngressMetrics:
   enabled: false
-  ingressName: "sample-ingress"
-  path: "/"
+services: []
+# - serviceName: "sample"
+#   deploymentName: "sample"
+
+#   slo: {}
+#     # availability: 99.9
+#     # latency: 99
+ 
+#   alertThresholds: {}
+#     # latencyMS: 100
+#     # rate4xx: 5
+#     # rate5xx: 0.05
