@@ -1,0 +1,14 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "nopo11y-operator.fullname" . }}
+  labels:
+    {{- include "nopo11y-operator.labels" . | nindent 4 }}
+subjects:
+  - kind: ServiceAccount
+    namespace: {{ .Release.Namespace }}
+    name: {{ include "nopo11y-operator.serviceAccountName" . }}
+roleRef:
+  kind: ClusterRole
+  name: {{ include "nopo11y-operator.fullname" . }}
+  apiGroup: rbac.authorization.k8s.io

@@ -1,0 +1,16 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "nopo11y-operator.fullname" . }}
+  labels:
+    {{- include "nopo11y-operator.labels" . | nindent 4 }}
+rules:
+  - apiGroups: ["znsio.nopo11y.com"]
+    resources: ["nopo11yconfigs"]
+    verbs: ["list", "get", "watch", "patch"]
+  - apiGroups: ["sloth.slok.dev", "monitoring.coreos.com", ""]
+    resources: ["prometheusrules", "prometheusservicelevels", "configmaps"]
+    verbs: ["*"]
+  - apiGroups: ["apps", ""]
+    resources: ["deployments", "services"]
+    verbs: ["list", "get", "watch"]

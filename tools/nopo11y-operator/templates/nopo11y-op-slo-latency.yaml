@@ -1,0 +1,51 @@
+apiVersion: sloth.slok.dev/v1
+kind: PrometheusServiceLevel
+metadata:
+  labels:
+    managedby: nopo11y-operator
+  name: {{ service }}-latency-slo
+  namespace: {{ namespace }}
+spec:
+  labels:
+    app: sloth
+    role: alert-rules
+    component: {{ service }}-latency-SLO-rules
+  service: {{ service }}
+  slos:
+  - alerting:
+      annotations:
+        {%- if grafanaUrl %}
+        dashboard: {{ grafanaUrl }}/d/slo-detail?var-service={{ service }}
+        {%- endif %}
+        summary: SLO to measure response time - {{ latency }}% of the time requests should
+          be succesfully served in < {{ latencyThreshold }}ms. When you receive this alert it means that
+          the SLO is at risk as your error budget is getting exhausted. To know more
+          about ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
+        description: SLO to measure response time - {{ latency }}% of the time requests should
+          be succesfully served in < {{ latencyThreshold }}ms. When you receive this alert it means that
+          the SLO is at risk as your error budget is getting exhausted. To know more
+          about ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
+      name: {{ service }} - latency SLO is at RISK
+      pageAlert:
+        labels:
+          alert_type: symptom
+          severity: critical
+      ticketAlert:
+        labels:
+          alert_type: symptom
+          severity: warning
+    description: SLO to measure response time - {{ latency }}% of the time requests should
+          be succesfully served in < {{ latencyThreshold }}ms. When you receive this alert it means that the
+      SLO is at risk as your error budget is getting exhausted. To know more about
+      ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
+    name: latency-{{ service }}
+    objective: {{ latency }}
+    sli:
+      events:
+        {%- if apiGateway == "istio" %}
+        errorQuery: (sum(rate(istio_request_duration_milliseconds_bucket{ {%- if cluster %}cluster="{{ cluster }}", {%- endif %}source_workload!~"unknown", reporter="source", destination_service_name="{{ service }}", destination_service_namespace="{{ serviceNamespace }}", le="+Inf"}[{%- raw %}{{.window}}{%- endraw %}])) - sum(rate(istio_request_duration_milliseconds_bucket{ {%- if cluster %}cluster="{{ cluster }}", {%- endif %}source_workload!~"unknown", reporter="source", destination_service_name="{{ service }}", destination_service_namespace="{{ serviceNamespace }}", le="{{ latencyThreshold }}"}[{%- raw %}{{.window}}{%- endraw %}])))
+        totalQuery: sum(rate(istio_request_duration_milliseconds_bucket{ {%- if cluster %}cluster="{{ cluster }}", {%- endif %}source_workload!~"unknown", reporter="source", destination_service_name="{{ service }}", destination_service_namespace="{{ serviceNamespace }}", le="+Inf"}[{%- raw %}{{.window}}{%- endraw %}]))
+        {%- elif apiGateway == "nginx" %}
+        errorQuery: (sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ {%- if cluster %}cluster="{{ cluster }}", {%- endif %}le="+Inf", exported_service="{{ service }}", exported_namespace="{{ serviceNamespace }}"}[{%- raw %}{{.window}}{%- endraw %}])) - sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ {%- if cluster %}cluster="{{ cluster }}", {%- endif %}le="{{ latencyThreshold / 1000 }}", exported_service="{{ service }}", exported_namespace="{{ serviceNamespace }}"}[{%- raw %}{{.window}}{%- endraw %}])))
+        totalQuery: sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ {%- if cluster %}cluster="{{ cluster }}", {%- endif %}le="+Inf", exported_service="{{ service }}", exported_namespace="{{ serviceNamespace }}"}[{%- raw %}{{.window}}{%- endraw %}]))
+        {%- endif %}
