@@ -1,0 +1,40 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  namespace: {{ namespace }}
+  name: {{ service }}-alert-rules
+  labels:
+    managedby: nopo11y-operator
+spec:
+  groups:
+  - name: {{ service }}-alert-rules
+    rules:
+    - alert: {{ service }}High5xxErrorRate
+      {%- if apiGateway == "istio" %}
+      expr: sum(rate(istio_requests_total{ {%- if cluster %}cluster="{{ cluster }}", {%- endif %}source_workload!~"unknown", reporter="source", destination_service_name="{{ service }}", destination_service_namespace="{{ serviceNamespace }}", response_code=~"5.."}[5m])) by (instance) / sum(rate(istio_requests_total{ {%- if cluster %}cluster="{{ cluster }}", {%- endif %}source_workload!~"unknown", reporter="source", destination_service_name="{{ service }}", destination_service_namespace="{{ serviceNamespace }}"}[5m])) by (instance) * 100 > {{ rate5xx }}
+      {%- elif apiGateway == "nginx" %}
+      expr: sum(rate(nginx_ingress_controller_requests{ {%- if cluster %}cluster="{{ cluster }}", {%- endif %}status=~"5..", exported_service="{{ service }}", exported_namespace="{{ serviceNamespace }}"}[5m])) / sum(rate(nginx_ingress_controller_requests{ {%- if cluster %}cluster="{{ cluster }}", {%- endif %}exported_service="{{ service }}", exported_namespace="{{ serviceNamespace }}"}[5m])) * 100 > {{ rate5xx }}
+      {%- endif %}
+      annotations:
+        description: {{ service }} service is experiencing high 5xx errors rate from last 5 minutes.
+        summary: {{ service }} service is experiencing high 5xx error rate.
+        {%- if grafanaUrl %}
+        dashboard: {{ grafanaUrl }}/d/{{ dashboarduid }}
+        {%- endif %}
+      labels:
+        severity: critical
+    - alert: {{ service }}High4xxErrorRate
+      {%- if apiGateway == "istio" %}
+      expr: sum(rate(istio_requests_total{ {%- if cluster %}cluster="{{ cluster }}", {%- endif %}source_workload!~"unknown", reporter="source", destination_service_name="{{ service }}", destination_service_namespace="{{ serviceNamespace }}", response_code=~"4.."}[5m])) by (instance) / sum(rate(istio_requests_total{ {%- if cluster %}cluster="{{ cluster }}", {%- endif %}source_workload!~"unknown", reporter="source", destination_service_name="{{ service }}", destination_service_namespace="{{ serviceNamespace }}"}[5m])) by (instance) * 100 > {{ rate4xx }}
+      {%- elif apiGateway == "nginx" %}
+      expr: sum(rate(nginx_ingress_controller_requests{ {%- if cluster %}cluster="{{ cluster }}", {%- endif %}status=~"4..", exported_service="{{ service }}", exported_namespace="{{ serviceNamespace }}"}[5m])) / sum(rate(nginx_ingress_controller_requests{ {%- if cluster %}cluster="{{ cluster }}", {%- endif %}exported_service="{{ service }}", exported_namespace="{{ serviceNamespace }}"}[5m])) * 100 > {{ rate4xx }}
+      {%- endif %}
+      for: 5m
+      annotations:
+        {%- if grafanaUrl %}
+        dashboard: {{ grafanaUrl }}/d/{{ dashboarduid }}
+        {%- endif %}
+        description: {{ service }} service is experiencing high 4xx errors rate from last 5 minutes.
+        summary: {{ service }} service is experiencing high 4xx error rate.
+      labels:
+        severity: warning

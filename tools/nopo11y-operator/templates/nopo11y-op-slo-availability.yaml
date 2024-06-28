@@ -1,0 +1,51 @@
+apiVersion: sloth.slok.dev/v1
+kind: PrometheusServiceLevel
+metadata:
+  labels:
+    managedby: nopo11y-operator
+  name: {{ service }}-availability-slo
+  namespace: {{ namespace }}
+spec:
+  labels:
+    app: sloth
+    role: alert-rules
+    component: {{ service }}-availability-SLO-rules
+  service: {{ service }}
+  slos:
+  - alerting:
+      annotations:
+        {%- if grafanaUrl %}
+        dashboard: {{ grafanaUrl }}/d/slo-detail?var-service={{ service }}
+        {%- endif %}
+        summary: SLO to measure success vs errors - {{ availability }}% of the time requests should
+          be succesfully served (non 5xx). When you receive this alert it means that
+          the SLO is at risk as your error budget is getting exhausted. To know more
+          about ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
+        description: SLO to measure success vs errors - {{ availability }}% of the time requests should
+          be succesfully served (non 5xx). When you receive this alert it means that the
+          SLO is at risk as your error budget is getting exhausted. To know more about
+          ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
+      name: {{ service }} - availability SLO is at RISK 
+      pageAlert:
+        labels:
+          alert_type: symptom
+          severity: critical
+      ticketAlert:
+        labels:
+          alert_type: symptom
+          severity: warning
+    description: SLO to measure success vs errors - {{ availability }}% of the time requests should
+      be succesfully served (non 5xx). When you receive this alert it means that the
+      SLO is at risk as your error budget is getting exhausted. To know more about
+      ErrorBudgets and SLOs read https://sre.google/workbook/implementing-slos/
+    name: availability-{{ service }}
+    objective: {{ availability }}
+    sli:
+      events:
+        {%- if apiGateway == "istio" %}
+        errorQuery: sum(rate(istio_requests_total{ {%- if cluster %}cluster="{{ cluster }}", {%- endif %}source_workload!~"unknown", reporter="source", destination_service_name="{{ service }}", destination_service_namespace="{{ serviceNamespace }}", response_code=~"5.."}[{%- raw %}{{.window}}{%- endraw %}]))
+        totalQuery: sum(rate(istio_requests_total{ {%- if cluster %}cluster="{{ cluster }}", {%- endif %}source_workload!~"unknown", reporter="source", destination_service_name="{{ service }}", destination_service_namespace="{{ serviceNamespace }}"}[{%- raw %}{{.window}}{%- endraw %}]))
+        {%- elif apiGateway == "nginx" %}
+        errorQuery: sum(rate(nginx_ingress_controller_requests{ {%- if cluster %}cluster="{{ cluster }}", {%- endif %}status=~"5..", exported_service="{{ service }}", exported_namespace="{{ serviceNamespace }}"}[{%- raw %}{{.window}}{%- endraw %}]))
+        totalQuery: sum(rate(nginx_ingress_controller_requests{ {%- if cluster %}cluster="{{ cluster }}", {%- endif %}exported_service="{{ service }}", exported_namespace="{{ serviceNamespace }}"}[{%- raw %}{{.window}}{%- endraw %}]))
+        {%- endif %}
