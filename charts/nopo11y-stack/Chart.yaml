@@ -37,7 +37,11 @@ dependencies:
   name: kuberhealthy
   repository: "https://kuberhealthy.github.io/kuberhealthy/helm-repos"
   version: "104"
+- condition: nopo11y-operator.enabled
+  name: nopo11y-operator
+  repository: ""
+  version: 1.0.0
 description: A Helm chart for observability stack
 name: nopo11y-stack
 type: application
-version: 1.2.2
+version: 1.3.0
