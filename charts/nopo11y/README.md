@@ -1,3 +1,4 @@
+**Note** - If you have nopo11y-stack >= 1.3.1 installed then you don't have to use nopo11y helm chart, the nopo11y-stack has nopo11y-operator which is a replacement of nopo11y helm chart, please check [this](https://github.com/znsio/nopo11y/tree/main/tools/nopo11y-operator) to know more about nopo11y-operator
 # Introduction
 
 Nopo11y is a wrapper on top of nopo11y-stack, using nopo11y one can create basic dashboards with golder signals, alerts and SLOs for every microservice.
@@ -22,25 +23,57 @@ To install the chart:
 To uninstall the chart:
 
     helm delete <service_name>-nopo11y
-
+To add it as a dependency in your service's chart add below lines in your service's Chart.yaml file
+```yaml
+dependencies:
+- condition: nopo11y.enabled
+  name: nopo11y
+  repository: https://znsio.github.io/nopo11y
+  version: 2.1.0
+``` 
 # Configuration
 
 | Key                               | Type   | Required? | Default        | Description                                                                        |
 |-----------------------------------|--------|-----------|----------------|------------------------------------------------------------------------------------|
 | enabled                           | bool   | no        | false          | If set to true then it will create default dashboard, alerts and SLOs              |
 | namespace                         | string | no        | observability  | Use the same namespace as you used during the installation of nopo11y stack        |
-| appLabel                          | string | yes       | <empty>        | You will find it in your deployment yaml                                           |
-| includeReleaseNameInMetricsLabels | bool   | no        | false          | If set to true then it will add release name in metric label                       |
-| deploymentName                    | string | yes       | <empty>        | Your deployment name                                                               |
-| prometheusReleaseLabel            | string | no        | nopo11y-stack  |                                                                                    |
-| availabilitySLO                   | float  | no        | 99.9           | Threshold for service availability SLO. Value is in percentage                     |
-| latencySLO                        | float  | no        | 99             | Threshold for service latency SLO. Value is in percentage                          |
-| latency                           | number | no        | 1000           | Threshold for overall api latency alert. Value is in milliseconds                  |
-| errorRate5xx                      | float  | no        | 0.05           | Threshold for 5xx error rate alert. Value is in percentage                         |
-| errorRate4xx                      | float  | no        | 5              | Threshold for 4xx error rate alert. Value is in percentage                         |
-| grafanaURL                        | string | no        | <empty>        | External grafana url, if set then dashboard links will be visible in the alert     |
-| logLabel                          | string | no        | <empty>        | If set then logs will be filtered with specified log label in logs dashboard panel |
-| logLabelValue                     | string | no        | <empty>        | value for the logLabel                                                             |
-| istioMetrics.enabled              | bool   | no        | true           | If true then istio metrics will be visible in prometheus                           |
-| nginxIngressMetrics.enabled       | bool   | no        | false          | If true then nginx ingress metrics will be visible in prometheus                   |
-| nginxIngressMetrics.ingressName   | string | no        | sample-ingress | Name of the ingress                                                                |
+| defaults                         | map | no       | -      | Default values for SLO objective and alert thresholds for all services                                           |
+| prependReleaseName | bool   | no        | false          | If set to true then it will prepend release name to service and deployment name                       |
+| grafanaURL            | string | no        | empty  |  External grafana URL                                                                       |
+| apiGateway | string | yes | istio | Which api gateway metrics to use, allowed values istio, nginx |
+| services | array | yes | - | list of services for which you want to create dashboard, alerts and SLOs |
+
+# Sample values
+```yaml
+enabled: false
+
+defaults:
+  slo:
+    availability: 99.9
+    latency: 99
+  alertThresholds:
+    latencyMS: 100
+    rate5xx: 0.05
+    rate4xx: 5
+
+namespace: observability
+
+prependReleaseName: false
+
+grafanaURL: "https://observability.grafana.com"
+
+apiGateway: "istio"
+
+services:
+- serviceName: "sample"
+  deploymentName: "sample"
+  namespace: "sample"
+  slo: 
+    availability: 99.9
+    latency: 99
+ 
+  alertThresholds: 
+    latencyMS: 100
+    rate4xx: 5
+    rate5xx: 0.05
+```
