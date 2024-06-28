@@ -5,10 +5,10 @@
 replicaCount: 1
 
 image:
-  repository: ghcr.io/znsio/nopo11y/nopo11y-operator:v1
+  repository: ghcr.io/znsio/nopo11y/nopo11y-operator
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v2"
+  tag: "v1"
 
 imagePullSecrets: []
 nameOverride: ""
