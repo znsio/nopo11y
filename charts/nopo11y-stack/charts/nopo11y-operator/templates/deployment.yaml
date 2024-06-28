@@ -5,9 +5,7 @@ metadata:
   labels:
     {{- include "nopo11y-operator.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
-  {{- end }}
   selector:
     matchLabels:
       {{- include "nopo11y-operator.selectorLabels" . | nindent 6 }}
