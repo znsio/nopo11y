@@ -12,13 +12,14 @@
 {{- $namespace:= .Release.Namespace }}
 {{- range .Values.services }}
 {{- $service:= dict }}
-{{- if or (not (hasKey . "deploymentName")) (not (hasKey . "serviceName")) -}}
-{{- fail "deploymentName and serviceName are required for each service" -}}
-{{- else if and (eq .deploymentName "") (eq .serviceName "") -}}
-{{- fail "deploymentName and ServiceName are required for each service" -}}
+{{- if or (not (hasKey . "deploymentName")) (not (hasKey . "serviceName")) (not (hasKey . "namespace")) -}}
+{{- fail "serviceName, deploymentName and namespace are required for each service" -}}
+{{- else if and (eq .deploymentName "") (eq .serviceName "") (eq .namespace "") -}}
+{{- fail "ServiceName, deploymentName and namespace are required for each service" -}}
 {{- end -}}
 {{ $service = set $service "deployment" (printf "%s%s" $release .deploymentName) }}
 {{ $service = set $service "service" (printf "%s%s" $release .serviceName) }}
+{{ $service = set $service "namespace" .namespace  }}
 {{- if not (hasKey . "slo") }}
 {{ $service = set $service "availability" $defaulAvailability }}
 {{ $service = set $service "latency" $defaulLatency }}
