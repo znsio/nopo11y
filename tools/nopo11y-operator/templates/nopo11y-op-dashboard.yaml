@@ -1435,24 +1435,92 @@ data:
             "uid": "P8E80F9AEF21F6940"
           },
           "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "noValue": "0",
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Count of Error Logs"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "red",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
           "gridPos": {
-            "h": 12,
-            "w": 24,
+            "h": 8,
+            "w": 8,
             "x": 0,
             "y": 68
           },
-          "id": 22,
+          "id": 25,
           "options": {
-            "dedupStrategy": "none",
-            "enableLogDetails": true,
-            "prettifyLogMessage": false,
-            "showCommonLabels": false,
-            "showLabels": false,
-            "showTime": false,
-            "sortOrder": "Descending",
-            "wrapLogMessage": false
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
           },
-          "pluginVersion": "9.1.7",
           "targets": [
             {
               "datasource": {
@@ -1460,12 +1528,51 @@ data:
                 "uid": "P8E80F9AEF21F6940"
               },
               "editorMode": "code",
-              "expr": "{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}pod=~\"{{ deployment }}.*\", container!=\"istio-proxy\"} |= ``",
+              "expr": "sum(rate({ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}pod=~\"{{ deployment }}.*\", container!=\"istio-proxy\"} |~ `(?i)error` or `(?i)exception` [$__interval]))",
+              "legendFormat": "Count of Error Logs",
               "queryType": "range",
               "refId": "A"
             }
           ],
-          "title": "Logs",
+          "title": "Logs Error Count",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "P8E80F9AEF21F6940"
+          },
+          "description": "",
+          "gridPos": {
+            "h": 8,
+            "w": 16,
+            "x": 8,
+            "y": 68
+          },
+          "id": 26,
+          "options": {
+            "dedupStrategy": "none",
+            "enableLogDetails": true,
+            "prettifyLogMessage": false,
+            "showCommonLabels": false,
+            "showLabels": false,
+            "showTime": true,
+            "sortOrder": "Descending",
+            "wrapLogMessage": false
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "loki",
+                "uid": "P8E80F9AEF21F6940"
+              },
+              "editorMode": "code",
+              "expr": "{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}pod=~\"{{ deployment }}.*\", container!=\"istio-proxy\"} |~ `(?i)error` or `(?i)exception`",
+              "queryType": "range",
+              "refId": "A"
+            }
+          ],
+          "title": "Error Logs",
           "type": "logs"
         }
       ],
