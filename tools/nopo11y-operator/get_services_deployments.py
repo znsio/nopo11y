@@ -32,7 +32,6 @@ DEFAULT_CONFIG = {
     }
 }
 O11Y_NAMEPSACE = str(os.getenv("NOPO11Y_STACK_NAMESPACE", "observability"))
-FORCE_RECREATE = False
 
 GROUP = "znsio.nopo11y.com"
 VERSION = "v1alpha"
@@ -120,11 +119,7 @@ def get_service_deployment_map(service=None):
 @kopf.on.startup()
 def configure(settings: kopf.OperatorSettings, **_):
     """ This function overwrites default kopf operator configuration """
-    global FORCE_RECREATE
     settings.watching.client_timeout = 4 * 60
-
-    # At every startup of the operator update all the existing resources using CRDs
-    FORCE_RECREATE = True
 
 
 @kopf.on.create(GROUP, VERSION, COMPONENTS_PLURAL)
@@ -132,14 +127,12 @@ def configure(settings: kopf.OperatorSettings, **_):
 @kopf.on.resume(GROUP, VERSION, COMPONENTS_PLURAL)
 def generate_dashboard_alerts(spec, namespace, old, new, **kwargs):
     """ This function will generate dashboards, slos and alert rules for your service """
-    global FORCE_RECREATE
-
     old = old if isinstance(old, dict) and old else {}
     new = new if isinstance(new, dict) and new else {}
 
     spec_dict = dict(spec)
     old_spec, new_spec = transform_spec(old, new)
-    if old_spec == new_spec and not FORCE_RECREATE:
+    if old_spec == new_spec:
         logger.info("There is no change in specs, skipping")
         return
 
@@ -166,7 +159,7 @@ def generate_dashboard_alerts(spec, namespace, old, new, **kwargs):
     for service in spec_dict.get("services", []):
         service_name = service.get("serviceName")
         if new_spec.get(service_name) == old_spec.get(service_name) and \
-            old_spec.get("defaults") == new_spec.get("defaults") and not FORCE_RECREATE:
+            old_spec.get("defaults") == new_spec.get("defaults"):
             logger.info(f"Found no changes for following service: {service_name}")
             continue
 
@@ -246,8 +239,6 @@ def generate_dashboard_alerts(spec, namespace, old, new, **kwargs):
             create_configmap(O11Y_NAMEPSACE, dashboard_manifest)
 
         logger.info(f"Updated resources for following service: {service_name}")
-
-    FORCE_RECREATE = False
 
 
 def update_custom_obj(group, version, name, namespace, plural, body, **kwargs):
