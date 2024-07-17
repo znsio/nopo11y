@@ -15,8 +15,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY templates ./templates/
 
 # Copy the script into the container
-COPY get_services_deployments.py ./
+COPY main.py ./
 
 # Run the script
-CMD ["kopf", "run", "-A", "--standalone", "./get_services_deployments.py"]
+CMD ["kopf", "run", "-A", "--standalone", "./main.py"]
 
