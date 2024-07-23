@@ -1,0 +1,29 @@
+{{- if .Values.gateway.services }}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ .Values.gateway.name }}-vs
+  namespace: {{ .Values.gateway.namespace }}
+spec:
+  hosts:
+  {{- range .Values.gateway.hosts }}
+  - {{ . |quote }}
+  {{- end }}
+  gateways:
+  - {{ $.Values.gateway.name }}
+  http:
+  {{- range .Values.gateway.services }}
+  - match:
+    - uri:
+        prefix: {{ .path }}
+    {{- if hasKey . "rewritePath"}}
+    rewrite:
+      uri: {{ .rewritePath }}
+    {{- end }}
+    route:
+    - destination:
+        host: {{ .name }}
+        port:
+          number: {{ .port }}
+  {{- end }}
+{{- end }}
