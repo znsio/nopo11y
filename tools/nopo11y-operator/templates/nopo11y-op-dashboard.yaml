@@ -33,7 +33,7 @@ data:
       "editable": true,
       "fiscalYearStartMonth": 0,
       "graphTooltip": 0,
-      "id": 66,
+      "id": 34,
       "links": [],
       "liveNow": false,
       "panels": [
@@ -46,7 +46,7 @@ data:
             "x": 0,
             "y": 0
           },
-          "id": 26,
+          "id": 4,
           "panels": [],
           "title": "Nginx Ingress Metrics",
           "type": "row"
@@ -56,194 +56,6 @@ data:
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "description": "This panel show the request count",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 10,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              },
-              "unit": "reqps"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 0,
-            "y": 1
-          },
-          "id": 28,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "sum(rate(nginx_ingress_controller_requests{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}exported_service=\"{{ service }}\", exported_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval]))",
-              "legendFormat": "Requests/sec",
-              "range": true,
-              "refId": "A"
-            }
-          ],
-          "title": "Request Count",
-          "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "description": "This panel shows response time of the service ",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 10,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 1,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              },
-              "unit": "s"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 1
-          },
-          "id": 30,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "sum(rate(nginx_ingress_controller_request_duration_seconds_sum{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}exported_service=\"{{ service }}\", exported_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval])) / sum(rate(nginx_ingress_controller_request_duration_seconds_count{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}exported_service=\"{{ service }}\", exported_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval]))",
-              "legendFormat": "Latency",
-              "range": true,
-              "refId": "A"
-            }
-          ],
-          "title": "Response Time",
-          "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
           "description": "This panel shows response error rate for the service",
           "fieldConfig": {
             "defaults": {
@@ -251,6 +63,7 @@ data:
                 "mode": "palette-classic"
               },
               "custom": {
+                "axisBorderShow": false,
                 "axisCenteredZero": false,
                 "axisColorMode": "text",
                 "axisLabel": "",
@@ -264,6 +77,7 @@ data:
                   "tooltip": false,
                   "viz": false
                 },
+                "insertNulls": false,
                 "lineInterpolation": "linear",
                 "lineWidth": 1,
                 "pointSize": 1,
@@ -287,24 +101,51 @@ data:
                   {
                     "color": "green",
                     "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
                   }
                 ]
               },
               "unit": "percent"
             },
-            "overrides": []
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "5xx Error Rate"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "red",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "4xx Error Rate"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "orange",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              }
+            ]
           },
           "gridPos": {
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 9
+            "y": 1
           },
-          "id": 32,
+          "id": 5,
           "options": {
             "legend": {
               "calcs": [],
@@ -325,101 +166,7 @@ data:
               },
               "editorMode": "code",
               "expr": "sum(rate(nginx_ingress_controller_requests{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}status=~\"5..\", exported_service=\"{{ service }}\", exported_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval])) / sum(rate(nginx_ingress_controller_requests{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}exported_service=\"{{ service }}\", exported_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval])) * 100",
-              "legendFormat": "5xx error rate",
-              "range": true,
-              "refId": "A"
-            }
-          ],
-          "title": "Error Rate",
-          "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "description": "This panel show the success vs error rate for the service",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 10,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 1,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              },
-              "unit": "percent"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 9
-          },
-          "id": 34,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "sum(rate(nginx_ingress_controller_requests{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}status=~\"2..|4..\", exported_service=\"{{ service }}\", exported_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval])) / sum(rate(nginx_ingress_controller_requests{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}exported_service=\"{{ service }}\", exported_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval])) * 100",
-              "legendFormat": "Success ",
+              "legendFormat": "5xx Error Rate",
               "range": true,
               "refId": "A"
             },
@@ -429,1012 +176,23 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(rate(nginx_ingress_controller_requests{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}status=~\"5..\", exported_service=\"{{ service }}\", exported_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval])) / sum(rate(nginx_ingress_controller_requests{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}exported_service=\"{{ service }}\", exported_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval])) * 100",
+              "expr": "sum(rate(nginx_ingress_controller_requests{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}status=~\"4..\", exported_service=\"{{ service }}\", exported_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval])) / sum(rate(nginx_ingress_controller_requests{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}exported_service=\"{{ service }}\", exported_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval])) * 100",
               "hide": false,
-              "legendFormat": "Error",
+              "instant": false,
+              "legendFormat": "4xx Error Rate",
               "range": true,
               "refId": "B"
             }
           ],
-          "title": "Success vs Error Rate",
-          "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "description": "This panel shows response size of the service",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 10,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 1,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              },
-              "unit": "decbytes"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 0,
-            "y": 17
-          },
-          "id": 36,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "sum (rate(nginx_ingress_controller_response_size_sum{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}exported_service=\"{{ service }}\", exported_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval]))/sum(rate(nginx_ingress_controller_response_size_count{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}exported_service=\"{{ service }}\", exported_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval]))",
-              "legendFormat": "Response Size",
-              "range": true,
-              "refId": "A"
-            }
-          ],
-          "title": "Response Size",
-          "type": "timeseries"
-        },
-        {% endif %}
-        {% if apiGateway == "istio" %}
-        {
-          "collapsed": false,
-          "gridPos": {
-            "h": 1,
-            "w": 24,
-            "x": 0,
-            "y": 25
-          },
-          "id": 4,
-          "panels": [],
-          "title": "Istio Metrics",
-          "type": "row"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 10,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 1,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  }
-                ]
-              },
-              "unit": "reqps"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 0,
-            "y": 26
-          },
-          "id": 6,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "sum(rate(istio_requests_total{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}source_workload!~\"unknown\", reporter=\"source\", destination_service_name=\"{{ service }}\", destination_service_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval]))",
-              "legendFormat": "Requests/sec",
-              "range": true,
-              "refId": "A"
-            }
-          ],
-          "title": "Request Count",
-          "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "description": "This panel shows response time of the service ",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 10,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 1,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 1000
-                  }
-                ]
-              },
-              "unit": "ms"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 26
-          },
-          "id": 2,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "sum(rate(istio_request_duration_milliseconds_sum{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}source_workload!~\"unknown\", reporter=\"source\", destination_service_name=\"{{ service }}\", destination_service_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval])) / sum(rate(istio_request_duration_milliseconds_count{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}source_workload!~\"unknown\", reporter=\"source\", destination_service_name=\"{{ service }}\", destination_service_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval]))",
-              "legendFormat": "Latency",
-              "range": true,
-              "refId": "A"
-            }
-          ],
-          "title": "Response Time",
-          "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "description": "This panel shows response error rate for the service",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 10,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 1,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 1
-                  }
-                ]
-              },
-              "unit": "percent"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 0,
-            "y": 34
-          },
-          "id": 8,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "sum(rate(istio_requests_total{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}source_workload!~\"unknown\", reporter=\"source\", destination_service_name=\"{{ service }}\", destination_service_namespace=\"{{ deploymentNamespace }}\", response_code=~\"5..\"}[$__rate_interval])) / sum(rate(istio_requests_total{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}source_workload!~\"unknown\", reporter=\"source\", destination_service_name=\"{{ service }}\", destination_service_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval])) * 100",
-              "legendFormat": "5xx error rate",
-              "range": true,
-              "refId": "A"
-            }
-          ],
           "title": "Error Rate",
           "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "description": "This panel show the success vs error rate for the service",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 10,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 1,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              },
-              "unit": "percent"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 34
-          },
-          "id": 10,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "sum(rate(istio_requests_total{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}source_workload!~\"unknown\", reporter=\"source\", destination_service_name=\"{{ service }}\", destination_service_namespace=\"{{ deploymentNamespace }}\", response_code=~\"2..|4..\"}[$__rate_interval])) / sum(rate(istio_requests_total{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}source_workload!~\"unknown\", reporter=\"source\", destination_service_name=\"{{ service }}\", destination_service_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval])) * 100",
-              "legendFormat": "Success ",
-              "range": true,
-              "refId": "A"
-            },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "sum(rate(istio_requests_total{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}source_workload!~\"unknown\", reporter=\"source\", destination_service_name=\"{{ service }}\", destination_service_namespace=\"{{ deploymentNamespace }}\", response_code=~\"5..\"}[$__rate_interval])) / sum(rate(istio_requests_total{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}source_workload!~\"unknown\", reporter=\"source\", destination_service_name=\"{{ service }}\", destination_service_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval])) * 100",
-              "hide": false,
-              "legendFormat": "Error",
-              "range": true,
-              "refId": "B"
-            }
-          ],
-          "title": "Success vs Error Rate",
-          "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "description": "This panel shows response size of the service",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 10,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 2,
-                "pointSize": 1,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "min": 0,
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              },
-              "unit": "decbytes"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 0,
-            "y": 42
-          },
-          "id": 12,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "sum(rate(istio_response_bytes_sum{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}source_workload!~\"unknown\", reporter=\"source\", destination_service_name=\"{{ service }}\", destination_service_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval])) / sum(rate(istio_response_bytes_count{source_workload!~\"unknown\", reporter=\"source\", destination_service_name=\"{{ service }}\", destination_service_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval]))",
-              "legendFormat": "Response Size",
-              "range": true,
-              "refId": "A"
-            }
-          ],
-          "title": "Response Size",
-          "type": "timeseries"
-        },
-        {% endif %}
-        {
-          "collapsed": false,
-          "gridPos": {
-            "h": 1,
-            "w": 24,
-            "x": 0,
-            "y": 50
-          },
-          "id": 14,
-          "panels": [],
-          "title": "Resource Metrics",
-          "type": "row"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "description": "Memory utilization percentage against the requested memory of container",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 10,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 1,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              },
-              "unit": "percent"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 0,
-            "y": 51
-          },
-          "id": 16,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "sum(\r\n    container_memory_working_set_bytes{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}namespace=\"{{ deploymentNamespace }}\", container!=\"\", image!=\"\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}namespace=\"{{ deploymentNamespace }}\", workload=\"{{ deployment }}\", workload_type=\"deployment\"}\r\n) by (pod)\r\n/sum(\r\n    kube_pod_container_resource_requests{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}job=\"kube-state-metrics\", namespace=\"{{ deploymentNamespace }}\", resource=\"memory\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}namespace=\"{{ deploymentNamespace }}\", workload=\"{{ deployment }}\", workload_type=\"deployment\"}\r\n) by (pod) * 100",
-              "legendFormat": "__auto",
-              "range": true,
-              "refId": "A"
-            }
-          ],
-          "title": "Memory Utilization Requests %",
-          "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "description": "Memory utilization percentage against the limits of memory of container",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 10,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 1,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              },
-              "unit": "percent"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 51
-          },
-          "id": 17,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "sum(\r\n    container_memory_working_set_bytes{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}namespace=\"{{ deploymentNamespace }}\", container!=\"\", image!=\"\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}namespace=\"{{ deploymentNamespace }}\", workload=\"{{ deployment }}\", workload_type=\"deployment\"}\r\n) by (pod)\r\n/sum(\r\n    kube_pod_container_resource_limits{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}job=\"kube-state-metrics\", namespace=\"{{ deploymentNamespace }}\", resource=\"memory\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}namespace=\"{{ deploymentNamespace }}\", workload=\"{{ deployment }}\", workload_type=\"deployment\"}\r\n) by (pod) * 100",
-              "legendFormat": "__auto",
-              "range": true,
-              "refId": "A"
-            }
-          ],
-          "title": "Memory Utilization Limits %",
-          "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "description": "CPU utilization percentage against the requested CPU for containers",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 10,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 1,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              },
-              "unit": "percent"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 0,
-            "y": 59
-          },
-          "id": 19,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "sum(\r\n    rate(container_cpu_usage_seconds_total{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}namespace=\"{{ deploymentNamespace }}\"}[5m])\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}namespace=\"{{ deploymentNamespace }}\", workload=\"{{ deployment }}\", workload_type=\"deployment\"}\r\n) by (pod)\r\n/sum(\r\n    kube_pod_container_resource_requests{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}job=\"kube-state-metrics\", namespace=\"{{ deploymentNamespace }}\", resource=\"cpu\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}namespace=\"{{ deploymentNamespace }}\", workload=\"{{ deployment }}\", workload_type=\"deployment\"}\r\n) by (pod) * 100",
-              "legendFormat": "__auto",
-              "range": true,
-              "refId": "A"
-            }
-          ],
-          "title": "CPU Utilization Requests %",
-          "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "description": "CPU utilization percentage against the limits of CPU for containers",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 10,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 1,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              },
-              "unit": "percent"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 59
-          },
-          "id": 20,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "sum(\r\n    rate(container_cpu_usage_seconds_total{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}namespace=\"{{ deploymentNamespace }}\"}[5m])\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}namespace=\"{{ deploymentNamespace }}\", workload=\"{{ deployment }}\", workload_type=\"deployment\"}\r\n) by (pod)\r\n/sum(\r\n    kube_pod_container_resource_limits{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}job=\"kube-state-metrics\", namespace=\"{{ deploymentNamespace }}\", resource=\"cpu\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}namespace=\"{{ deploymentNamespace }}\", workload=\"{{ deployment }}\", workload_type=\"deployment\"}\r\n) by (pod) * 100",
-              "legendFormat": "__auto",
-              "range": true,
-              "refId": "A"
-            }
-          ],
-          "title": "CPU Utilization Limits %",
-          "type": "timeseries"
-        },
-        {
-          "collapsed": false,
-          "gridPos": {
-            "h": 1,
-            "w": 24,
-            "x": 0,
-            "y": 67
-          },
-          "id": 24,
-          "panels": [],
-          "title": "Logs",
-          "type": "row"
         },
         {
           "datasource": {
             "type": "loki",
             "uid": "P8E80F9AEF21F6940"
           },
-          "description": "",
+          "description": "This panel shows count of the error and exception in the logs, you can check logs dashboard for more details",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -1504,11 +262,11 @@ data:
           },
           "gridPos": {
             "h": 8,
-            "w": 8,
-            "x": 0,
-            "y": 68
+            "w": 12,
+            "x": 12,
+            "y": 1
           },
-          "id": 25,
+          "id": 6,
           "options": {
             "legend": {
               "calcs": [],
@@ -1528,7 +286,7 @@ data:
                 "uid": "P8E80F9AEF21F6940"
               },
               "editorMode": "code",
-              "expr": "sum(rate({ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}pod=~\"{{ deployment }}.*\", container!=\"istio-proxy\"} |~ `(?i)error` or `(?i)exception` [$__interval]))",
+              "expr": "sum(count_over_time({ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}pod=~\"{{ service }}.*\", container!=\"istio-proxy\"} |~ `(?i)error` or `(?i)exception` [$__interval]))",
               "legendFormat": "Count of Error Logs",
               "queryType": "range",
               "refId": "A"
@@ -1539,15 +297,986 @@ data:
         },
         {
           "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "description": "This panel shows request count and response time",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "reqps"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Response Time"
+                },
+                "properties": [
+                  {
+                    "id": "custom.axisPlacement",
+                    "value": "right"
+                  },
+                  {
+                    "id": "unit",
+                    "value": "ms"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 9
+          },
+          "id": 7,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "editorMode": "code",
+              "expr": "sum(rate(nginx_ingress_controller_requests{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}exported_service=\"{{ service }}\", exported_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval]))",
+              "legendFormat": "Requests/sec",
+              "range": true,
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "editorMode": "code",
+              "expr": "sum(rate(nginx_ingress_controller_request_duration_seconds_sum{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}exported_service=\"{{ service }}\", exported_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval])) / sum(rate(nginx_ingress_controller_request_duration_seconds_count{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}exported_service=\"{{ service }}\", exported_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval]))",
+              "hide": false,
+              "instant": false,
+              "legendFormat": "Response Time",
+              "range": true,
+              "refId": "B"
+            }
+          ],
+          "title": "Request Count vs Response Time",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "description": "This panel shows response size of the service",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "decbytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 9
+          },
+          "id": 8,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "editorMode": "code",
+              "expr": "sum (rate(nginx_ingress_controller_response_size_sum{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}exported_service=\"{{ service }}\", exported_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval]))/sum(rate(nginx_ingress_controller_response_size_count{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}exported_service=\"{{ service }}\", exported_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval]))",
+              "legendFormat": "Response Size",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Response Size",
+          "type": "timeseries"
+        },
+        {% endif %}
+        {% if apiGateway == "istio" %}
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "id": 4,
+          "panels": [],
+          "title": "Istio Metrics",
+          "type": "row"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "description": "This panel shows response error rate for the service",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 1
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "5xx Error Rate"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "red",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "4xx Error Rate"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "orange",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 1
+          },
+          "id": 8,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "editorMode": "code",
+              "expr": "sum(rate(istio_requests_total{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}source_workload!~\"unknown\", reporter=\"source\", destination_service_name=\"{{ service }}\", destination_service_namespace=\"{{ deploymentNamespace }}\", response_code=~\"5..\"}[$__rate_interval])) / sum(rate(istio_requests_total{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}source_workload!~\"unknown\", reporter=\"source\", destination_service_name=\"{{ service }}\", destination_service_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval])) * 100",
+              "legendFormat": "5xx Error Rate",
+              "range": true,
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "editorMode": "code",
+              "expr": "sum(rate(istio_requests_total{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}source_workload!~\"unknown\", reporter=\"source\", destination_service_name=\"{{ service }}\", destination_service_namespace=\"{{ deploymentNamespace }}\", response_code=~\"4..\"}[$__rate_interval])) / sum(rate(istio_requests_total{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}source_workload!~\"unknown\", reporter=\"source\", destination_service_name=\"{{ service }}\", destination_service_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval])) * 100",
+              "hide": false,
+              "instant": false,
+              "legendFormat": "4xx Error Rate",
+              "range": true,
+              "refId": "B"
+            }
+          ],
+          "title": "Error Rate",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
             "type": "loki",
             "uid": "P8E80F9AEF21F6940"
           },
-          "description": "",
+          "description": "This panel shows count of the error and exception in the logs, you can check logs dashboard for more details",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "noValue": "0",
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Count of Error Logs"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "red",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
           "gridPos": {
             "h": 8,
-            "w": 16,
-            "x": 8,
-            "y": 68
+            "w": 12,
+            "x": 12,
+            "y": 1
+          },
+          "id": 5,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "loki",
+                "uid": "P8E80F9AEF21F6940"
+              },
+              "editorMode": "code",
+              "expr": "sum(count_over_time({ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}pod=~\"{{ service }}.*\", container!=\"istio-proxy\"} |~ `(?i)error` or `(?i)exception` [$__interval]))",
+              "legendFormat": "Count of Error Logs",
+              "queryType": "range",
+              "refId": "A"
+            }
+          ],
+          "title": "Logs Error Count",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "reqps"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Response Time"
+                },
+                "properties": [
+                  {
+                    "id": "custom.axisPlacement",
+                    "value": "right"
+                  },
+                  {
+                    "id": "unit",
+                    "value": "ms"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 9
+          },
+          "id": 6,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "editorMode": "code",
+              "expr": "sum(irate(istio_requests_total{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}source_workload!~\"unknown\", reporter=\"source\", destination_service_name=\"{{ service }}\", destination_service_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval]))",
+              "legendFormat": "Requests/sec",
+              "range": true,
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "editorMode": "code",
+              "expr": "sum(rate(istio_request_duration_milliseconds_sum{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}source_workload!~\"unknown\", reporter=\"source\", destination_service_name=\"{{ service }}\", destination_service_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval])) / sum(rate(istio_request_duration_milliseconds_count{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}source_workload!~\"unknown\", reporter=\"source\", destination_service_name=\"{{ service }}\", destination_service_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval]))",
+              "hide": false,
+              "instant": false,
+              "legendFormat": "Response Time",
+              "range": true,
+              "refId": "B"
+            }
+          ],
+          "title": "Request Count vs Response Time",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "description": "This panel shows response size of the service",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 2,
+                "pointSize": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "decbytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 9
+          },
+          "id": 12,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "editorMode": "code",
+              "expr": "sum(rate(istio_response_bytes_sum{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}source_workload!~\"unknown\", reporter=\"source\", destination_service_name=\"{{ service }}\", destination_service_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval])) / sum(rate(istio_response_bytes_count{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}source_workload!~\"unknown\", reporter=\"source\", destination_service_name=\"{{ service }}\", destination_service_namespace=\"{{ deploymentNamespace }}\"}[$__rate_interval]))",
+              "legendFormat": "Response Size",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Response Size",
+          "type": "timeseries"
+        },
+        {% endif %}
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 17
+          },
+          "id": 14,
+          "panels": [],
+          "title": "Resource Metrics",
+          "type": "row"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "description": "CPU utilization percentage against the request and limit CPU for containers",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Limit"
+                },
+                "properties": [
+                  {
+                    "id": "custom.axisPlacement",
+                    "value": "right"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 18
+          },
+          "id": 19,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "editorMode": "code",
+              "expr": "sum(\r\n    rate(container_cpu_usage_seconds_total{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}namespace=\"{{ deploymentNamespace }}\"}[5m])\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}namespace=\"{{ deploymentNamespace }}\", workload=\"{{ deployment }}\", workload_type=\"deployment\"}\r\n) by (pod)\r\n/sum(\r\n    kube_pod_container_resource_requests{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}job=\"kube-state-metrics\", namespace=\"{{ deploymentNamespace }}\", resource=\"cpu\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}namespace=\"{{ deploymentNamespace }}\", workload=\"{{ deployment }}\", workload_type=\"deployment\"}\r\n) by (pod) * 100",
+              "legendFormat": "Request",
+              "range": true,
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "editorMode": "code",
+              "exemplar": false,
+              "expr": "sum(\n    rate(container_cpu_usage_seconds_total{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}namespace=\"{{ deploymentNamespace }}\"}[5m])\n  * on(namespace,pod)\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}namespace=\"{{ deploymentNamespace }}\", workload=\"{{ deployment }}\", workload_type=\"deployment\"}\n) by (pod)\n/sum(\n    kube_pod_container_resource_limits{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}job=\"kube-state-metrics\", namespace=\"{{ deploymentNamespace }}\", resource=\"cpu\"}\n  * on(namespace,pod)\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}namespace=\"{{ deploymentNamespace }}\", workload=\"{{ deployment }}\", workload_type=\"deployment\"}\n) by (pod) * 100",
+              "hide": false,
+              "instant": false,
+              "legendFormat": "Limit",
+              "range": true,
+              "refId": "B"
+            }
+          ],
+          "title": "CPU Utilization Requests vs Limit %",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "description": "Memory utilization percentage against the request and limit memory of container",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Limit"
+                },
+                "properties": [
+                  {
+                    "id": "custom.axisPlacement",
+                    "value": "right"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 18
+          },
+          "id": 16,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "editorMode": "code",
+              "expr": "sum(\r\n    container_memory_working_set_bytes{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}namespace=\"{{ deploymentNamespace }}\", container!=\"\", image!=\"\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}namespace=\"{{ deploymentNamespace }}\", workload=\"{{ deployment }}\", workload_type=\"deployment\"}\r\n) by (pod)\r\n/sum(\r\n    kube_pod_container_resource_requests{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}job=\"kube-state-metrics\", namespace=\"{{ deploymentNamespace }}\", resource=\"memory\"}\r\n  * on(namespace,pod)\r\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}namespace=\"{{ deploymentNamespace }}\", workload=\"{{ deployment }}\", workload_type=\"deployment\"}\r\n) by (pod) * 100",
+              "legendFormat": "Request",
+              "range": true,
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "editorMode": "code",
+              "expr": "sum(\n    container_memory_working_set_bytes{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}namespace=\"{{ deploymentNamespace }}\", container!=\"\", image!=\"\"}\n  * on(namespace,pod)\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}namespace=\"{{ deploymentNamespace }}\", workload=\"{{ deployment }}\", workload_type=\"deployment\"}\n) by (pod)\n/sum(\n    kube_pod_container_resource_limits{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}job=\"kube-state-metrics\", namespace=\"{{ deploymentNamespace }}\", resource=\"memory\"}\n  * on(namespace,pod)\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}namespace=\"{{ deploymentNamespace }}\", workload=\"{{ deployment }}\", workload_type=\"deployment\"}\n) by (pod) * 100",
+              "hide": false,
+              "instant": false,
+              "legendFormat": "Limit",
+              "range": true,
+              "refId": "B"
+            }
+          ],
+          "title": "Memory Utilization Requests vs Limit %",
+          "type": "timeseries"
+        },
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 26
+          },
+          "id": 24,
+          "panels": [],
+          "title": "Logs",
+          "type": "row"
+        },
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "P8E80F9AEF21F6940"
+          },
+          "description": "This panels shows error and exception logs for the service",
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 27
           },
           "id": 26,
           "options": {
@@ -1567,7 +1296,7 @@ data:
                 "uid": "P8E80F9AEF21F6940"
               },
               "editorMode": "code",
-              "expr": "{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}pod=~\"{{ deployment }}.*\", container!=\"istio-proxy\"} |~ `(?i)error` or `(?i)exception`",
+              "expr": "{ {%- if cluster %}cluster=\"{{ cluster }}\", {%- endif %}pod=~\"{{ service }}.*\", container!=\"istio-proxy\"} |~ `(?i)error` or `(?i)exception`",
               "queryType": "range",
               "refId": "A"
             }
@@ -1576,9 +1305,8 @@ data:
           "type": "logs"
         }
       ],
-      "refresh": "30s",
-      "schemaVersion": 37,
-      "style": "dark",
+      "refresh": "",
+      "schemaVersion": 39,
       "tags": [
         "nopo11y"
       ],
@@ -1586,13 +1314,22 @@ data:
         "list": []
       },
       "time": {
-        "from": "now-1h",
+        "from": "now-30m",
         "to": "now"
       },
-      "timepicker": {},
-      "timezone": "",
+      "timepicker": {
+        "refresh_intervals": [
+          "1m",
+          "5m",
+          "15m",
+          "30m",
+          "1h",
+          "2h",
+          "1d"
+        ]
+      },
+      "timezone": "browser",
       "title": "{{ service }} Overview - Dashboard",
       "uid": "{{ dashboarduid }}",
-      "version": 10,
       "weekStart": ""
     }
