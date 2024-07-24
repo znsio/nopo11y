@@ -1,4 +1,0 @@
-apiVersion: v2
-name: istio-common-ingress
-description: A Helm chart for creating common ingress using istio ingress gateway and virtual service to access nopo11y-stack components
-version: 1.0.0
