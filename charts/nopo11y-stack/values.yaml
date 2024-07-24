@@ -16015,8 +16015,6 @@ kuberhealthy:
 
 ### Nopo11y-health-check
 nopo11y_health_check:
-  ingress:
-    enabled: false
   checks: []
   # - name: test
   #   image: ghcr.io/znsio/nopo11y/system_health_check:1.0
@@ -16126,3 +16124,22 @@ nopo11y-operator:
   tolerations: []
 
   affinity: {}
+
+## Ingress for nopo11y-stack components 
+nopo11y_ingress:
+  ## enable or disable ingress for nopo11y-stack components, by default it is disabled
+  enabled: false
+  ## Ingress type either istio or nginx, the default is istio
+  type: nginx
+  ## host name to access nopo11y-stack components
+  host: ""
+  ## if you use istio ingress type then check the lables of your istio ingress gateway pod and add it as istioGatewaySelector
+  istioGatewaySelector: {}
+    # app: gateway
+  ## if you use istio ingress type then istio namespace is required by default it is set to istio-system namespace
+  istioNamespace: "istio-system"
+  ## TLS section for ingress
+  tls:
+    enabled: false
+    tlsKey: ""
+    tlsCert: ""
