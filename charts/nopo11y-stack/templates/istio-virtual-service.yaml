@@ -1,0 +1,33 @@
+{{- if and (.Values.nopo11y_ingress.enabled) (eq .Values.nopo11y_ingress.type "istio") }}
+{{- if gt (len (include "nopo11y.services" . |fromJsonArray)) 0 }}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ .Release.Name }}-vs
+  namespace: {{ .Release.Namespace }}
+spec:
+  hosts:
+  {{- if .Values.nopo11y_ingress.host }}
+  - {{ .Values.nopo11y_ingress.host |quote }}
+  {{- else }}
+  - "*"
+  {{- end }}
+  gateways:
+  - {{ $.Release.Name }}-gateway
+  http:
+  {{- range (include "nopo11y.services" . |fromJsonArray) }}
+  - match:
+    - uri:
+        prefix: {{ .path }}
+    {{- if hasKey . "rewritePath"}}
+    rewrite:
+      uri: {{ .rewritePath }}
+    {{- end }}
+    route:
+    - destination:
+        host: {{ .name }}
+        port:
+          number: {{ .port }}
+  {{- end }}
+{{- end }}
+{{- end }}
