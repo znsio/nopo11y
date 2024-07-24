@@ -16130,7 +16130,7 @@ nopo11y_ingress:
   ## enable or disable ingress for nopo11y-stack components, the default it is disabled
   enabled: false
   ## Ingress type either istio or nginx, the default is istio
-  type: nginx
+  type: istio
   ## DNS or host name to access nopo11y-stack components with.
   host: ""
   ## istio gateway selector to select which istio gateway to use.
