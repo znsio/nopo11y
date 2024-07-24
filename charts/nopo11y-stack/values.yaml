@@ -16127,16 +16127,17 @@ nopo11y-operator:
 
 ## Ingress for nopo11y-stack components 
 nopo11y_ingress:
-  ## enable or disable ingress for nopo11y-stack components, by default it is disabled
+  ## enable or disable ingress for nopo11y-stack components, the default it is disabled
   enabled: false
   ## Ingress type either istio or nginx, the default is istio
   type: nginx
-  ## host name to access nopo11y-stack components
+  ## DNS or host name to access nopo11y-stack components with.
   host: ""
-  ## if you use istio ingress type then check the lables of your istio ingress gateway pod and add it as istioGatewaySelector
+  ## istio gateway selector to select which istio gateway to use.
+  ## if you set ingress type to istio, check the lables of your istio ingress gateway pod and add it as istioGatewaySelector
   istioGatewaySelector: {}
     # app: gateway
-  ## if you use istio ingress type then istio namespace is required by default it is set to istio-system namespace
+  ## if you set ingress type to istio then istio namespace is required, the default is istio-system
   istioNamespace: "istio-system"
   ## TLS section for ingress
   tls:
