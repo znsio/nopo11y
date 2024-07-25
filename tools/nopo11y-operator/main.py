@@ -136,8 +136,9 @@ def generate_dashboard_alerts(spec, namespace, old, new, **kwargs):
         logger.info("There is no change in specs, skipping")
         return
 
-    deleted_svc_list = set(old_spec.keys()) - set(new_spec.keys())
-    delete_service_nopo11y(deleted_svc_list)
+    if "services" in old_spec and "services" in new_spec:
+        deleted_svc_list = set(old_spec["services"].keys()) - set(new_spec["services"].keys())
+        delete_service_nopo11y(deleted_svc_list)
 
     environment = Environment(loader=FileSystemLoader("templates/"))
     try:
