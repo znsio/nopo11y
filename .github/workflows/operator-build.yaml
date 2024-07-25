@@ -1,4 +1,4 @@
-name: CI
+name: Nopo11y Operator Build
 
 on:
   push:
