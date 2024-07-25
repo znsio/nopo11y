@@ -1,0 +1,56 @@
+{{- if and (.Values.nopo11y_ingress.enabled) (eq .Values.nopo11y_ingress.type "nginx") }}
+{{- if gt (len (include "nopo11y.services" . |fromJsonArray)) 0 }}
+{{- if and (.Values.nopo11y_ingress.tls.enabled) (not .Values.nopo11y_ingress.host) }}
+{{- fail "if nopo11y_ingress tls is enabled host is required host can not be empty" }}
+{{- end }}
+{{- range (include "nopo11y.services" . |fromJsonArray) }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .name }}-ingress
+  namespace: {{ $.Release.Namespace }}
+  {{- if hasKey . "rewritePath" }}
+  {{- if contains "nopo11y-health-check" .path }}
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/add-base-url : "true"
+  {{- end }}
+  {{- else }}
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1$2
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+  {{- end }}
+spec:
+  {{- if $.Values.nopo11y_ingress.tls.enabled }}
+  tls:
+  - hosts:
+    - {{ $.Values.nopo11y_ingress.host |quote }}
+    secretName: {{ $.Release.Name }}-{{ $.Release.Namespace }}-tls-secret
+  {{- end }}
+  ingressClassName: nginx
+  rules:
+    {{- if $.Values.nopo11y_ingress.host }}
+  - host: {{ $.Values.nopo11y_ingress.host }}
+    http:
+    {{- else }}
+  - http:
+    {{- end }}
+      paths:
+      {{- $path:= (trimPrefix "/" .path) }}
+      {{- if contains "nopo11y-health-check" .path }}
+      - path: {{ .path }}
+      {{- else }}
+      - path: "/({{ $path }})(/.*){0,}"
+      {{- end }}
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .name }}
+            port:
+              number: {{ .port }}
+---
+{{- end }}
+{{- end }}
+{{- end }}

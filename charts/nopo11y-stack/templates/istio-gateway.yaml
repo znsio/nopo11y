@@ -1,0 +1,37 @@
+{{- if and (.Values.nopo11y_ingress.enabled) (eq .Values.nopo11y_ingress.type "istio") }}
+{{- if gt (len (include "nopo11y.services" . |fromJsonArray)) 0 }}
+{{- if and (.Values.nopo11y_ingress.tls.enabled) (not .Values.nopo11y_ingress.host) }}
+{{- fail "if nopo11y_ingress tls is enabled then host is required host can not be empty" }}
+{{- end }}
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: {{ .Release.Name }}-gateway
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    {{- toYaml .Values.nopo11y_ingress.istioGatewaySelector |nindent 4 }}
+  servers:
+  - port:
+      {{- if $.Values.nopo11y_ingress.tls.enabled  }}
+      number: 443
+      name: https
+      protocol: HTTPS
+      {{- else }}
+      number: 80
+      name: http
+      protocol: HTTP
+      {{- end }}
+    hosts:
+    {{- if .Values.nopo11y_ingress.host }}
+    - {{ .Values.nopo11y_ingress.host |quote }}
+    {{- else }}
+    - "*"
+    {{- end }}
+    {{- if .Values.nopo11y_ingress.tls.enabled }}
+    tls:
+      mode: SIMPLE
+      credentialName: {{ $.Release.Name }}-{{ $.Release.Namespace }}-tls-secret
+    {{- end }}
+{{- end }}
+{{- end }}
