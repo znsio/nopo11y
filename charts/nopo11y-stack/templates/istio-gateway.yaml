@@ -3,7 +3,7 @@
 {{- if and (.Values.nopo11y_ingress.tls.enabled) (not .Values.nopo11y_ingress.host) }}
 {{- fail "if nopo11y_ingress tls is enabled then host is required host can not be empty" }}
 {{- end }}
-apiVersion: networking.nopo11y_ingress.istio.io/v1beta1
+apiVersion: networking.istio.io/v1beta1
 kind: Gateway
 metadata:
   name: {{ .Release.Name }}-gateway
