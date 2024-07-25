@@ -71,7 +71,6 @@ services:
   slo: 
     availability: 99.9
     latency: 99
- 
   alertThresholds: 
     latencyMS: 100
     rate4xx: 5
