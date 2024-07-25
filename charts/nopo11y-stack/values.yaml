@@ -16015,8 +16015,6 @@ kuberhealthy:
 
 ### Nopo11y-health-check
 nopo11y_health_check:
-  ingress:
-    enabled: false
   checks: []
   # - name: test
   #   image: ghcr.io/znsio/nopo11y/system_health_check:1.0
@@ -16043,3 +16041,106 @@ nopo11y_health_check:
   #   ## HEALTHY_NODE_ROOT_AVAILABEL_SPACE - default is 200mb
   #   ## SLOTH_SLO_CRITICAL_ALERT_CHECK - default is true
   #   env: {}
+
+# Nopo11y Operator
+nopo11y-operator:
+  enabled: true
+  # Default values for nopo11y-operator.
+  # This is a YAML-formatted file.
+  # Declare variables to be passed into your templates.
+
+  replicaCount: 1
+
+  image:
+    repository: ghcr.io/znsio/nopo11y/nopo11y-operator
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "v1"
+
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+
+  env: {}
+    # - name: LOG_LEVEL
+    #   value: "INFO"
+    # - name: API_GATEWAY
+    #   value: "istio"
+    # - name: GRAFANA_EXTERNAL_URL
+    #   value: ""
+    # - name: AVAILABILITY_SLO
+    #   value: "99"
+    # - name: LATENCY_SLO
+    #   value: "99"
+    # - name: LATENCY_MS
+    #   value: "3000"
+    # - name: ERROR_RATE_4XX
+    #   value: "5"
+    # - name: ERROR_RATE_5XX
+    #   value: "1"
+    # - name: NOPO11Y_STACK_NAMESPACE
+    #   value: "observability"
+
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  podAnnotations: {}
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 256Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+## Ingress for nopo11y-stack components 
+nopo11y_ingress:
+  ## enable or disable ingress for nopo11y-stack components, the default it is disabled
+  enabled: false
+  ## Ingress type either istio or nginx, the default is istio
+  type: "istio"
+  ## DNS or host name to access nopo11y-stack components with.
+  host: ""
+  ## istio gateway selector to select which istio gateway to use.
+  ## if you set ingress type to istio, check the lables of your istio ingress gateway pod and add it as istioGatewaySelector
+  istioGatewaySelector: {}
+    # app: gateway
+  ## if you set ingress type to istio then istio namespace is required, the default is istio-system
+  istioNamespace: "istio-system"
+  ## TLS section for ingress
+  tls:
+    enabled: false
+    tlsKey: ""
+    tlsCert: ""

@@ -1,0 +1,68 @@
+{{- if .Values.enabled }}
+{{- if eq .Values.namespace ""}}
+{{ fail "values.namespace is required" }}
+{{- end }}
+{{- if and (not (eq .Values.apiGateway "istio")) (not (eq .Values.apiGateway "nginx"))}}
+{{ fail "Allowed values for apiGateway are istio, nginx" }}
+{{- end }}
+{{- range (include "nopo11y.services" . |fromJsonArray) }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  namespace: {{ $.Values.namespace }}
+  name: {{ .service }}-alert-rules
+  labels:
+    managedby: nopo11y
+spec:
+  groups:
+  - name: {{ .service }}-alert-rules
+    rules:
+    {{- if eq $.Values.apiGateway "istio" }}
+    - alert: {{ .service }}High5xxErrorRate
+      expr: sum(rate(istio_requests_total{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_service_name="{{ .service }}", destination_service_namespace="{{ .namespace }}", response_code=~"5.."}[5m])) by (instance) / sum(rate(istio_requests_total{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_service_name="{{ .service }}", destination_service_namespace="{{ .namespace }}"}[5m])) by (instance) * 100 > {{ .rate5xx }}
+      annotations:
+        description: {{ .service }} service is experiencing high 5xx errors rate from last 5 minutes.
+        summary: {{ .service }} service is experiencing high 5xx error rate.
+        {{- if $.Values.grafanaURL }}
+        dashboard: {{ $.Values.grafanaURL }}/d/{{ .dashboarduid }}
+        {{- end }}
+      labels:
+            severity: critical
+    - alert: {{ .service }}High4xxErrorRate
+      expr: sum(rate(istio_requests_total{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_service_name="{{ .service }}", destination_service_namespace="{{ .namespace }}", response_code=~"4.."}[5m])) by (instance) / sum(rate(istio_requests_total{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}source_workload!~"unknown", reporter="source", destination_service_name="{{ .service }}", destination_service_namespace="{{ .namespace }}"}[5m])) by (instance) * 100 > {{ .rate4xx }}
+      for: 5m
+      annotations:
+        {{- if $.Values.grafanaURL }}
+        dashboard: {{ $.Values.grafanaURL }}/d/{{ .dashboarduid }}
+        {{- end }}
+        description: {{ .service }} service is experiencing high 4xx errors rate from last 5 minutes.
+        summary: {{ .service }} service is experiencing high 4xx error rate.
+      labels:
+            severity: warning
+    {{- end }}
+    {{- if eq $.Values.apiGateway "nginx" }}
+    - alert: {{ .service }}High5xxErrorRate-NginxIngress
+      expr: sum(rate(nginx_ingress_controller_requests{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}status=~"5..", exported_service="{{ .service }}", exported_namespace="{{ .namespace }}"}[5m])) / sum(rate(nginx_ingress_controller_requests{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}exported_service="{{ .service }}", exported_namespace="{{ .namespace }}"}[5m])) * 100 > {{ .rate5xx }}
+      annotations:
+        description: {{ .service }} service is experiencing high 5xx errors rate from last 5 minutes.
+        summary: {{ .service }} is experiencing high 5xx error rate.
+        {{- if $.Values.grafanaURL }}
+        dashboard: {{ $.Values.grafanaURL }}/d/{{ .dashboarduid }}
+        {{- end }}
+      labels:
+            severity: critical
+    - alert: {{ .service }}High4xxErrorRate-NginxIngress
+      expr: sum(rate(nginx_ingress_controller_requests{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}status=~"4..", exported_service="{{ .service }}", exported_namespace="{{ .namespace }}"}[5m])) / sum(rate(nginx_ingress_controller_requests{ {{- if hasKey . "cluster" }}cluster="{{ .cluster }}", {{- end }}exported_service="{{ .service }}", exported_namespace="{{ .namespace }}"}[5m])) * 100 > {{ .rate4xx }}
+      for: 10m
+      annotations:
+        description: {{ .service }} service is experiencing high 4xx errors rate from last 5 minutes.
+        summary: {{ .service }} service is experiencing high 4xx error rate.
+        {{- if $.Values.grafanaURL }}
+        dashboard: {{ $.Values.grafanaURL }}/d/{{ .dashboarduid }}
+        {{- end }}
+      labels:
+            severity: warning
+    {{- end }}
+---
+{{- end }}
+{{- end }}
