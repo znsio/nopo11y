@@ -26,7 +26,13 @@
         {{- if (index .Values "kube-prometheus-stack" "grafana" "enabled" ) }}
             {{- $grafana:= dict }}
             {{- $path:= "" }}
-            {{- if hasKey (index .Values "kube-prometheus-stack" "grafana" "grafana.ini" "server") "root_url" }}
+            {{- if (index .Values "kube-prometheus-stack" "grafana" "env") }}
+                {{- range $key, $val := (index .Values "kube-prometheus-stack" "grafana" "env") }}
+                    {{- if eq $key "GF_SERVER_ROOT_URL" }}
+                        {{- $path = (urlParse $val).path }}
+                    {{- end }}
+                {{- end }}
+            {{- else if hasKey (index .Values "kube-prometheus-stack" "grafana" "grafana.ini" "server") "root_url" }}
                 {{- $path = (urlParse (index .Values "kube-prometheus-stack" "grafana" "grafana.ini" "server" "root_url")).path }}
             {{- end }}
             {{- $port:= (index .Values "kube-prometheus-stack" "grafana" "service" "port") |int }}
