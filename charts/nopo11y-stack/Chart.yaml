@@ -44,4 +44,4 @@ dependencies:
 description: A Helm chart for observability stack
 name: nopo11y-stack
 type: application
-version: 1.4.0
+version: 1.4.1
