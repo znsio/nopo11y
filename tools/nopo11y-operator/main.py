@@ -11,6 +11,7 @@ from kubernetes.client.rest import ApiException
 import yaml
 
 # Initialize the Kubernetes client
+# kubernetes.config.load_kube_config()
 kubernetes.config.load_incluster_config()
 core_v1_api = CoreV1Api()
 apps_v1_api = AppsV1Api()
@@ -136,8 +137,8 @@ def generate_dashboard_alerts(spec, namespace, old, new, **kwargs):
         logger.info("There is no change in specs, skipping")
         return
 
-    if "services" in old_spec and "services" in new_spec:
-        deleted_svc_list = set(old_spec["services"].keys()) - set(new_spec["services"].keys())
+    deleted_svc_list = set(old_spec.keys()) - set(new_spec.keys())
+    if delete_service_nopo11y:
         delete_service_nopo11y(deleted_svc_list)
 
     environment = Environment(loader=FileSystemLoader("templates/"))
@@ -160,7 +161,7 @@ def generate_dashboard_alerts(spec, namespace, old, new, **kwargs):
     for service in spec_dict.get("services", []):
         service_name = service.get("serviceName")
         if new_spec.get(service_name) == old_spec.get(service_name) and \
-            old_spec.get("defaults") == new_spec.get("defaults"):
+            old.get("defaults") == new.get("defaults"):
             logger.info(f"Found no changes for following service: {service_name}")
             continue
 
@@ -316,16 +317,16 @@ def update_configmap(name, namespace, body):
 def transform_spec(old=None, new=None):
     """ This will extract the services from the old and new specs and add them to the new map and return those maps """
     old_spec = deepcopy(old)
-    for service in old_spec.get("spec", {}).get("services", []):
+    old_spec["spec"] = {}
+    for service in old.get("spec", {}).get("services", []):
         old_spec["spec"][service["serviceName"]] = service
-    old_spec = old_spec.get("spec", {})
 
     new_spec = deepcopy(new)
-    for service in new_spec.get("spec", {}).get("services", []):
+    new_spec["spec"] = {}
+    for service in new.get("spec", {}).get("services", []):
         new_spec["spec"][service["serviceName"]] = service
-    new_spec = new_spec.get("spec", {})
 
-    return old_spec, new_spec
+    return old_spec["spec"], new_spec["spec"]
 
 
 def delete_service_nopo11y(service_list):
