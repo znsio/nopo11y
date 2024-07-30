@@ -138,7 +138,7 @@ def generate_dashboard_alerts(spec, namespace, old, new, **kwargs):
         return
 
     deleted_svc_list = set(old_spec.keys()) - set(new_spec.keys())
-    if delete_service_nopo11y:
+    if deleted_svc_list:
         delete_service_nopo11y(deleted_svc_list)
 
     environment = Environment(loader=FileSystemLoader("templates/"))
