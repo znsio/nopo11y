@@ -37,6 +37,10 @@ dependencies:
   name: kuberhealthy
   repository: "https://kuberhealthy.github.io/kuberhealthy/helm-repos"
   version: "104"
+- condition: kubernetes-event-exporter.enabled
+  name: kubernetes-event-exporter
+  repository: https://charts.bitnami.com/bitnami
+  version: 3.2.9
 - condition: nopo11y-operator.enabled
   name: nopo11y-operator
   repository: ""
@@ -44,4 +48,4 @@ dependencies:
 description: A Helm chart for observability stack
 name: nopo11y-stack
 type: application
-version: 1.4.1
+version: 1.5.0
