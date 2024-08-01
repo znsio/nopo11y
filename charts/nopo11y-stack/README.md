@@ -58,7 +58,7 @@ nopo11y_ingress:
   host: <your-domian-name>
 ```
 
-Replace <your-domain-name> with your DNS.
+Replace `<your-domain-name>` with your DNS.
 
 |Tool |Endpoint|
 |-----------|------------|
