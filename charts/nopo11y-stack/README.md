@@ -23,7 +23,7 @@ It will install following components into your kubernetes cluster:
 - **Sloth**: Prometheus SLO generator
 
 
-# How to install?
+## How to install?
 
 [Helm](https://helm.sh) must be installed to use the charts. Please refer to
 Helm's [documentation](https://helm.sh/docs) to get started.
@@ -42,4 +42,32 @@ To install the chart:
 
 To uninstall the chart:
 
-    helm delete nopo11y-stack
+    helm uninstall nopo11y-stack
+
+## How to access?
+
+You need to configure below settings in your `values.yaml` to create ingress for your nopo11y-stack.
+
+```yaml
+nopo11y_ingress:
+  ## enable or disable ingress for nopo11y-stack components, the default it is disabled
+  enabled: true
+  ## Ingress type either istio or nginx, the default is istio
+  type: "istio"
+  ## DNS or hostname to access nopo11y-stack components with.
+  host: <your-domian-name>
+```
+
+Replace `<your-domain-name>` with your DNS.
+
+|Tool |Endpoint|
+|-----------|------------|
+|Prometheus |/prometheus |
+|Grafana |/grafana |
+|Alertmanager |/alertmanager |
+|Thanos-query |/thanos-query |
+|Kiali |/kiali |
+|Jaeger |/jaeger |
+|Kuberhealthy |/nopo11y-health-check |
+
+**Note:** Nopo11y-stack creates an ingress only for those components which are configured with route-prefix other than ```/```, if you configured your component to run on ```/``` web root then it won't create an ingress for that component.
