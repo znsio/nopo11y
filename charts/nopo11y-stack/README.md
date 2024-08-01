@@ -44,19 +44,30 @@ To uninstall the chart:
 
     helm uninstall nopo11y-stack
 
-## How to access
-Nopo11y-stack gives you an option to setup an ingress for accessing nopo11y-stack components externally either using nginx ingress or istio ingress, based on the ingress type you select. 
+## How to access?
 
-Nopo11y-stack creates an ingress with path based routing to the nopo11y-stack components, if you have enabled nopo11y-stack ingress with DNS/hostname ```observability.example.com``` and configured nopo11y-stack components like prometheus, alertmanaget, grafana, kiali, jaeger etc. with route-prefix other than ```/``` then you can access thonse componets using the DNS and the route-prefix, e.g. if you configure prometheus with route-prefix ```/prometheus``` then you would be able to access prometheus on ```http(s)://observability.example.com/prometheus```
+You need to configure below settings in your `values.yaml` to create ingress for your nopo11y-stack.
 
-|Tools |Route-prefix|Endpoint|
-|-----------|------------|--------|
-|Prometheus |/prometheus |http(s)://observability.example.com/prometheus |
-|Grafana |/grafana |http(s)://observability.example.com/grafnan |
-|Alertmanager |/alertmanager |http(s)://observability.example.com/alertmanager |
-|Thanos-query |/thanos-query |http(s)://observability.example.com/thanos-query |
-|Kiali |/kiali |http(s)://observability.example.com/kiali |
-|Jaeger |/jaeger |http(s)://observability.example.com/jaeger |
-|Kuberhealthy |/nopo11y-health-check |http(s)://observability.example.com/nopo11y-health-check |
+```yaml
+nopo11y_ingress:
+  ## enable or disable ingress for nopo11y-stack components, the default it is disabled
+  enabled: true
+  ## Ingress type either istio or nginx, the default is istio
+  type: "istio"
+  ## DNS or hostname to access nopo11y-stack components with.
+  host: <your-domian-name>
+```
+
+Replace <your-domain-name> with your DNS.
+
+|Tool |Endpoint|
+|-----------|------------|
+|Prometheus |/prometheus |
+|Grafana |/grafana |
+|Alertmanager |/alertmanager |
+|Thanos-query |/thanos-query |
+|Kiali |/kiali |
+|Jaeger |/jaeger |
+|Kuberhealthy |/nopo11y-health-check |
 
 **Note:** Nopo11y-stack creates an ingress only for those components which are configured with route-prefix other than ```/```, if you configured your component to run on ```/``` web root then it won't create an ingress for that component.
