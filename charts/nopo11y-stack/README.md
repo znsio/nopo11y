@@ -49,7 +49,7 @@ Nopo11y-stack gives you an option to setup an ingress for accessing nopo11y-stac
 
 Nopo11y-stack creates an ingress with path based routing to the nopo11y-stack components, if you have enabled nopo11y-stack ingress with DNS/hostname ```observability.example.com``` and configured nopo11y-stack components like prometheus, alertmanaget, grafana, kiali, jaeger etc. with route-prefix other than ```/``` then you can access thonse componets using the DNS and the route-prefix, e.g. if you configure prometheus with route-prefix ```/prometheus``` then you would be able to access prometheus on ```http(s)://observability.example.com/prometheus```
 
-|Components |Route-prefix|Endpoint|
+|Tools |Route-prefix|Endpoint|
 |-----------|------------|--------|
 |Prometheus |/prometheus |http(s)://observability.example.com/prometheus |
 |Grafana |/grafana |http(s)://observability.example.com/grafnan |
