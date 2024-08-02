@@ -56,26 +56,51 @@
             {{- end }}
         {{- end }}
 
-        {{- if .Values.thanos.enabled }}
-            {{- if .Values.thanos.query.enabled }}
-                {{- $query:= dict }}
-                {{- $query = set $query "name" (printf "%s-query" (include "common.names.fullname" .Subcharts.thanos)) }}
-                {{- $query = set $query "port" .Values.thanos.query.service.ports.http }}
-                {{- $path:= "" }}
-                {{- if .Values.thanos.query.extraFlags }}
-                    {{- range .Values.thanos.query.extraFlags }}
-                        {{- if contains "--web.route-prefix" . }}
-                            {{- $path = (trimPrefix "--web.route-prefix=" . ) }}
-                        {{- end }}
+        {{- if and .Values.thanos.enabled .Values.thanos.query.enabled }}
+            {{- $query:= dict }}
+            {{- $query = set $query "name" (printf "%s-query" (include "common.names.fullname" .Subcharts.thanos)) }}
+            {{- $query = set $query "port" .Values.thanos.query.service.ports.http }}
+            {{- $path:= "" }}
+            {{- if .Values.thanos.query.extraFlags }}
+                {{- range .Values.thanos.query.extraFlags }}
+                    {{- if contains "--web.route-prefix" . }}
+                        {{- $path = (trimPrefix "--web.route-prefix=" . ) }}
                     {{- end }}
                 {{- end }}
-                {{- if ne $path "" }}
-                    {{- $query = set $query "path" $path }}
-                    {{- $servicesList = append $servicesList $query }}
-                {{- end }}
+            {{- end }}
+            {{- if and (ne $path "") (ne $path "/") }}
+                {{- $query = set $query "path" $path }}
+                {{- $servicesList = append $servicesList $query }}
             {{- end }}
         {{- end }}
 
+        {{- if (index .Values "kube-prometheus-stack" "thanosRuler" "enabled" ) }}
+            {{- $thanosruler:= dict }}
+            {{- $thanosruler = set $thanosruler "name" (printf "%s" (include "kube-prometheus-stack.thanosRuler.name" (index .Subcharts "kube-prometheus-stack"))) }}
+            {{- $port:= (index .Values "kube-prometheus-stack" "thanosRuler" "service" "port") |int }}
+            {{- $path:= (index .Values "kube-prometheus-stack" "thanosRuler" "thanosRulerSpec" "routePrefix") }}
+            {{- $thanosruler = set $thanosruler "port" (printf "%d" $port) }}
+            {{- if ne $path "/" }}
+                {{- $thanosruler = set $thanosruler "path" $path }}
+                {{- $servicesList = append $servicesList $thanosruler }}
+            {{- end }}
+        {{- else if and .Values.thanos.enabled .Values.thanos.ruler.enabled }}
+            {{- $thanosruler:= dict }}
+            {{- $thanosruler = set $thanosruler "name" (printf "%s-ruler" (include "common.names.fullname" .Subcharts.thanos)) }}
+            {{- $thanosruler = set $thanosruler "port" .Values.thanos.ruler.service.ports.http }}
+            {{- $path:= "" }}
+            {{- if .Values.thanos.query.extraFlags }}
+                {{- range .Values.thanos.ruler.extraFlags }}
+                    {{- if contains "--web.route-prefix" . }}
+                        {{- $path = (trimPrefix "--web.route-prefix=" . ) }}
+                    {{- end }}
+                {{- end }}
+            {{- end }}
+            {{- if and (ne $path "") (ne $path "/") }}
+                {{- $thanosruler = set $thanosruler "path" $path }}
+                {{- $servicesList = append $servicesList $thanosruler }}
+            {{- end }}
+        {{- end }}
 
         {{- if (index .Values "kiali-server" "enabled") }}
             {{- $kiali:= dict }}

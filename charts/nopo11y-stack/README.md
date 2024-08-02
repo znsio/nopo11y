@@ -66,6 +66,7 @@ Replace `<your-domain-name>` with your DNS.
 |Grafana |/grafana |
 |Alertmanager |/alertmanager |
 |Thanos-query |/thanos-query |
+|Thanos-ruler |/thanos-ruler |
 |Kiali |/kiali |
 |Jaeger |/jaeger |
 |Kuberhealthy |/nopo11y-health-check |

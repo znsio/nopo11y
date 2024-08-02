@@ -1,4 +1,4 @@
-{{- if .Values.sloth.enabled }}
+{{- if (index .Values "kube-prometheus-stack" "grafana" "enabled" ) }}
 {{- range $file, $_ := .Files.Glob "dashboards/*" }}
 apiVersion: v1
 kind: ConfigMap
