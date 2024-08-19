@@ -1,0 +1,22 @@
+{{- if .Values.jaeger.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  {{- if .Values.jaeger.serviceMonitor.labels }}
+  labels:
+  {{- toYaml .Values.jaeger.serviceMonitor.labels | nindent 4 }}
+  {{- end }}
+  name: {{ .Release.Name }}-tracing
+  namespace: {{ .Release.Namespace }}
+spec:
+  endpoints:
+  - port: metrics
+    scheme: http
+    path: "/metrics"
+  namespaceSelector:
+    matchNames:
+    - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      app: jaeger
+{{- end }}
