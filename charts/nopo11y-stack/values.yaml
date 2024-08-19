@@ -15618,7 +15618,7 @@ jaeger:
       storageClassName: "default"
       size: 8Gi
     tracesTTL: "168h"
-    serviceMonitr:
+    serviceMonitor:
       enabled: false
       labels: {}
         # app: jaeger
