@@ -15618,6 +15618,11 @@ jaeger:
       storageClassName: "default"
       size: 8Gi
     tracesTTL: "168h"
+    serviceMonitr:
+      enabled: false
+      labels: {}
+        # app: jaeger
+        # env: Dev
 
 ### Prom2teams
 ### This Helm chart is taken from here https://github.com/idealista/prom2teams, please check how to configure and use prom2teams.
