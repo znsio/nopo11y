@@ -105,7 +105,7 @@
         {{- if (index .Values "kiali-server" "enabled") }}
             {{- $kiali:= dict }}
             {{- $kiali = set $kiali "name" (printf "%s" (include "kiali-server.fullname" (index .Subcharts "kiali-server"))) }}
-            {{- $kiali = set $kiali "port" .Values.kiali.server.port }}
+            {{- $kiali = set $kiali "port" (index .Values "kiali-server" "server" "port") }}
             {{- if (index .Values "kiali-server" "server" "web_root") }}
                 {{- if ne (index .Values "kiali-server" "server" "web_root") "/" }}
                     {{- $kiali = set $kiali "path" (index .Values "kiali-server" "server" "web_root") }}
