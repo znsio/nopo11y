@@ -4,11 +4,12 @@ Nopo11y-stack is a fully opensource observability stack. Which provides metrics,
 
 - kube-prometheus-stack v58.2.2
 - thanos v15.4.1
-- grafana-loki v4.0.0
-- promtail v6.15.5
+- grafana-loki v4.6.18
+- promtail v6.16.6
 - sloth v0.7.0
-- kiali-server v1.83.0
+- kiali-server v1.89.8
 - jaeger v1.0.0
+- kubernetes-event-exporter v3.2.13
 
 It will install following components into your kubernetes cluster:
 
