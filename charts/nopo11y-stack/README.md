@@ -7,7 +7,7 @@ Nopo11y-stack is a fully opensource observability stack. Which provides metrics,
 - grafana-loki v4.6.18
 - promtail v6.16.6
 - sloth v0.7.0
-- kiali-server v1.89.8
+- kiali-server v1.89.7
 - jaeger v1.0.0
 - kubernetes-event-exporter v3.2.13
 
