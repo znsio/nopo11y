@@ -8,7 +8,7 @@ Nopo11y-stack is a fully opensource observability stack. Which provides metrics,
 - promtail v6.16.6
 - sloth v0.7.0
 - kiali-server v1.89.7
-- jaeger v1.0.0
+- Tempo-distributed v1.18.4
 - kubernetes-event-exporter v3.2.13
 
 It will install following components into your kubernetes cluster:
