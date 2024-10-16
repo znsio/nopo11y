@@ -15823,32 +15823,6 @@ kiali-server:
         port: 9090
     web_root: ""
 
-#Jaeger
-jaeger:
-  enabled: true
-  jaeger:
-    image: docker.io/jaegertracing/all-in-one:1.35
-    resources:
-      requests:
-        cpu: 10m
-        memory: 128Mi
-      limits:
-        cpu: 100m
-        memory: 256Mi
-    pathPrefix: /jaeger
-    persistence:
-      enabled: false
-      accessModes:
-      - ReadWriteOnce
-      storageClassName: "default"
-      size: 8Gi
-    tracesTTL: "168h"
-    serviceMonitor:
-      enabled: false
-      labels: {}
-        # app: jaeger
-        # env: Dev
-
 ### Prom2teams
 ### This Helm chart is taken from here https://github.com/idealista/prom2teams, please check how to configure and use prom2teams.
 prom2teams:
