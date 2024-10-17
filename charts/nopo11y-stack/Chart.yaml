@@ -17,6 +17,10 @@ dependencies:
   name: promtail
   repository: https://grafana.github.io/helm-charts
   version: 6.16.6
+- condition: tempo-distributed.enabled
+  name: tempo-distributed
+  repository: https://grafana.github.io/helm-charts
+  version: 1.18.4
 - condition: sloth.enabled
   name: sloth
   repository: ""
@@ -25,10 +29,6 @@ dependencies:
   name: kiali-server
   repository: https://kiali.org/helm-charts
   version: 1.89.7
-- condition: jaeger.enabled
-  name: jaeger
-  repository: ""
-  version: 1.0.1
 - condition: prom2teams.enabled
   name: prom2teams
   repository: ""
@@ -48,4 +48,4 @@ dependencies:
 description: A Helm chart for observability stack
 name: nopo11y-stack
 type: application
-version: 1.6.0
+version: 1.7.0
