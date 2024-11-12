@@ -20,7 +20,7 @@ spec:
       {{- else }}
       number: 80
       name: http
-      protocol: HTTP
+      protocol: HTTP2
       {{- end }}
     hosts:
     {{- if .Values.nopo11y_ingress.host }}
@@ -33,5 +33,19 @@ spec:
       mode: SIMPLE
       credentialName: {{ $.Release.Name }}-{{ $.Release.Namespace }}-tls-secret
     {{- end }}
+  {{- if .Values.nopo11y_ingress.tls.enabled }}
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP2
+    hosts:
+    {{- if .Values.nopo11y_ingress.host }}
+    - {{ .Values.nopo11y_ingress.host |quote }}
+    {{- else }}
+    - "*"
+    {{- end }}
+    tls:
+      httpsRedirect: true
+  {{- end }}
 {{- end }}
 {{- end }}

@@ -12,11 +12,15 @@ dependencies:
 - condition: grafana-loki.enabled
   name: grafana-loki
   repository: https://charts.bitnami.com/bitnami
-  version: 4.0.0
+  version: 4.6.18
 - condition: promtail.enabled
   name: promtail
   repository: https://grafana.github.io/helm-charts
-  version: 6.15.5
+  version: 6.16.6
+- condition: tempo-distributed.enabled
+  name: tempo-distributed
+  repository: https://grafana.github.io/helm-charts
+  version: 1.18.4
 - condition: sloth.enabled
   name: sloth
   repository: ""
@@ -25,10 +29,6 @@ dependencies:
   name: kiali-server
   repository: https://kiali.org/helm-charts
   version: 2.1.0
-- condition: jaeger.enabled
-  name: jaeger
-  repository: ""
-  version: 1.0.1
 - condition: prom2teams.enabled
   name: prom2teams
   repository: ""
@@ -40,7 +40,7 @@ dependencies:
 - condition: kubernetes-event-exporter.enabled
   name: kubernetes-event-exporter
   repository: https://charts.bitnami.com/bitnami
-  version: 3.2.9
+  version: 3.2.13
 - condition: nopo11y-operator.enabled
   name: nopo11y-operator
   repository: ""
@@ -48,4 +48,4 @@ dependencies:
 description: A Helm chart for observability stack
 name: nopo11y-stack
 type: application
-version: 1.5.2
+version: 1.7.1

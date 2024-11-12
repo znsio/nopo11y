@@ -105,7 +105,7 @@
         {{- if (index .Values "kiali-server" "enabled") }}
             {{- $kiali:= dict }}
             {{- $kiali = set $kiali "name" (printf "%s" (include "kiali-server.fullname" (index .Subcharts "kiali-server"))) }}
-            {{- $kiali = set $kiali "port" .Values.kiali.server.port }}
+            {{- $kiali = set $kiali "port" (index .Values "kiali-server" "server" "port") }}
             {{- if (index .Values "kiali-server" "server" "web_root") }}
                 {{- if ne (index .Values "kiali-server" "server" "web_root") "/" }}
                     {{- $kiali = set $kiali "path" (index .Values "kiali-server" "server" "web_root") }}
@@ -117,12 +117,20 @@
             {{- end }}
         {{- end }}
 
-        {{- if .Values.jaeger.enabled}}
-            {{- $jaeger:= dict }}
-            {{- $jaeger = set $jaeger "name" (printf "%s-tracing" .Release.Name) }}
-            {{- $jaeger = set $jaeger "port" 80 }}
-            {{- $jaeger = set $jaeger "path" .Values.jaeger.jaeger.pathPrefix }}
-            {{- $servicesList = append $servicesList $jaeger }}
+        {{- if and (index .Values "tempo-distributed" "enabled") (index .Values "tempo-distributed" "queryFrontend" "query" "enabled") (index .Values "tempo-distributed" "queryFrontend" "query" "extraArgs") }}
+            {{- $tempo:= dict }}
+            {{- $path:= "" }}
+            {{- $tempo = set $tempo "name" (printf "%s-query-frontend" (include "tempo.fullname" (index .Subcharts "tempo-distributed"))) }}
+            {{- $tempo = set $tempo "port" (index .Values "tempo-distributed").queryFrontend.service.port }}
+            {{- range (index .Values "tempo-distributed" "queryFrontend" "query" "extraArgs") }}
+                {{- if contains "--query.base-path" . }}
+                    {{- $path = (trimPrefix "--query.base-path=" . ) }}
+                {{- end }}
+            {{- end }}
+            {{- if and (ne $path "") (ne $path "/") }}
+                {{- $tempo = set $tempo "path" $path }}
+                {{- $servicesList = append $servicesList $tempo }}
+            {{- end }}
         {{- end }}
 
         {{- if .Values.kuberhealthy.enabled }}
