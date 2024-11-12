@@ -18044,16 +18044,16 @@ kiali-server:
     clusters: []
 
   deployment:
-    # This only limits what Kiali will attempt to see, but Kiali Service Account has permissions to see everything.
-    # For more control over what the Kial Service Account can see, use the Kiali Operator
-    accessible_namespaces:
-    - "**"
     additional_service_yaml: {}
     affinity:
       node: {}
       pod: {}
       pod_anti: {}
+    # The Kiali server helm chart only supports cluster-wide access; setting cluster_wide_access to false is not supported.
+    # For more control over what the Kial Service Account can see, use the Kiali Operator.
+    cluster_wide_access: true
     configmap_annotations: {}
+    custom_envs: []
     custom_secrets: []
     dns:
       config: {}
@@ -18083,6 +18083,7 @@ kiali-server:
     pod_annotations: {}
     pod_labels: {}
     priority_class_name: ""
+    remote_cluster_resources_only: false
     # if deployment.hpa is defined, this replicas setting will be ignored
     replicas: 1
     resources:
@@ -18110,11 +18111,6 @@ kiali-server:
     #private_key_file:
 
   kiali_feature_flags:
-    certificates_information_indicators:
-      enabled: true
-      secrets:
-      - cacerts
-      - istio-ca-secret
     disabled_features: []
     validations:
       ignore: ["KIA1301"]

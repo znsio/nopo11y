@@ -28,7 +28,7 @@ dependencies:
 - condition: kiali-server.enabled
   name: kiali-server
   repository: https://kiali.org/helm-charts
-  version: 1.89.7
+  version: 2.1.0
 - condition: prom2teams.enabled
   name: prom2teams
   repository: ""
@@ -48,4 +48,4 @@ dependencies:
 description: A Helm chart for observability stack
 name: nopo11y-stack
 type: application
-version: 1.7.0
+version: 1.7.1
