@@ -1,6 +1,9 @@
 # Use the official Python base image
 FROM python:3.12.4-alpine
 
+# Updated OS libraries
+RUN apk upgrade --no-cache
+
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 
