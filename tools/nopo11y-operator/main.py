@@ -21,6 +21,7 @@ custom_object_api = CustomObjectsApi()
 LOGGING_LEVEL = str(os.getenv("LOG_LEVEL", "INFO"))
 API_GATEWAY = str(os.getenv("API_GATEWAY", "istio"))
 GRAFANA_URL = str(os.getenv("GRAFANA_EXTERNAL_URL", ""))
+ISTIO_MODE = str(os.getenv("ISTIO_OPERATION_MODE", ""))
 DEFAULT_CONFIG = {
     "slo": {
         "availability": float(os.getenv("AVAILABILITY_SLO", "99")),
@@ -184,6 +185,7 @@ def generate_dashboard_alerts(spec, namespace, old, new, **kwargs):
             namespace=O11Y_NAMEPSACE,
             apiGateway=API_GATEWAY,
             grafanaUrl=GRAFANA_URL,
+            istioMode=ISTIO_MODE,
             service=service_name,
             serviceNamespace=service_namespace,
             cluster=cluster_name,
@@ -200,6 +202,7 @@ def generate_dashboard_alerts(spec, namespace, old, new, **kwargs):
             namespace=O11Y_NAMEPSACE,
             apiGateway=API_GATEWAY,
             grafanaUrl=GRAFANA_URL,
+            istioMode=ISTIO_MODE,
             service=service_name,
             serviceNamespace=service_namespace,
             cluster=cluster_name,
@@ -215,6 +218,7 @@ def generate_dashboard_alerts(spec, namespace, old, new, **kwargs):
             namespace=O11Y_NAMEPSACE,
             apiGateway=API_GATEWAY,
             grafanaUrl=GRAFANA_URL,
+            istioMode=ISTIO_MODE,
             service=service_name,
             serviceNamespace=service_namespace,
             cluster=cluster_name,
@@ -229,6 +233,7 @@ def generate_dashboard_alerts(spec, namespace, old, new, **kwargs):
         dashboard_manifest = dashboard_template.render(
             namespace=O11Y_NAMEPSACE,
             apiGateway=API_GATEWAY,
+            istioMode=ISTIO_MODE,
             service=service_name,
             cluster=cluster_name,
             deployment=deployment_name,

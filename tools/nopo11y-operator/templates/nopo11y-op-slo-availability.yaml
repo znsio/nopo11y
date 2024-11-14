@@ -43,8 +43,8 @@ spec:
     sli:
       events:
         {%- if apiGateway == "istio" %}
-        errorQuery: sum(rate(istio_requests_total{ {%- if cluster %}cluster="{{ cluster }}", {%- endif %}source_workload!~"unknown", reporter="source", destination_service_name="{{ service }}", destination_service_namespace="{{ serviceNamespace }}", response_code=~"5.."}[{%- raw %}{{.window}}{%- endraw %}]))
-        totalQuery: sum(rate(istio_requests_total{ {%- if cluster %}cluster="{{ cluster }}", {%- endif %}source_workload!~"unknown", reporter="source", destination_service_name="{{ service }}", destination_service_namespace="{{ serviceNamespace }}"}[{%- raw %}{{.window}}{%- endraw %}]))
+        errorQuery: sum(rate(istio_requests_total{ {%- if cluster %}cluster="{{ cluster }}", {%- endif %}{% if istioMode == "sidecar" %}source_workload!~"unknown", reporter="source", {% endif %}destination_service_name="{{ service }}", destination_service_namespace="{{ serviceNamespace }}", response_code=~"5.."}[{%- raw %}{{.window}}{%- endraw %}]))
+        totalQuery: sum(rate(istio_requests_total{ {%- if cluster %}cluster="{{ cluster }}", {%- endif %}{% if istioMode == "sidecar" %}source_workload!~"unknown", reporter="source", {% endif %}destination_service_name="{{ service }}", destination_service_namespace="{{ serviceNamespace }}"}[{%- raw %}{{.window}}{%- endraw %}]))
         {%- elif apiGateway == "nginx" %}
         errorQuery: sum(rate(nginx_ingress_controller_requests{ {%- if cluster %}cluster="{{ cluster }}", {%- endif %}status=~"5..", exported_service="{{ service }}", exported_namespace="{{ serviceNamespace }}"}[{%- raw %}{{.window}}{%- endraw %}]))
         totalQuery: sum(rate(nginx_ingress_controller_requests{ {%- if cluster %}cluster="{{ cluster }}", {%- endif %}exported_service="{{ service }}", exported_namespace="{{ serviceNamespace }}"}[{%- raw %}{{.window}}{%- endraw %}]))
