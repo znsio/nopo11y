@@ -56,6 +56,16 @@ kopf_logger.setLevel(logging.WARNING)
 logger = logging.getLogger("Nopo11yOperator")
 logger.setLevel(LOGGING_LEVEL)
 
+environment = Environment(loader=FileSystemLoader("templates/"))
+try:
+    ALERT_TEMPLATE = environment.get_template("nopo11y-op-alerts.yaml")
+    DASHBOARD_TEMPLATE = environment.get_template("nopo11y-op-dashboard.yaml")
+    AVAILABILITY_SLO_TEMPLATE = environment.get_template("nopo11y-op-slo-availability.yaml")
+    LATENCY_SLO_TEMPLATE = environment.get_template("nopo11y-op-slo-latency.yaml")
+except Exception as e:
+    logger.info(f"Unable to find templates inside 'templates/' directory, error: {e}")
+    raise
+
 
 def get_services():
     """ This will return all the services available inside the k8s cluster """
@@ -124,45 +134,41 @@ def configure(settings: kopf.OperatorSettings, **_):
     settings.watching.client_timeout = 4 * 60
 
 
+@kopf.on.resume(GROUP, VERSION, COMPONENTS_PLURAL)
+def re_generate_dashboard_alerts(spec, namespace, old, new, **kwargs):
+    recreate_resources = True
+    generate_dashboard_alerts(spec, namespace, old, new, recreate=recreate_resources)
+    return None
+
+
 @kopf.on.create(GROUP, VERSION, COMPONENTS_PLURAL)
 @kopf.on.update(GROUP, VERSION, COMPONENTS_PLURAL)
-@kopf.on.resume(GROUP, VERSION, COMPONENTS_PLURAL)
 def generate_dashboard_alerts(spec, namespace, old, new, **kwargs):
     """ This function will generate dashboards, slos and alert rules for your service """
-    old = old if isinstance(old, dict) and old else {}
-    new = new if isinstance(new, dict) and new else {}
+    old = old.get("spec", {}) if isinstance(old, dict) else {}
+    new = new.get("spec", {}) if isinstance(new, dict) else {}
+    recreate_resources = kwargs.get("recreate") or False
+    old_svcs = {service["serviceName"]: service for service in old.get("services", [])}
+    new_svcs = {service["serviceName"]: service for service in new.get("services", [])}
+    same_defaults = old.get("defaults") == new.get("defaults")
 
-    spec_dict = dict(spec)
-    old_spec, new_spec = transform_spec(old, new)
-    if old_spec == new_spec:
-        logger.info("There is no change in specs, skipping")
+    if old_svcs == new_svcs and same_defaults and not recreate_resources:
+        logger.info(f"Found no changes in the configurations, skipping..")
         return
 
-    deleted_svc_list = set(old_spec.keys()) - set(new_spec.keys())
+    deleted_svc_list = set(old_svcs.keys()) - set(new_svcs.keys())
     if deleted_svc_list:
         delete_service_nopo11y(deleted_svc_list)
 
-    environment = Environment(loader=FileSystemLoader("templates/"))
-    try:
-        alert_template = environment.get_template("nopo11y-op-alerts.yaml")
-        dashboard_template = environment.get_template("nopo11y-op-dashboard.yaml")
-        availabilty_slo_template = environment.get_template("nopo11y-op-slo-availability.yaml")
-        latency_slo_template = environment.get_template("nopo11y-op-slo-latency.yaml")
-    except Exception as e:
-        logger.info(f"Unable to find templates inside 'templates/' directory, error: {e}")
-        raise
-
     svc_deploy_map = get_service_deployment_map()
-    default_slo_availability = spec_dict.get("defaults", {}).get("slo", {}).get("availability") or DEFAULT_CONFIG["slo"]["availability"]
-    default_slo_latency = spec_dict.get("defaults", {}).get("slo", {}).get("latency") or DEFAULT_CONFIG["slo"]["latency"]
-    default_4xx_rate = spec_dict.get("defaults", {}).get("alertThresholds", {}).get("errorRate4xx") or DEFAULT_CONFIG["alertThresholds"]["errorRate4xx"]
-    default_5xx_rate = spec_dict.get("defaults", {}).get("alertThresholds", {}).get("errorRate5xx") or DEFAULT_CONFIG["alertThresholds"]["errorRate5xx"]
-    default_latency = spec_dict.get("defaults", {}).get("alertThresholds", {}).get("latencyMs") or DEFAULT_CONFIG["alertThresholds"]["latencyMs"]
+    default_slo_availability = new.get("defaults", {}).get("slo", {}).get("availability") or DEFAULT_CONFIG["slo"]["availability"]
+    default_slo_latency = new.get("defaults", {}).get("slo", {}).get("latency") or DEFAULT_CONFIG["slo"]["latency"]
+    default_4xx_rate = new.get("defaults", {}).get("alertThresholds", {}).get("errorRate4xx") or DEFAULT_CONFIG["alertThresholds"]["errorRate4xx"]
+    default_5xx_rate = new.get("defaults", {}).get("alertThresholds", {}).get("errorRate5xx") or DEFAULT_CONFIG["alertThresholds"]["errorRate5xx"]
+    default_latency = new.get("defaults", {}).get("alertThresholds", {}).get("latencyMs") or DEFAULT_CONFIG["alertThresholds"]["latencyMs"]
 
-    for service in spec_dict.get("services", []):
-        service_name = service.get("serviceName")
-        if new_spec.get(service_name) == old_spec.get(service_name) and \
-            old.get("defaults") == new.get("defaults"):
+    for service_name, service in new_svcs.items():
+        if service == old_svcs.get(service_name) and same_defaults and not recreate_resources:
             logger.info(f"Found no changes for following service: {service_name}")
             continue
 
@@ -175,13 +181,13 @@ def generate_dashboard_alerts(spec, namespace, old, new, **kwargs):
         alert_5xx = service.get("alertThresholds", {}).get("errorRate5xx") or default_5xx_rate
         alert_latency = service.get("alertThresholds", {}).get("latencyMs") or default_latency
         dashboard_uuid = uuid.uuid4().hex
-        patch_service = service_name in old_spec
+        patch_service = service_name in old_svcs
 
         if not deployment_name:
             logger.info(f"Unable to find deployment name for the given namespace: {service_namespace} and serviceName: {service}")
             continue
 
-        alert_manifest = alert_template.render(
+        alert_manifest = ALERT_TEMPLATE.render(
             namespace=O11Y_NAMEPSACE,
             apiGateway=API_GATEWAY,
             grafanaUrl=GRAFANA_URL,
@@ -198,7 +204,7 @@ def generate_dashboard_alerts(spec, namespace, old, new, **kwargs):
         else:
             create_custom_obj(PROMETHEUS_GROUP, PROMETHEUS_CRD_VERSION, O11Y_NAMEPSACE, "prometheusrules", alert_manifest)
 
-        availabilty_slo_manifest = availabilty_slo_template.render(
+        availabilty_slo_manifest = AVAILABILITY_SLO_TEMPLATE.render(
             namespace=O11Y_NAMEPSACE,
             apiGateway=API_GATEWAY,
             grafanaUrl=GRAFANA_URL,
@@ -214,7 +220,7 @@ def generate_dashboard_alerts(spec, namespace, old, new, **kwargs):
         else:
             create_custom_obj(SLOTH_GROUP, SLOTH_CRD_VERSION, O11Y_NAMEPSACE, "prometheusservicelevels", availabilty_slo_manifest)
 
-        latency_slo_manifest = latency_slo_template.render(
+        latency_slo_manifest = LATENCY_SLO_TEMPLATE.render(
             namespace=O11Y_NAMEPSACE,
             apiGateway=API_GATEWAY,
             grafanaUrl=GRAFANA_URL,
@@ -230,7 +236,7 @@ def generate_dashboard_alerts(spec, namespace, old, new, **kwargs):
         else:
             create_custom_obj(SLOTH_GROUP, SLOTH_CRD_VERSION, O11Y_NAMEPSACE, "prometheusservicelevels", latency_slo_manifest)
 
-        dashboard_manifest = dashboard_template.render(
+        dashboard_manifest = DASHBOARD_TEMPLATE.render(
             namespace=O11Y_NAMEPSACE,
             apiGateway=API_GATEWAY,
             istioMode=ISTIO_MODE,
@@ -247,6 +253,7 @@ def generate_dashboard_alerts(spec, namespace, old, new, **kwargs):
 
         logger.info(f"Updated resources for following service: {service_name}")
 
+    return None
 
 def update_custom_obj(group, version, name, namespace, plural, body, **kwargs):
     """ This will patch the custom object in the k8s cluster """
@@ -317,21 +324,6 @@ def update_configmap(name, namespace, body):
     except Exception as e:
         logger.info(f"Error while patching the configmap name: {name}, error: {e}")
     return True
-
-
-def transform_spec(old=None, new=None):
-    """ This will extract the services from the old and new specs and add them to the new map and return those maps """
-    old_spec = deepcopy(old)
-    old_spec["spec"] = {}
-    for service in old.get("spec", {}).get("services", []):
-        old_spec["spec"][service["serviceName"]] = service
-
-    new_spec = deepcopy(new)
-    new_spec["spec"] = {}
-    for service in new.get("spec", {}).get("services", []):
-        new_spec["spec"][service["serviceName"]] = service
-
-    return old_spec["spec"], new_spec["spec"]
 
 
 def delete_service_nopo11y(service_list):
