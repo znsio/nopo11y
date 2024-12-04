@@ -18536,6 +18536,8 @@ nopo11y_health_check:
   #     limits:
   #     cpu: 20m
   #     memory: 100Mi
+  #   customLabels: {}
+  #      app: test
   #   ## You can provide the below environment variables to the health check
   #   ## NAMESPACE - default is default namespace
   #   ## HEALTHY_PODS_PERCENTAGE - default is 30%
