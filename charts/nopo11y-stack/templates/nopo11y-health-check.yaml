@@ -16,7 +16,7 @@ spec:
   {{- else }}
   timeout: 5m
   {{- end }}
-  {{- if .customLabels }}
+  {{- if and (hasKey . "customLabels") .customLabels }}
   extraLabels:
     {{- toYaml .customLabels | nindent 8 }}
   {{- end }}
