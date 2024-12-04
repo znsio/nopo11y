@@ -45,6 +45,61 @@ entries:
   nopo11y-stack:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2024-12-04T11:54:25.683731659Z"
+    dependencies:
+    - condition: kube-prometheus-stack.enabled
+      name: kube-prometheus-stack
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 58.5.2
+    - condition: thanos.enabled
+      name: thanos
+      repository: https://charts.bitnami.com/bitnami
+      version: 15.4.1
+    - condition: grafana-loki.enabled
+      name: grafana-loki
+      repository: https://charts.bitnami.com/bitnami
+      version: 4.6.18
+    - condition: promtail.enabled
+      name: promtail
+      repository: https://grafana.github.io/helm-charts
+      version: 6.16.6
+    - condition: tempo-distributed.enabled
+      name: tempo-distributed
+      repository: https://grafana.github.io/helm-charts
+      version: 1.18.4
+    - condition: sloth.enabled
+      name: sloth
+      repository: ""
+      version: 0.7.0
+    - condition: kiali-server.enabled
+      name: kiali-server
+      repository: https://kiali.org/helm-charts
+      version: 2.1.0
+    - condition: prom2teams.enabled
+      name: prom2teams
+      repository: ""
+      version: 1.0.0
+    - condition: kuberhealthy.enabled
+      name: kuberhealthy
+      repository: https://kuberhealthy.github.io/kuberhealthy/helm-repos
+      version: "104"
+    - condition: kubernetes-event-exporter.enabled
+      name: kubernetes-event-exporter
+      repository: https://charts.bitnami.com/bitnami
+      version: 3.2.13
+    - condition: nopo11y-operator.enabled
+      name: nopo11y-operator
+      repository: ""
+      version: 1.0.0
+    description: A Helm chart for observability stack
+    digest: bfd704871c18dd2fe9d77b09043749b58da81eaa89f346510d1db132165000f4
+    name: nopo11y-stack
+    type: application
+    urls:
+    - https://github.com/znsio/nopo11y/releases/download/nopo11y-stack-1.7.2/nopo11y-stack-1.7.2.tgz
+    version: 1.7.2
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2024-11-12T11:17:43.884816513Z"
     dependencies:
     - condition: kube-prometheus-stack.enabled
@@ -765,4 +820,4 @@ entries:
     urls:
     - https://github.com/znsio/nopo11y/releases/download/nopo11y-stack-1.1.0/nopo11y-stack-1.1.0.tgz
     version: 1.1.0
-generated: "2024-11-12T11:17:43.884912643Z"
+generated: "2024-12-04T11:54:25.683841084Z"
