@@ -1,0 +1,33 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name:  {{ include "sentry-webhook.fullname" . }}-webhook-patch
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  template:
+    metadata:
+      name:  {{ include "sentry-webhook.fullname" . }}-webhook-patch
+    spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: patch
+          image: "{{ .Values.certgen.image.repository }}:{{ .Values.certgen.image.tag }}"
+          imagePullPolicy: "{{ .Values.certgen.image.pullPolicy }}"
+          args:
+            - patch
+            - --webhook-name={{ include "sentry-webhook.fullname" . }}-webhook
+            - --namespace={{ .Release.Namespace }}
+            - --secret-name={{ include "sentry-webhook.fullname" . }}-webhook-certs
+            - --patch-validating=false
+          {{- if .Values.certgen.resources }}
+          resources:
+          {{- toYaml .Values.certgen.resources | nindent 12 }}
+          {{- end }}
+      restartPolicy: OnFailure
+      serviceAccountName: {{ include "sentry-webhook.fullname" . }}-webhook
