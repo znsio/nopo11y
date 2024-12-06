@@ -1,0 +1,25 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name:  {{ include "sentry-webhook.fullname" . }}-webhook
+webhooks:
+  - name: sentry-webhook.znsio.nopo11y.com
+    failurePolicy: Ignore
+    rules:
+      - apiGroups:
+          - apps
+        apiVersions:
+          - "v1"
+        resources:
+          - deployments
+        operations:
+          - CREATE
+          - UPDATE
+    clientConfig:
+      service:
+        namespace: {{ .Release.Namespace }}
+        name: {{ include "sentry-webhook.fullname" . }}-webhook
+        path: /mutate
+    timeoutSeconds: {{ .Values.timeoutSeconds }}
+    admissionReviewVersions: ["v1"]
+    sideEffects: None

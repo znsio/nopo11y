@@ -1,0 +1,38 @@
+# Default values for sentry-webhook.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  imagePullSecrets: []
+
+replicas: 1
+image:
+  repository: ghcr.io/znsio/nopo11y/sentry-webhook
+  pullPolicy: IfNotPresent
+  tag: "v2"
+env: {}
+  # - name: LOG_LEVEL
+  #   value: ""
+  # - name: SENTRY_API_TOKEN
+  #   value: ""
+  # - name: SENTRY_ORG_SLUG
+  #   value: ""
+  # - name: DEFAULT_TEAM
+  #   value: ""
+  # - name: SENTRY_HOST_URL
+  #   value: ""
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 256Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+timeoutSeconds: 10
+certgen:
+  image:
+    repository: registry.k8s.io/ingress-nginx/kube-webhook-certgen
+    pullPolicy: IfNotPresent
+    tag: "v20221220-controller-v1.5.1-58-g787ea74b6"
+  resources: {}
+
