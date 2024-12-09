@@ -42,7 +42,38 @@ This health check program except below environment variables, if you don't provi
 [Check][Example](./examples/health-check.yaml)
 
 ## Sample Kuberhealthy check using nopoo11y-health-check
+
 ```yaml
+apiVersion: comcast.github.io/v1
+kind: KuberhealthyCheck
+metadata:
+  name: sample-nopo11y-health-check
+  namespace: observability
+spec:
+  podSpec:
+    containers:
+    - env:
+      - name: KH_REPORTING_URL
+        value: kuberhealthy:80
+      - name: PROMETHEUS_ENDPOINT
+        value: http://nopo11y-stack-kube-prometh-prometheus:9090/prometheus
+      - name: NAMESPACE
+        value: sample
+      image: ghcr.io/znsio/nopo11y/system-health-check:latest
+      imagePullPolicy: IfNotPresent
+      name: main
+      resources:
+        requests:
+          cpu: 10m
+          memory: 50Mi
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+    securityContext:
+      fsGroup: 999
+      runAsUser: 999
+  runInterval: 1m
+  timeout: 5m
 ```
 
 ## Build docker image
