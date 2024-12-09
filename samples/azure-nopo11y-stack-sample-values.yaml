@@ -1,6 +1,6 @@
-imageRegistry: &imageRegistry "<Your Image Registry>"
-clusterLabel: &clusterLabel "<Your Cluster Label>"
-imagePullSecretName: &imagePullSecretName "<Your image pull secret name>"
+imageRegistry: &imageRegistry "<CHANGE_THIS-Your Image Registry>"
+clusterLabel: &clusterLabel "<CHANGE_THIS-Your Cluster Label>"
+imagePullSecretName: &imagePullSecretName "<CHANGE_THIS-Your image pull secret name>"
 ## kube-prometheus-stack
 kube-prometheus-stack:
   enabled: true
@@ -48,7 +48,7 @@ kube-prometheus-stack:
       routePrefix: /prometheus
       externalLabels:
         cluster: *clusterLabel
-      externalUrl: "<External URL to access prometheus>"
+      externalUrl: "<CHANGE_THIS-External URL to access prometheus>"
       retention: 2d
       storageSpec:
         volumeClaimTemplate:
@@ -130,7 +130,7 @@ kube-prometheus-stack:
       global:
         resolve_timeout: 5m
         http_config:
-          proxy_url: '<Put your proxy URL if you are behind coporate firewall>'
+          proxy_url: '<CHANGE_THIS-Put your proxy URL if you are behind coporate firewall>'
       inhibit_rules:
         - source_matchers:
             - 'severity = critical'
@@ -177,7 +177,7 @@ kube-prometheus-stack:
         repository: prometheus/alertmanager
         tag: v0.27.0
         sha: ""
-      externalUrl: "<Your external URL for accessing alertmanager>"
+      externalUrl: "<CHANGE_THIS-Your external URL for accessing alertmanager>"
       routePrefix: /alertmanager
       resources:
         requests:
@@ -224,10 +224,10 @@ kube-prometheus-stack:
         sha: ""
         pullPolicy: IfNotPresent
     assertNoLeakedSecrets: false
-    adminPassword: "<Admin password for Grafana>"
+    adminPassword: "<CHANGE_THIS-Admin password for Grafana>"
     grafana.ini:
       server:
-        root_url: <External URL to access Grafana>
+        root_url: <CHANGE_THIS-External URL to access Grafana>
         serve_from_sub_path: true
       users:
         viewers_can_edit: true
@@ -240,11 +240,11 @@ kube-prometheus-stack:
         enabled: true
         allow_sign_up: true
         auto_login: false
-        client_id: <Client ID of Grafana Azure App for SSO>
-        client_secret: <Client Secret of Grafana Azure App for SSO>
+        client_id: <CHANGE_THIS-Client ID of Grafana Azure App for SSO>
+        client_secret: <CHANGE_THIS-Client Secret of Grafana Azure App for SSO>
         scopes: openid email profile
-        auth_url: <Auth-URL of Grafana Azure App>
-        token_url: <Token-URL of Grafana Azure App>
+        auth_url: <CHANGE_THIS-Auth-URL of Grafana Azure App>
+        token_url: <CHANGE_THIS-Token-URL of Grafana Azure App>
         role_attribute_strict: false
         allow_assign_grafana_admin: true
         skip_org_role_sync: false
@@ -408,9 +408,9 @@ thanos:
   objstoreConfig:
     type: AZURE
     config:
-      storage_account: <Your Azure StorageAccount name>
-      storage_account_key: <Your Azure StorageAccount access key>
-      container: <Your Azure StroageAccount container name>
+      storage_account: <CHANGE_THIS-Your Azure StorageAccount name>
+      storage_account_key: <CHANGE_THIS-Your Azure StorageAccount access key>
+      container: <CHANGE_THIS-Your Azure StroageAccount container name>
       max_retries: 0
       endpoint: blob.core.windows.net
 
@@ -563,9 +563,9 @@ grafana-loki:
 
       storage_config:
         azure:
-          account_name: <Your Azure StroragAccount name>
-          account_key: <Your Azure StorageAccount access key>
-          container_name: <Your Azure StorageAccount container name>
+          account_name: <CHANGE_THIS-Your Azure StroragAccount name>
+          account_key: <CHANGE_THIS-Your Azure StorageAccount access key>
+          container_name: <CHANGE_THIS-Your Azure StorageAccount container name>
           use_managed_identity: false
           request_timeout: 0 
         boltdb_shipper:
@@ -673,7 +673,7 @@ grafana-loki:
             store: memberlist
         rule_path: /tmp/loki/scratch
         alertmanager_url: http://nopo11y-stack-kube-prometh-alertmanager:9093/alertmanager
-        external_url: <External URL of Alertmanager>
+        external_url: <CHANGE_THIS-External URL of Alertmanager>
         enable_alertmanager_v2: true
         enable_api: true
   
@@ -801,7 +801,7 @@ promtail:
       memory: 128Mi
   namespace: observability
   extraArgs:
-    - -client.external-labels=cluster=<Your cluster label>
+    - -client.external-labels=cluster=<CHANGE_THIS-Your cluster label>
   serviceMonitor:
     enabled: true
     namespace: "observability"
@@ -1215,9 +1215,9 @@ tempo-distributed:
     trace:
       backend: azure
       azure:
-        container_name: <Your Azure StorageAccount container name>
-        storage_account_name: <Your Azure StorageAccount name>
-        storage_account_key: <Your Azure StorageAccount access key>
+        container_name: <CHANGE_THIS-Your Azure StorageAccount container name>
+        storage_account_name: <CHANGE_THIS-Your Azure StorageAccount name>
+        storage_account_key: <CHANGE_THIS-Your Azure StorageAccount access key>
 
   memcached:
     enabled: true
@@ -1260,7 +1260,7 @@ prom2teams:
     tag: null
     pullPolicy: IfNotPresent
   prom2teams:
-      connector: <Your MS Team's webhook connector URL>
+      connector: <CHANGE_THIS-Your MS Team's webhook connector URL>
 
 kiali-server:
   enabled: true
@@ -1270,8 +1270,8 @@ kiali-server:
   auth:
     strategy: "openid" # Kubernetes secret container client secret should already be created
     openid:
-      client_id: "<Client ID of your Azure App for kiali SSO>"
-      issuer_uri: "https://sts.windows.net/<Your Azure Tenant ID>/"
+      client_id: "<CHANGE_THIS-Client ID of your Azure App for kiali SSO>"
+      issuer_uri: "https://sts.windows.net/<CHANGE_THIS-Your Azure Tenant ID>/"
       username_claim: email
       scopes:
       - email
@@ -1307,7 +1307,7 @@ kiali-server:
     tracing:
       enabled: true
       internal_url: http://nopo11y-stack-tempo-query-frontend.observability.svc.cluster.local:3100
-      external_url: <External URL accessing jaeger UI of Grafana Tempo>
+      external_url: <CHANGE_THIS-External URL accessing jaeger UI of Grafana Tempo>
       health_check_url: http://nopo11y-stack-tempo-query-frontend.observability.svc.cluster.local:3100/status/services
       provider: "tempo"
       tempo_config:
@@ -1317,7 +1317,7 @@ kiali-server:
     grafana:
         enabled: true
         in_cluster_url: 'http://nopo11y-stack-grafana.observability.svc.cluster.local/grafana'
-        url: '<External URL of Grafana>'
+        url: '<CHANGE_THIS-External URL of Grafana>'
 
   server:
     port: 20001
@@ -1370,13 +1370,13 @@ kuberhealthy:
 
 nopo11y_health_check:
   checks:
-  - name: <Your nopo11y health check name>
+  - name: <CHANGE_THIS-Your nopo11y health check name>
     image: *imageRegistry/znsio/nopo11y/system-health-check:latest
     imagePullPolicy: IfNotPresent
     runInterval: 1m
     timeout: 5m
     env:
-      NAMESPACE: "<Namespace for which you want to create health check>"
+      NAMESPACE: "<CHANGE_THIS-Namespace for which you want to create health check>"
 
 # Nopo11y operator
 nopo11y-operator:
@@ -1394,7 +1394,7 @@ nopo11y-operator:
     - name: API_GATEWAY
       value: "istio"
     - name: GRAFANA_EXTERNAL_URL
-      value: "<External URL of Grafana>"
+      value: "<CHANGE_THIS-External URL of Grafana>"
     - name: AVAILABILITY_SLO
       value: "99"
     - name: LATENCY_SLO
@@ -1419,14 +1419,14 @@ nopo11y-operator:
 nopo11y_ingress:
   enabled: true
   type: "istio"
-  host: <Domain name to access nopo11y-stack components>
+  host: <CHANGE_THIS-Domain name to access nopo11y-stack components>
   istioGatewaySelector:
-    app: <App label value of your istio ingress gateway>
+    app: <CHANGE_THIS-App label value of your istio ingress gateway>
   istioNamespace: "istio-system"
   tls:
     enabled: true
-    tlsKey: <Base64 encoded SSL certificate key>
-    tlsCert: <Base64 encoded SSL certificate>
+    tlsKey: <CHANGE_THIS-Base64 encoded SSL certificate key>
+    tlsCert: <CHANGE_THIS-Base64 encoded SSL certificate>
 
 ## Kubernetes event exporter
 kubernetes-event-exporter:

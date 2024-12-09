@@ -1,4 +1,4 @@
-imageRegistry: &imageRegistry "<CHANGE_THIS-CHANGE_THIS-Your Image Registry>"
+imageRegistry: &imageRegistry "<CHANGE_THIS-Your Image Registry>"
 clusterLabel: &clusterLabel "<CHANGE_THIS-Your Cluster Label>"
 imagePullSecretName: &imagePullSecretName "<CHANGE_THIS-Your image pull secret name>"
 ## kube-prometheus-stack
@@ -600,7 +600,7 @@ grafana-loki:
             store: memberlist
         rule_path: /tmp/loki/scratch
         alertmanager_url: http://nopo11y-stack-kube-prometh-alertmanager:9093/alertmanager
-        external_url: https://observability.canvas.jio.com/alertmanager
+        external_url: <CHANGE_THIS-External URL of Alertmanager>
         enable_alertmanager_v2: true
         enable_api: true
   
