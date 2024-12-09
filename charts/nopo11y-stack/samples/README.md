@@ -1,7 +1,5 @@
 # Configuration Guide
 
-## Introduction
-
 These sample values file contains configuration settings required for proper functionality of nopo11y-stack. To ensure a smooth setup process, certain placeholders have been included that need to be updated based on your setup. Follow the instructions below to customize the values file correctly for your choice of cloud.
 
 ## Configuration Instructions
