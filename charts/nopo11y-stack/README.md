@@ -22,6 +22,9 @@ It will install following components into your kubernetes cluster:
 - **Alertmanager**: The Alertmanager handles alerts sent by client applications such as the Prometheus server. It takes care of deduplicating, grouping, and routing them to the correct receiver integration such as email, PagerDuty, or OpsGenie
 - **Kiali**: Kiali is a console for Istio service mesh, You can configure, visualize, validate and troubleshoot your mesh using Kiali
 - **Sloth**: Prometheus SLO generator
+- **Kubernetes-event-exporter**: This tool allows exporting the often missed Kubernetes events to various outputs so that they can be used for observability or alerting purposes. You won't believe what you are missing.
+- **Nopo11y-operator**: Creates SLOs, alerts and Grafana dashboards automatically for any web service deployed on the cluster, [read][nopo11y-operator](../../tools/nopo11y-operator/README.md)
+- **Nopo11y-health-check**: Creates Kuberhealthy checks for deployments, pvcs and nodes, [read][nopo11y-health-check](../../tools/system-health-check/README.md)
 
 
 ## How to install?
