@@ -45,7 +45,7 @@ To uninstall the chart:
 
     helm uninstall nopo11y-stack
 
-## How to access?
+## How to access nopo11y-stack component's UI?
 
 You need to configure below settings in your `values.yaml` to create ingress for your nopo11y-stack.
 
@@ -73,3 +73,6 @@ Replace `<your-domain-name>` with your DNS.
 |Kuberhealthy |/nopo11y-health-check |
 
 **Note:** Nopo11y-stack creates an ingress only for those components which are configured with route-prefix other than ```/```, if you configured your component to run on ```/``` web root then it won't create an ingress for that component.
+
+## Sample values files
+See sample values files for Azure and GCP cloud [here](./samples/)
