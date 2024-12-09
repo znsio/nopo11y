@@ -22,6 +22,9 @@ It will install following components into your kubernetes cluster:
 - **Alertmanager**: The Alertmanager handles alerts sent by client applications such as the Prometheus server. It takes care of deduplicating, grouping, and routing them to the correct receiver integration such as email, PagerDuty, or OpsGenie
 - **Kiali**: Kiali is a console for Istio service mesh, You can configure, visualize, validate and troubleshoot your mesh using Kiali
 - **Sloth**: Prometheus SLO generator
+- **Kubernetes-event-exporter**: This tool allows exporting the often missed Kubernetes events to various outputs so that they can be used for observability or alerting purposes. You won't believe what you are missing.
+- **Nopo11y-operator**: Creates SLOs, alerts and Grafana dashboards automatically for any web service deployed on the cluster, [read][nopo11y-operator](../../tools/nopo11y-operator/README.md)
+- **Nopo11y-health-check**: Creates Kuberhealthy checks for deployments, pvcs and nodes, [read][nopo11y-health-check](../../tools/system-health-check/README.md)
 
 
 ## How to install?
@@ -45,7 +48,7 @@ To uninstall the chart:
 
     helm uninstall nopo11y-stack
 
-## How to access?
+## How to access nopo11y-stack component's UI?
 
 You need to configure below settings in your `values.yaml` to create ingress for your nopo11y-stack.
 
@@ -73,3 +76,6 @@ Replace `<your-domain-name>` with your DNS.
 |Kuberhealthy |/nopo11y-health-check |
 
 **Note:** Nopo11y-stack creates an ingress only for those components which are configured with route-prefix other than ```/```, if you configured your component to run on ```/``` web root then it won't create an ingress for that component.
+
+## Sample values files
+See sample values files for Azure and GCP cloud [here](./samples/)
