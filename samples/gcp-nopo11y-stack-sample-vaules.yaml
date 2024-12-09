@@ -1443,5 +1443,64 @@ nopo11y_ingress:
   istioNamespace: "istio-system"
   tls:
     enabled: true
-    tlsKey: <CHANGE_THIS-CHANGE_THIS-Base64 encoded SSL certificate key>
-    tlsCert: <CHANGE_THIS-CHANGE_THIS-Base64 encoded SSL certificate>
+    tlsKey: <CHANGE_THIS-Base64 encoded SSL certificate key>
+    tlsCert: <CHANGE_THIS-Base64 encoded SSL certificate>
+
+## Kubernetes event exporter
+kubernetes-event-exporter:
+  enabled: true
+  image:
+    registry: *imageRegistry
+    repository: bitnami/kubernetes-event-exporter
+    tag: 1.7.0-debian-12-r10
+
+  config:
+    logLevel: warn
+    logFormat: json
+    receivers:
+      - name: "dump"
+        stdout: {}
+    route:
+      routes:
+        - match:
+            - receiver: "dump"
+
+  resources:
+    limits:
+      memory: 128Mi
+    requests:
+      cpu: 25m
+      memory: 128Mi
+
+  metrics:
+    enabled: true
+    service:
+      ports:
+        http: 2112
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "{{ .Values.metrics.service.ports.http }}"
+    serviceMonitor:
+      enabled: true
+      port: http
+      endpoints:
+        - path: /metrics
+
+      path: ""
+      namespace: "observability"
+      interval: 30s
+    prometheusRule:
+      enabled: true
+      namespace: "observability"
+      labels: {}
+      groups:
+        - name: KubernetesEventExporter
+          rules:
+            - alert: ErrorsWithKubernetesEventExporter
+              annotations:
+                message: "Kubernetes Event Exporter instance has reported errors while fetching kubernetes events."
+              expr: |
+                irate(watch_errors{namespace="{{ include "common.names.namespace" . }}"}[5m]) > 1
+              for: 5m
+              labels:
+                severity: critical
