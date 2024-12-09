@@ -1,0 +1,1507 @@
+imageRegistry: &imageRegistry "<CHANGE_THIS-Your Image Registry>"
+clusterLabel: &clusterLabel "<CHANGE_THIS-Your Cluster Label>"
+imagePullSecretName: &imagePullSecretName "<CHANGE_THIS-Your image pull secret name>"
+## kube-prometheus-stack
+kube-prometheus-stack:
+  enabled: true
+  global:
+    imagePullSecrets:
+    - name: *imagePullSecretName
+
+  prometheus:
+    prometheusSpec:
+      image:
+        registry: *imageRegistry
+        repository: prometheus/prometheus
+        tag: v2.51.2
+        sha: ""
+      routePrefix: /prometheus
+      externalLabels: 
+        cluster: *clusterLabel
+      externalUrl: "<CHANGE_THIS-External URL to access prometheus>"
+      retention: 2d
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 30Gi
+      thanos:
+        image: *imageRegistry/thanos/thanos:v0.35.0
+        objectStorageConfig:
+          existingSecret:
+            name: nopo11y-stack-thanos-objstore-secret
+            key: objstore.yml
+    thanosService:
+      enabled: true
+
+  windowsMonitoring:
+    enabled: false
+  prometheus-windows-exporter:
+    prometheus:
+      monitor:
+        enabled: false
+        jobLabel: jobLabel
+
+  prometheus-node-exporter:
+    image:
+      registry: *imageRegistry
+
+  kube-state-metrics:
+    image:
+      registry: *imageRegistry
+
+  alertmanager:
+    enabled: true
+    config:
+      global:
+        resolve_timeout: 5m
+        http_config:
+          proxy_url: '<CHANGE_THIS-Put your proxy URL if you are behind coporate firewall>'
+      inhibit_rules:
+        - source_matchers:
+            - 'severity = critical'
+          target_matchers:
+            - 'severity =~ warning|info'
+          equal:
+            - 'namespace'
+            - 'alertname'
+        - source_matchers:
+            - 'severity = warning'
+          target_matchers:
+            - 'severity = info'
+          equal:
+            - 'namespace'
+            - 'alertname'
+        - source_matchers:
+            - 'alertname = InfoInhibitor'
+          target_matchers:
+            - 'severity = info'
+          equal:
+            - 'namespace'
+      route:
+        group_by: ['alertname']
+        group_wait: 30s
+        group_interval: 5m
+        repeat_interval: 48h
+        receiver: 'ms_teams'
+        routes:
+          - matchers:
+              - alertname =~ "InfoInhibitor|Watchdog"
+            receiver: "null"
+      receivers:
+        - name: "null"
+        - name: ms_teams
+          webhook_configs:
+            - send_resolved: true
+              url: http://nopo11y-stack-prom2teams:8089
+              http_config: {}
+      templates:
+      - '/etc/alertmanager/config/*.tmpl'
+
+    alertmanagerSpec:
+      image:
+        registry: *imageRegistry
+        repository: prometheus/alertmanager
+        tag: v0.27.0
+        sha: ""
+      externalUrl: "<CHANGE_THIS-Your external URL for accessing alertmanager>"
+      routePrefix: /alertmanager
+      resources:
+        requests:
+          cpu: 11m
+          memory: 53M
+        limits:
+          memory: 53M
+
+  grafana:
+    enabled: true
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+    image:
+      registry: *imageRegistry
+      repository: grafana/grafana
+      tag: ""
+      sha: ""
+      pullPolicy: IfNotPresent
+    testFramework:
+      enabled: true
+      image:
+        registry: *imageRegistry
+        repository: bats/bats
+        tag: "v1.4.1"
+      imagePullPolicy: IfNotPresent
+    downloadDashboardsImage:
+      registry: *imageRegistry
+      repository: curlimages/curl
+      tag: 7.85.0
+      sha: ""
+      pullPolicy: IfNotPresent
+    initChownData:
+      enabled: true
+      image:
+        registry: *imageRegistry
+        repository: library/busybox
+        tag: "1.31.1"
+        sha: ""
+        pullPolicy: IfNotPresent
+    assertNoLeakedSecrets: false
+    adminPassword: "<CHANGE_THIS-Admin password for Grafana>"
+    grafana.ini:
+      server:
+        root_url: <CHANGE_THIS-External URL to access Grafana>
+        serve_from_sub_path: true
+      users:
+        viewers_can_edit: true
+      auth:
+        disable_login_form: false
+      auth.anonymous:
+        enabled: true
+      dashboards:
+        default_home_dashboard_path: "/tmp/dashboards/home.json"
+    sidecar:
+      resources:
+        requests:
+          cpu: 50m
+          memory: 110M
+        limits:
+          memory: 110M
+      dashboards:
+        enabled: true
+        label: grafana_dashboard
+        labelValue: "1"
+        searchNamespace: ALL
+        multicluster:
+          global:
+            enabled: true
+      image:
+        registry: *imageRegistry
+      datasources:
+        enabled: true
+        defaultDatasourceEnabled: true
+        isDefaultDatasource: true
+        uid: prometheus
+        url: http://nopo11y-stack-thanos-query:9090/thanos-query
+    additionalDataSources:
+    - name: Loki
+      type: loki
+      url: http://nopo11y-stack-grafana-loki-gateway
+      access: proxy
+      isDefault: false
+      editable: false
+      version: 1
+      uid: loki
+    - name: Tempo
+      type: tempo
+      url: http://nopo11y-stack-tempo-query-frontend:3100
+      access: proxy
+      isDefault: false
+      editable: false
+      version: 1
+      uid: tempo
+    persistence:
+      enabled: false
+
+  kubeControllerManager:
+    enabled: false
+
+  kubeEtcd:
+    enabled: false
+
+  kubeScheduler:
+    enabled: false
+
+  kubeProxy:
+    enabled: false
+
+  prometheusOperator:
+    enabled: true
+    tls:
+      enabled: false
+    prometheusConfigReloader:
+      image:
+        registry: *imageRegistry
+        repository: prometheus-operator/prometheus-config-reloader
+    admissionWebhooks:
+      deployment:
+        image:
+          registry: *imageRegistry
+          repository: kube-webhook-certgen/amd64
+          tag: ""
+          sha: ""
+          pullPolicy: IfNotPresent
+      patch:
+        enabled: true
+        image:
+          registry: *imageRegistry
+          repository: ingress-nginx/kube-webhook-certgen
+          tag: v20221220-controller-v1.5.1-58-g787ea74b6
+          sha: ""
+          pullPolicy: IfNotPresent  
+    image:
+      registry: *imageRegistry
+      repository: prometheus-operator/prometheus-operator
+      # if not set appVersion field from Chart.yaml is used
+      tag: ""
+      sha: ""
+      pullPolicy: IfNotPresent
+      resources:
+        requests:
+          cpu: 126m
+          memory: 1Gi
+        limits:
+          memory: 2Gi
+
+    additionalServiceMonitors:
+    - name: istiod-monitor
+      namespaceSelector:
+        matchNames:
+        - istio-system
+      selector:
+        matchLabels:
+          app: istiod
+      endpoints:
+      - port: http-monitoring
+        relabelings:
+          - action: labelmap
+            regex: __meta_kubernetes_pod_label_(.+)
+          
+    additionalPodMonitors:
+    - name: istio-enovy-monitor
+      namespaceSelector:
+        any: true
+      selector: {}
+      podMetricsEndpoints:
+      - port: http-envoy-prom
+        path: /stats/prometheus
+    - name: istio-ztunnel-monitor
+      namespaceSelector:
+        any: true
+      selector: {}
+      podMetricsEndpoints:
+      - port: ztunnel-stats
+        path: /stats/prometheus
+    - name: istio-waypoint-monitor
+      namespaceSelector:
+        any: true
+      selector: {}
+      podMetricsEndpoints:
+      - port: metrics
+        path: /stats/prometheus
+
+  thanosRuler:
+    enabled: true
+    thanosRulerSpec:
+      image:
+        registry: *imageRegistry
+        repository: thanos/thanos
+        tag: v0.34.1
+      ruleSelector:
+        matchExpressions:
+          - key: managedby
+            operator: In
+            values:
+              - nopo11y-operator
+      alertmanagersConfig:
+        secret:
+          alertmanagers:
+          - api_version: v2
+            static_configs:
+              - nopo11y-stack-kube-prometh-alertmanager:9093
+            scheme: http
+            path_prefix: "/alertmanager"
+            timeout: 30s
+      objectStorageConfig:
+        existingSecret:
+          name: nopo11y-stack-thanos-objstore-secret
+          key: objstore.yml
+      queryConfig:
+        secret:
+        - static_configs:
+            - nopo11y-stack-thanos-query:9090
+          scheme: http
+          path_prefix: "/thanos-query"
+      externalPrefix: "/thanos-ruler"
+      routePrefix: "/thanos-ruler"
+      additionalArgs:
+      - name: "grpc-address"
+        value: "0.0.0.0:10901"
+      storage:
+        volumeClaimTemplate:
+          spec:
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 30Gi
+
+
+# Thanos
+thanos:
+  enabled: true
+  
+  image:
+    registry: *imageRegistry
+    repository: bitnami/thanos
+    tag: 0.34.1-debian-12-r3
+    pullSecrets:
+    - name: *imagePullSecretName
+
+  objstoreConfig:
+    type: GCS
+    config:
+      bucket: <CHANGE_THIS-Your GCS bucket name>
+      service_account: |-
+        <CHNAGE_THIS-Your Service Account credentials json>
+
+  query:
+    enabled: true
+    logLevel: info
+    logFormat: logfmt
+    dnsDiscovery:
+      enabled: true
+      sidecarsService: "nopo11y-stack-kube-prometh-thanos-discovery"
+      sidecarsNamespace: "observability"
+    extraFlags: 
+    - "--web.external-prefix=/thanos-query"
+    - "--web.route-prefix=/thanos-query"
+    resources:
+      limits:
+        memory: 1Gi
+        cpu: 300m
+      requests:
+        memory: 256Mi
+        cpu: 200m
+    networkPolicy:
+      enabled: false
+
+  queryFrontend:
+    enabled: false
+
+  compactor:
+    enabled: true
+    logLevel: info
+    logFormat: logfmt
+    retentionResolutionRaw: 7d
+    retentionResolution5m: 15d
+    retentionResolution1h: 30d
+    extraFlags:
+      - --downsample.concurrency=1
+      - --compact.concurrency=1
+    resources:
+      limits:
+        memory: 1Gi
+        cpu: 300m
+      requests:
+        memory: 257Mi
+        cpu: 200m
+    networkPolicy:
+      enabled: false
+    persistence:
+      enabled: true
+      accessModes:
+        - ReadWriteOnce
+      size: 10Gi
+
+  storegateway:
+    enabled: true
+    logLevel: info
+    logFormat: logfmt
+    resources:
+      limits:
+        memory: 1Gi
+        cpu: 300m
+      requests:
+        memory: 256Mi
+        cpu: 200m
+    networkPolicy:
+      enabled: false
+    persistence:
+      enabled: true
+      accessModes:
+        - ReadWriteOnce
+      size: 10Gi
+
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+
+# Grafana-Loki
+grafana-loki:
+  enabled: true
+  global:
+    imageRegistry: *imageRegistry
+    imagePullSecrets:
+      - name: *imagePullSecretName
+
+  loki:
+    configuration: |
+      auth_enabled: false
+
+      server:
+        http_listen_port: {{ .Values.loki.containerPorts.http }}
+        grpc_listen_port: {{ .Values.loki.containerPorts.grpc }}
+      common:
+        compactor_address: http://{{ include "grafana-loki.compactor.fullname" . }}:{{ .Values.compactor.service.ports.http }}
+
+      distributor:
+        ring:
+          kvstore:
+            store: memberlist
+
+      memberlist:
+        bind_addr: ["${MY_POD_IP}"]
+        join_members:
+          - {{ include "grafana-loki.gossip-ring.fullname" . }}
+
+      ingester:
+        lifecycler:
+          ring:
+            kvstore:
+              store: memberlist
+            replication_factor: 1
+        chunk_idle_period: 30m
+        chunk_block_size: 262144
+        chunk_encoding: snappy
+        chunk_retain_period: 1m
+        wal:
+          dir: {{ .Values.loki.dataDir }}/wal
+
+      limits_config:
+        retention_period: 14d
+        reject_old_samples: true
+        reject_old_samples_max_age: 168h
+        max_cache_freshness_per_query: 10m
+        split_queries_by_interval: 15m
+        allow_structured_metadata: false
+
+      schema_config:
+        configs:
+        - from: 2024-05-10
+          store: boltdb-shipper
+          object_store: gcs
+          schema: v13
+          index:
+            prefix: index_
+            period: 24h
+
+      storage_config:
+        gcs:
+          bucket_name: <CHANGE_THIS-Your GCS bucket name>
+          service_account: |-
+              <CHANGE_THIS-Your Service Account credentials json>
+        boltdb_shipper:
+          active_index_directory: {{ .Values.loki.dataDir }}/loki/index
+          cache_location: {{ .Values.loki.dataDir }}/loki/cache
+          cache_ttl: 168h
+          {{- if .Values.indexGateway.enabled }}
+          index_gateway_client:
+            server_address: {{ (printf "dns:///%s:9095" (include "grafana-loki.index-gateway.fullname" .)) }}
+          {{- end }}
+        filesystem:
+          directory: {{ .Values.loki.dataDir }}/chunks
+        index_queries_cache_config:
+          {{- if .Values.memcachedindexqueries.enabled }}
+          memcached:
+            batch_size: 100
+            parallelism: 100
+          memcached_client:
+            consistent_hash: true
+            addresses: dns+{{ include "grafana-loki.memcached-index-queries.host" . }}
+            service: http
+          {{- end }}
+        tsdb_shipper:
+          active_index_directory: {{ .Values.loki.dataDir }}/loki/tsdb-index
+          cache_location: {{ .Values.loki.dataDir }}/loki/tsdb-cache
+          {{- if .Values.indexGateway.enabled }}
+          index_gateway_client:
+            server_address: {{ (printf "dns:///%s:9095" (include "grafana-loki.index-gateway.fullname" .)) }}
+          {{- end }}
+
+      query_scheduler:
+        max_outstanding_requests_per_tenant: 32768
+
+      querier:
+        max_concurrent: 16
+
+      chunk_store_config:
+        {{- if .Values.memcachedchunks.enabled }}
+        chunk_cache_config:
+          memcached:
+            batch_size: 100
+            parallelism: 100
+          memcached_client:
+            consistent_hash: true
+            addresses: dns+{{ include "grafana-loki.memcached-chunks.host" . }}
+        {{- end }}
+        {{- if .Values.memcachedindexwrites.enabled }}
+        write_dedupe_cache_config:
+          memcached:
+            batch_size: 100
+            parallelism: 100
+          memcached_client:
+            consistent_hash: true
+            addresses: dns+{{ include "grafana-loki.memcached-index-writes.host" . }}
+        {{- end }}
+
+      table_manager:
+        retention_deletes_enabled: false
+        retention_period: 0s
+
+      query_range:
+        align_queries_with_step: true
+        max_retries: 5
+        cache_results: true
+        results_cache:
+          cache:
+            {{- if .Values.memcachedfrontend.enabled }}
+            memcached_client:
+              consistent_hash: true
+              addresses: dns+{{ include "grafana-loki.memcached-frontend.host" . }}
+              max_idle_conns: 16
+              timeout: 500ms
+              update_interval: 1m
+            {{- else }}
+            embedded-cache:
+              enabled: true
+              max_size_items: 1024
+              validity: 24h
+            {{- end }}
+      {{- if not .Values.queryScheduler.enabled }}
+      frontend_worker:
+        frontend_address: {{ include "grafana-loki.query-frontend.fullname" . }}:{{ .Values.queryFrontend.service.ports.grpc }}
+      {{- end }}
+
+      frontend:
+        log_queries_longer_than: 5s
+        compress_responses: true
+        tail_proxy_url: http://{{ include "grafana-loki.querier.fullname" . }}:{{ .Values.querier.service.ports.http }}
+
+      compactor:
+        working_directory: {{ .Values.loki.dataDir }}/loki/retention
+        compaction_interval: 10m
+        retention_enabled: true
+        retention_delete_delay: 2h
+        retention_delete_worker_count: 150
+        delete_request_store: gcs
+
+      ruler:
+        storage:
+          type: local
+          local:
+            directory: {{ .Values.loki.dataDir }}/conf/rules
+        ring:
+          kvstore:
+            store: memberlist
+        rule_path: /tmp/loki/scratch
+        alertmanager_url: http://nopo11y-stack-kube-prometh-alertmanager:9093/alertmanager
+        external_url: <CHANGE_THIS-External URL of Alertmanager>
+        enable_alertmanager_v2: true
+        enable_api: true
+  
+  compactor:
+    enabled: true
+    updateStrategy:
+      type: Recreate
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 200m
+        memory: 1Gi
+    networkPolicy:
+      enabled: false
+    extraEnvVars:
+      - name: MY_POD_IP
+        valueFrom:
+          fieldRef:
+            fieldPath: status.podIP
+    extraArgs:
+      - -config.expand-env=true
+      
+  gateway:
+    enabled: true
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 200m
+        memory: 512Mi
+    networkPolicy:
+      enabled: false
+    extraEnvVars:
+      - name: MY_POD_IP
+        valueFrom:
+          fieldRef:
+            fieldPath: status.podIP
+    extraArgs:
+      - -config.expand-env=true
+      
+  distributor:
+    enabled: true
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 200m
+        memory: 1Gi
+    networkPolicy:
+      enabled: false
+    extraEnvVars:
+      - name: MY_POD_IP
+        valueFrom:
+          fieldRef:
+            fieldPath: status.podIP
+    extraArgs:
+      - -config.expand-env=true
+
+  ingester:
+    enabled: true
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        cpu: 300m
+        memory: 1Gi
+    networkPolicy:
+      enabled: false
+    extraEnvVars:
+      - name: MY_POD_IP
+        valueFrom:
+          fieldRef:
+            fieldPath: status.podIP
+    extraArgs:
+      - -config.expand-env=true
+
+  querier:
+    enabled: true
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 200m
+        memory: 1Gi
+    networkPolicy:
+      enabled: false
+    extraEnvVars:
+      - name: LOG_LEVEL
+        value: DEBUG
+      - name: MY_POD_IP
+        valueFrom:
+          fieldRef:
+            fieldPath: status.podIP
+    extraArgs:
+      - -config.expand-env=true
+
+  queryFrontend:
+    enabled: true
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 200m
+        memory: 512Mi
+    networkPolicy:
+      enabled: false
+    extraEnvVars:
+      - name: LOG_LEVEL
+        value: DEBUG
+      - name: MY_POD_IP
+        valueFrom:
+          fieldRef:
+            fieldPath: status.podIP
+    extraArgs:
+      - -config.expand-env=true
+    
+  queryScheduler:
+    enabled: true
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+    networkPolicy:
+      enabled: false
+    extraEnvVars:
+      - name: MY_POD_IP
+        valueFrom:
+          fieldRef:
+            fieldPath: status.podIP
+    extraArgs:
+      - -config.expand-env=true
+
+  # Enabled via different helm chart
+  promtail:
+    enabled: false
+  
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: "observability"
+
+promtail:
+  enabled: true
+  image:
+    registry: *imageRegistry
+    repository: grafana/promtail
+    tag: null
+    pullPolicy: IfNotPresent
+
+  imagePullSecrets:
+    - name: *imagePullSecretName
+
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "http-metrics"
+
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  namespace: observability
+
+  extraArgs:
+    - -client.external-labels=cluster=<CHANGE_THIS-Your cluster label>
+
+  serviceMonitor:
+    enabled: true
+    namespace: "observability"
+    interval: 30s
+    scheme: http
+    prometheusRule:
+      enabled: true
+      namespace: "observability"
+      rules:
+      - alert: PromtailRequestErrors
+        expr: 100 * sum(rate(promtail_request_duration_seconds_count{status_code=~"5..|failed"}[1m])) by (namespace, job, route, instance) / sum(rate(promtail_request_duration_seconds_count[1m])) by (namespace, job, route, instance) > 10
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          description: |
+            The {{ $labels.job }} {{ $labels.route }} is experiencing
+            {{ printf "%.2f" $value }} errors.
+            VALUE = {{ $value }}
+            LABELS = {{ $labels }}
+          summary: Promtail request errors (instance {{ $labels.instance }})
+      - alert: PromtailRequestLatency
+        expr: histogram_quantile(0.99, sum(rate(promtail_request_duration_seconds_bucket[5m])) by (le)) > 1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: Promtail request latency (instance {{ $labels.instance }})
+          description: |
+            The {{ $labels.job }} {{ $labels.route }} is experiencing
+            {{ printf "%.2f" $value }}s 99th percentile latency.
+            VALUE = {{ $value }}
+            LABELS = {{ $labels }}
+
+  config:
+    clients:
+      - url: http://nopo11y-stack-grafana-loki-gateway/loki/api/v1/push
+    snippets:
+      pipelineStages:
+      - cri: {}
+      - multiline:
+          firstline: '^\d{4}-\d{2}-\d{2} \d{1,2}:\d{2}:\d{2}\.\d{3}'
+          max_wait_time: 10s
+          max_lines: 2048
+
+# Tempo
+tempo-distributed:
+  enabled: true
+  global:
+    image:
+      registry: *imageRegistry
+      pullSecrets:
+      - pmtsecret
+
+  tempo:
+    securityContext:
+      readOnlyRootFilesystem: false
+
+  ingester:
+    replicas: 2
+    persistence:
+      enabled: true
+      size: 8Gi
+    config:
+      replication_factor: 1
+    extraVolumeMounts:
+    - name: gcs-credentials
+      mountPath: /tmp/credentials.json
+      subPath: credentials.json
+      readOnly: true
+    extraVolumes:
+    - name: gcs-credentials
+      secret:
+        secretName: gcs-credentials
+
+  distributor:
+    replicas: 2
+    config:
+      log_received_traces: true
+      log_received_spans:
+        enabled: true
+    extraVolumeMounts:
+    - name: gcs-credentials
+      mountPath: /tmp/credentials.json
+      subPath: credentials.json
+      readOnly: true
+    extraVolumes:
+    - name: gcs-credentials
+      secret:
+        secretName: gcs-credentials
+
+  compactor:
+    replicas: 1
+    config:
+      compaction:
+        block_retention: 168h
+        compacted_block_retention: 1h
+        compaction_window: 1h
+    extraVolumeMounts:
+    - name: gcs-credentials
+      mountPath: /tmp/credentials.json
+      subPath: credentials.json
+      readOnly: true
+    extraVolumes:
+    - name: gcs-credentials
+      secret:
+        secretName: gcs-credentials
+
+  querier:
+    replicas: 2
+    extraVolumeMounts:
+    - name: gcs-credentials
+      mountPath: /tmp/credentials.json
+      subPath: credentials.json
+      readOnly: true
+    extraVolumes:
+    - name: gcs-credentials
+      secret:
+        secretName: gcs-credentials
+
+  queryFrontend:
+    replicas: 2
+    query:
+      enabled: true
+      extraArgs:
+      - "--query.base-path=/jaeger"
+
+  traces:
+    zipkin:
+      enabled: true
+    otlp:
+      http:
+        enabled: true
+      grpc:
+        enabled: true
+
+  memberlist:
+    node_name: ""
+    randomize_node_name: true
+    stream_timeout: "10s"
+    retransmit_factor: 1
+    pull_push_interval: "30s"
+    gossip_interval: "1s"
+    gossip_nodes: 1
+    gossip_to_dead_nodes_time: "30s"
+    min_join_backoff: "1s"
+    max_join_backoff: "1m"
+    max_join_retries: 10
+    abort_if_cluster_join_fails: false
+    rejoin_interval: "0s"
+    left_ingesters_timeout: "5m"
+    leave_timeout: "5s"
+    bind_addr: []
+    bind_port: 7946
+    packet_dial_timeout: "5s"
+    packet_write_timeout: "5s"
+
+  config: |
+    multitenancy_enabled: {{ .Values.multitenancyEnabled }}
+
+    usage_report:
+      reporting_enabled: {{ .Values.reportingEnabled }}
+
+    {{- if .Values.enterprise.enabled }}
+    license:
+      path: "/license/license.jwt"
+
+    admin_api:
+      leader_election:
+        enabled: true
+        ring:
+          kvstore:
+            store: "memberlist"
+
+    auth:
+      type: enterprise
+
+    http_api_prefix: {{get .Values.tempo.structuredConfig "http_api_prefix"}}
+
+    admin_client:
+      storage:
+        backend: {{.Values.storage.admin.backend}}
+        {{- if eq .Values.storage.admin.backend "s3"}}
+        s3:
+          {{- toYaml .Values.storage.admin.s3 | nindent 6}}
+        {{- end}}
+        {{- if eq .Values.storage.admin.backend "gcs"}}
+        gcs:
+          {{- toYaml .Values.storage.admin.gcs | nindent 6}}
+        {{- end}}
+        {{- if eq .Values.storage.admin.backend "azure"}}
+        azure:
+          {{- toYaml .Values.storage.admin.azure | nindent 6}}
+        {{- end}}
+        {{- if eq .Values.storage.admin.backend "swift"}}
+        swift:
+          {{- toYaml .Values.storage.admin.swift | nindent 6}}
+        {{- end}}
+        {{- if eq .Values.storage.admin.backend "filesystem"}}
+        filesystem:
+          {{- toYaml .Values.storage.admin.filesystem | nindent 6}}
+        {{- end}}
+    {{- end }}
+
+    {{- if and .Values.enterprise.enabled .Values.enterpriseGateway.useDefaultProxyURLs }}
+    gateway:
+      proxy:
+        admin_api:
+          url: http://{{ template "tempo.fullname" . }}-admin-api.{{ .Release.Namespace }}.svc:{{ include "tempo.serverHttpListenPort" . }}
+        compactor:
+          url: http://{{ template "tempo.fullname" . }}-compactor.{{ .Release.Namespace }}.svc:{{ include "tempo.serverHttpListenPort" . }}
+        default:
+          url: http://{{ template "tempo.fullname" . }}-admin-api.{{ .Release.Namespace }}.svc:{{ include "tempo.serverHttpListenPort" . }}
+        distributor:
+          url: http://{{ template "tempo.fullname" . }}-distributor.{{ .Release.Namespace }}.svc:{{ include "tempo.serverHttpListenPort" . }}
+          otlp/grpc:
+            url: h2c://{{ template "tempo.fullname" . }}-distributor.{{ .Release.Namespace }}.svc:4317
+          otlp/http:
+            url: http://{{ template "tempo.fullname" . }}-distributor.{{ .Release.Namespace }}.svc:4318
+        ingester:
+          url: http://{{ template "tempo.fullname" . }}-ingester.{{ .Release.Namespace }}.svc:{{ include "tempo.serverHttpListenPort" . }}
+        querier:
+          url: http://{{ template "tempo.fullname" . }}-querier.{{ .Release.Namespace }}.svc:{{ include "tempo.serverHttpListenPort" . }}
+        query_frontend:
+          url: http://{{ template "tempo.fullname" . }}-query-frontend.{{ .Release.Namespace }}.svc:{{ include "tempo.serverHttpListenPort" . }}{{get .Values.tempo.structuredConfig "http_api_prefix"}}
+    {{else}}
+    {{- if and .Values.enterprise.enabled .Values.enterpriseGateway.proxy }}
+    gateway:
+      proxy: {{- toYaml .Values.enterpriseGateway.proxy | nindent 6 }}
+    {{- end }}
+    {{- end }}
+
+    compactor:
+      compaction:
+        block_retention: {{ .Values.compactor.config.compaction.block_retention }}
+        compacted_block_retention: {{ .Values.compactor.config.compaction.compacted_block_retention }}
+        compaction_window: {{ .Values.compactor.config.compaction.compaction_window }}
+        v2_in_buffer_bytes: {{ .Values.compactor.config.compaction.v2_in_buffer_bytes }}
+        v2_out_buffer_bytes: {{ .Values.compactor.config.compaction.v2_out_buffer_bytes }}
+        max_compaction_objects: {{ .Values.compactor.config.compaction.max_compaction_objects }}
+        max_block_bytes: {{ .Values.compactor.config.compaction.max_block_bytes }}
+        retention_concurrency: {{ .Values.compactor.config.compaction.retention_concurrency }}
+        v2_prefetch_traces_count: {{ .Values.compactor.config.compaction.v2_prefetch_traces_count }}
+        max_time_per_tenant: {{ .Values.compactor.config.compaction.max_time_per_tenant }}
+        compaction_cycle: {{ .Values.compactor.config.compaction.compaction_cycle }}
+      ring:
+        kvstore:
+          store: memberlist
+    {{- if and .Values.enterprise.enabled .Values.enterpriseFederationFrontend.enabled }}
+    federation:
+      proxy_targets:
+        {{- toYaml .Values.enterpriseFederationFrontend.proxy_targets | nindent 6 }}
+    {{- end }}
+    {{- if .Values.metricsGenerator.enabled }}
+    metrics_generator:
+      ring:
+        kvstore:
+          store: memberlist
+      processor:
+        {{- toYaml .Values.metricsGenerator.config.processor | nindent 6 }}
+      storage:
+        {{- toYaml .Values.metricsGenerator.config.storage | nindent 6 }}
+      traces_storage:
+        {{- toYaml .Values.metricsGenerator.config.traces_storage | nindent 6 }}
+      registry:
+        {{- toYaml .Values.metricsGenerator.config.registry | nindent 6 }}
+      metrics_ingestion_time_range_slack: {{ .Values.metricsGenerator.config.metrics_ingestion_time_range_slack }}
+    {{- end }}
+    distributor:
+      ring:
+        kvstore:
+          store: memberlist
+      receivers:
+        {{- if  or (.Values.traces.jaeger.thriftCompact.enabled) (.Values.traces.jaeger.thriftBinary.enabled) (.Values.traces.jaeger.thriftHttp.enabled) (.Values.traces.jaeger.grpc.enabled) }}
+        jaeger:
+          protocols:
+            {{- if .Values.traces.jaeger.thriftCompact.enabled }}
+            thrift_compact:
+              {{- $mergedJaegerThriftCompactConfig := mustMergeOverwrite (dict "endpoint" "0.0.0.0:6831") .Values.traces.jaeger.thriftCompact.receiverConfig }}
+              {{- toYaml $mergedJaegerThriftCompactConfig | nindent 10 }}
+            {{- end }}
+            {{- if .Values.traces.jaeger.thriftBinary.enabled }}
+            thrift_binary:
+              {{- $mergedJaegerThriftBinaryConfig := mustMergeOverwrite (dict "endpoint" "0.0.0.0:6832") .Values.traces.jaeger.thriftBinary.receiverConfig }}
+              {{- toYaml $mergedJaegerThriftBinaryConfig | nindent 10 }}
+            {{- end }}
+            {{- if .Values.traces.jaeger.thriftHttp.enabled }}
+            thrift_http:
+              {{- $mergedJaegerThriftHttpConfig := mustMergeOverwrite (dict "endpoint" "0.0.0.0:14268") .Values.traces.jaeger.thriftHttp.receiverConfig }}
+              {{- toYaml $mergedJaegerThriftHttpConfig | nindent 10 }}
+            {{- end }}
+            {{- if .Values.traces.jaeger.grpc.enabled }}
+            grpc:
+              {{- $mergedJaegerGrpcConfig := mustMergeOverwrite (dict "endpoint" "0.0.0.0:14250") .Values.traces.jaeger.grpc.receiverConfig }}
+              {{- toYaml $mergedJaegerGrpcConfig | nindent 10 }}
+            {{- end }}
+        {{- end }}
+        {{- if .Values.traces.zipkin.enabled }}
+        zipkin:
+          {{- $mergedZipkinReceiverConfig := mustMergeOverwrite (dict "endpoint" "0.0.0.0:9411") .Values.traces.zipkin.receiverConfig }}
+          {{- toYaml $mergedZipkinReceiverConfig | nindent 6 }}
+        {{- end }}
+        {{- if or (.Values.traces.otlp.http.enabled) (.Values.traces.otlp.grpc.enabled) }}
+        otlp:
+          protocols:
+            {{- if .Values.traces.otlp.http.enabled }}
+            http:
+              {{- $mergedOtlpHttpReceiverConfig := mustMergeOverwrite (dict "endpoint" "0.0.0.0:4318") .Values.traces.otlp.http.receiverConfig }}
+              {{- toYaml $mergedOtlpHttpReceiverConfig | nindent 10 }}
+            {{- end }}
+            {{- if .Values.traces.otlp.grpc.enabled }}
+            grpc:
+              {{- $mergedOtlpGrpcReceiverConfig := mustMergeOverwrite (dict "endpoint" "0.0.0.0:4317") .Values.traces.otlp.grpc.receiverConfig }}
+              {{- toYaml $mergedOtlpGrpcReceiverConfig | nindent 10 }}
+            {{- end }}
+        {{- end }}
+        {{- if .Values.traces.opencensus.enabled }}
+        opencensus:
+          {{- $mergedOpencensusReceiverConfig := mustMergeOverwrite (dict "endpoint" "0.0.0.0:55678") .Values.traces.opencensus.receiverConfig }}
+          {{- toYaml $mergedOpencensusReceiverConfig | nindent 6 }}
+        {{- end }}
+        {{- if .Values.traces.kafka }}
+        kafka:
+          {{- toYaml .Values.traces.kafka | nindent 6 }}
+        {{- end }}
+      {{- if or .Values.distributor.config.log_received_traces .Values.distributor.config.log_received_spans.enabled }}
+      log_received_spans:
+        enabled: {{ or .Values.distributor.config.log_received_traces .Values.distributor.config.log_received_spans.enabled }}
+        include_all_attributes: {{ .Values.distributor.config.log_received_spans.include_all_attributes }}
+        filter_by_status_error: {{ .Values.distributor.config.log_received_spans.filter_by_status_error }}
+      {{- end }}
+      {{- if .Values.distributor.config.extend_writes }}
+      extend_writes: {{ .Values.distributor.config.extend_writes }}
+      {{- end }}
+    querier:
+      frontend_worker:
+        frontend_address: {{ include "tempo.resourceName" (dict "ctx" . "component" "query-frontend-discovery") }}:9095
+        {{- if .Values.querier.config.frontend_worker.grpc_client_config }}
+        grpc_client_config:
+          {{- toYaml .Values.querier.config.frontend_worker.grpc_client_config | nindent 6 }}
+        {{- end }}
+      trace_by_id:
+        query_timeout: {{ .Values.querier.config.trace_by_id.query_timeout }}
+      search:
+        external_endpoints: {{- toYaml .Values.querier.config.search.external_endpoints | nindent 6 }}
+        query_timeout: {{ .Values.querier.config.search.query_timeout }}
+        prefer_self: {{ .Values.querier.config.search.prefer_self }}
+        external_hedge_requests_at: {{ .Values.querier.config.search.external_hedge_requests_at }}
+        external_hedge_requests_up_to: {{ .Values.querier.config.search.external_hedge_requests_up_to }}
+        external_backend: {{ .Values.querier.config.search.external_backend }}
+        {{- if .Values.querier.config.search.google_cloud_run }}
+        google_cloud_run:
+          {{- toYaml .Values.querier.config.search.google_cloud_run | nindent 6 }}
+        {{- end }}
+      max_concurrent_queries: {{ .Values.querier.config.max_concurrent_queries }}
+    query_frontend:
+      max_outstanding_per_tenant: {{ .Values.queryFrontend.config.max_outstanding_per_tenant }}
+      max_retries: {{ .Values.queryFrontend.config.max_retries }}
+      search:
+        target_bytes_per_job: {{ .Values.queryFrontend.config.search.target_bytes_per_job }}
+        concurrent_jobs: {{ .Values.queryFrontend.config.search.concurrent_jobs }}
+      trace_by_id:
+        query_shards: {{ .Values.queryFrontend.config.trace_by_id.query_shards }}
+
+    ingester:
+      lifecycler:
+        ring:
+          replication_factor: {{ .Values.ingester.config.replication_factor }}
+          {{- if .Values.ingester.zoneAwareReplication.enabled }}
+          zone_awareness_enabled: true
+          {{- end }}
+          kvstore:
+            store: memberlist
+        tokens_file_path: /var/tempo/tokens.json
+      {{- if .Values.ingester.config.trace_idle_period }}
+      trace_idle_period: {{ .Values.ingester.config.trace_idle_period }}
+      {{- end }}
+      {{- if .Values.ingester.config.flush_check_period }}
+      flush_check_period: {{ .Values.ingester.config.flush_check_period }}
+      {{- end }}
+      {{- if .Values.ingester.config.max_block_bytes }}
+      max_block_bytes: {{ .Values.ingester.config.max_block_bytes }}
+      {{- end }}
+      {{- if .Values.ingester.config.max_block_duration }}
+      max_block_duration: {{ .Values.ingester.config.max_block_duration }}
+      {{- end }}
+      {{- if .Values.ingester.config.complete_block_timeout }}
+      complete_block_timeout: {{ .Values.ingester.config.complete_block_timeout }}
+      {{- end }}
+      {{- if .Values.ingester.config.flush_all_on_shutdown }}
+      flush_all_on_shutdown: {{ .Values.ingester.config.flush_all_on_shutdown }}
+      {{- end }}
+    memberlist:
+      {{- with .Values.memberlist }}
+        {{- toYaml . | nindent 2 }}
+      {{- end }}
+      join_members:
+        - dns+{{ include "tempo.fullname" . }}-gossip-ring:{{ .Values.memberlist.bind_port }}
+    overrides:
+      {{- toYaml .Values.global_overrides | nindent 2 }}
+    server:
+      http_listen_port: {{ .Values.server.httpListenPort }}
+      log_level: {{ .Values.server.logLevel }}
+      log_format: {{ .Values.server.logFormat }}
+      grpc_server_max_recv_msg_size: {{ .Values.server.grpc_server_max_recv_msg_size }}
+      grpc_server_max_send_msg_size: {{ .Values.server.grpc_server_max_send_msg_size }}
+      http_server_read_timeout: {{ .Values.server.http_server_read_timeout }}
+      http_server_write_timeout: {{ .Values.server.http_server_write_timeout }}
+    cache:
+    {{- toYaml .Values.cache | nindent 2}}
+    storage:
+      trace:
+        {{- if .Values.storage.trace.block.version }}
+        block:
+          version: {{.Values.storage.trace.block.version}}
+          {{- if .Values.storage.trace.block.dedicated_columns}}
+          parquet_dedicated_columns:
+            {{ .Values.storage.trace.block.dedicated_columns | toYaml | nindent 8}}
+          {{- end }}
+        {{- end }}
+        pool:
+          max_workers: {{ .Values.storage.trace.pool.max_workers }}
+          queue_depth: {{ .Values.storage.trace.pool.queue_depth }}
+        backend: {{.Values.storage.trace.backend}}
+        {{- if eq .Values.storage.trace.backend "s3"}}
+        s3:
+          {{- toYaml .Values.storage.trace.s3 | nindent 6}}
+        {{- end }}
+        {{- if eq .Values.storage.trace.backend "gcs"}}
+        gcs:
+          {{- toYaml .Values.storage.trace.gcs | nindent 6}}
+        {{- end }}
+        {{- if eq .Values.storage.trace.backend "azure"}}
+        azure:
+          {{- toYaml .Values.storage.trace.azure | nindent 6}}
+        {{- end }}
+        blocklist_poll: 5m
+        local:
+          path: /var/tempo/traces
+        wal:
+          path: /var/tempo/wal
+  
+  extraObjects:
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: gcs-credentials
+    data:
+      credentials.json: |-
+        <CHNAGE_THIS-Your Service Account credentials json>
+
+  storage:
+    trace:
+      backend: gcs
+      gcs:
+        bucket_name: <CHANGE_THIS-Your GCS bucket name>
+        credentials_file: /tmp/credentials.json
+
+  memcached:
+    enabled: true
+
+  metaMonitoring:
+    serviceMonitor:
+      enabled: true
+
+  metricsGenerator:
+    enabled: true
+
+sloth:
+  enabled: true
+  image:
+    repository: *imageRegistry/slok/sloth
+    tag: v0.11.0
+  resources:
+    limits:
+      cpu: 50m
+      memory: 150Mi
+    requests:
+      cpu: 5m
+      memory: 75Mi
+  imagePullSecrets:
+    - name: *imagePullSecretName
+  commonPlugins:
+    enabled: false
+  metrics:
+    enabled: true
+
+### Prom2Teams
+prom2teams:
+  enabled: true
+  image:
+    repository: *imageRegistry/idealista/prom2teams
+    tag: null
+    pullPolicy: IfNotPresent
+  prom2teams:
+      connector: <CHANGE_THIS-Your MS Team's webhook connector URL>
+
+kiali-server:
+  enabled: true
+  istio_namespace: "istio-system" # default is where Kiali is installed
+  login_token:
+    signing_key: "teOJZ1zTnXmnw3dB" # Random key
+  auth:
+    strategy: "anonymous"
+
+  deployment:
+    image_name: *imageRegistry/kiali/kiali
+    image_pull_policy: IfNotPresent
+    image_pull_secrets:
+    - name: *imagePullSecretName
+    image_version: v1.83.0 
+    replicas: 1
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "256Mi"
+      limits:
+        memory: "512Mi"
+        cpu: "200m"
+    version_label: v1.83.0
+
+  external_services:
+    custom_dashboards:
+      enabled: true
+    istio:
+      root_namespace: "observability"
+    prometheus:
+      url: "http://nopo11y-stack-kube-prometh-prometheus.observability.svc.cluster.local:9090/prometheus"
+    tracing:
+      enabled: true
+      provider: "tempo"
+      internal_url: http://nopo11y-stack-tempo-query-frontend.observability.svc.cluster.local:3100
+      external_url: <CHANGE_THIS-External URL accessing jaeger UI of Grafana Tempo>
+      health_check_url: http://nopo11y-stack-tempo-query-frontend.observability.svc.cluster.local:3100/status/services
+      use_grpc: false
+      tempo_config:
+        datasource_uid: "tempo"
+    grafana:
+        enabled: true
+        in_cluster_url: 'http://nopo11y-stack-grafana.observability.svc.cluster.local/grafana'
+        url: '<CHANGE_THIS-External URL of Grafana>'
+
+
+  server:
+    port: 20001
+    observability:
+      metrics:
+        enabled: true
+        port: 9090
+    web_root: "/kiali"
+    web_port: 443
+
+
+### Kuberhealthy
+kuberhealthy:
+  enabled: true
+  prometheus:
+    enabled: true
+    name: "prometheus"
+
+    grafanaDashboard:
+      enabled: true
+      label: grafana_dashboard
+      labelValue: "1"
+
+
+    serviceMonitor:
+      enabled: true
+      release: nopo11y-stack
+      namespace: observability
+
+
+    prometheusRule:
+      enabled: true
+      release: nopo11y-stack
+      namespace: observability
+
+  imageregistry: *imageRegistry
+
+  image:
+    registry: *imageRegistry
+    repository: kuberhealthy/kuberhealthy
+    tag:
+  
+  check:
+    daemonset:
+      enabled: false
+    deployment: 
+      enabled: false
+    dnsInternal:
+      enabled: true
+      runInterval: 2m
+      timeout: 15m
+      image:
+        registry: *imageRegistry
+        repository: kuberhealthy/dns-resolution-check
+        tag: v1.5.0
+      extraEnvs:
+        HOSTNAME: "kubernetes.default"
+      resources:
+        requests:
+          cpu: 10m
+          memory: 50Mi
+
+nopo11y_health_check:
+  checks:
+  - name: <CHANGE_THIS-Your nopo11y health check name>
+    image: *imageRegistry/znsio/nopo11y/system-health-check:latest
+    imagePullPolicy: IfNotPresent
+    runInterval: 1m
+    timeout: 5m
+    env:
+      NAMESPACE: "<CHANGE_THIS-Namespace for which you want to create health check>"
+
+# Nopo11y operator
+nopo11y-operator:
+  enabled: true
+  image:
+    repository: *imageRegistry/znsio/nopo11y/nopo11y-operator
+    pullPolicy: Always
+    tag: "latest"
+
+  imagePullSecrets:
+    - name: *imagePullSecretName
+  env:
+    - name: LOG_LEVEL
+      value: "INFO"
+    - name: API_GATEWAY
+      value: "istio"
+    - name: GRAFANA_EXTERNAL_URL
+      value: "<CHANGE_THIS-External URL of Grafana>"
+    - name: AVAILABILITY_SLO
+      value: "99"
+    - name: LATENCY_SLO
+      value: "99"
+    - name: LATENCY_MS
+      value: "3000"
+    - name: ERROR_RATE_4XX
+      value: "5"
+    - name: ERROR_RATE_5XX
+      value: "1"
+    - name: NOPO11Y_STACK_NAMESPACE
+      value: "observability"
+
+  resources:
+    limits:
+      cpu: 200m
+      memory: 240Mi
+    requests:
+      cpu: 100m
+      memory: 96Mi
+
+## Ingress for nopo11y-stack components 
+nopo11y_ingress:
+  enabled: true
+  type: "istio"
+  host: <CHANGE_THIS-Domain name to access nopo11y-stack components>
+  istioGatewaySelector:
+    app: <CHANGE_THIS-App label value of your istio ingress gateway>
+  istioNamespace: "istio-system"
+  tls:
+    enabled: true
+    tlsKey: <CHANGE_THIS-Base64 encoded SSL certificate key>
+    tlsCert: <CHANGE_THIS-Base64 encoded SSL certificate>
+
+## Kubernetes event exporter
+kubernetes-event-exporter:
+  enabled: true
+  image:
+    registry: *imageRegistry
+    repository: bitnami/kubernetes-event-exporter
+    tag: 1.7.0-debian-12-r10
+
+  config:
+    logLevel: warn
+    logFormat: json
+    receivers:
+      - name: "dump"
+        stdout: {}
+    route:
+      routes:
+        - match:
+            - receiver: "dump"
+
+  resources:
+    limits:
+      memory: 128Mi
+    requests:
+      cpu: 25m
+      memory: 128Mi
+
+  metrics:
+    enabled: true
+    service:
+      ports:
+        http: 2112
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "{{ .Values.metrics.service.ports.http }}"
+    serviceMonitor:
+      enabled: true
+      port: http
+      endpoints:
+        - path: /metrics
+
+      path: ""
+      namespace: "observability"
+      interval: 30s
+    prometheusRule:
+      enabled: true
+      namespace: "observability"
+      labels: {}
+      groups:
+        - name: KubernetesEventExporter
+          rules:
+            - alert: ErrorsWithKubernetesEventExporter
+              annotations:
+                message: "Kubernetes Event Exporter instance has reported errors while fetching kubernetes events."
+              expr: |
+                irate(watch_errors{namespace="{{ include "common.names.namespace" . }}"}[5m]) > 1
+              for: 5m
+              labels:
+                severity: critical
