@@ -15,7 +15,9 @@ logger.setLevel(logging.INFO)
 
 logger.info("Starting health check")
 
-prometheus = os.getenv("PROMETHEUS_ENDPOINT", "http://nopo11y-stack-kube-prometh-prometheus:9090")
+prometheus = os.getenv("PROMETHEUS_ENDPOINT", "http://nopo11y-stack-kube-prometh-prometheus.observability.svc.cluster.local:9090/prometheus")
+thanos_query = os.getenv("THANOS_QUERY_ENDPOINT", "")
+health_check_type = os.getenv("HEALTH_CHECK_TYPE","namespace")
 namespace = os.getenv("NAMESPACE","default")
 healthy_pods = os.getenv("HEALTHY_PODS_PERCENTAGE","30")
 pod_cpu_threshold = os.getenv("HEALTHY_POD_CPU_UTILIZATION_THRESHOLD","80")
@@ -28,6 +30,8 @@ node_memory_available = os.getenv("HEALTHY_NODE_MEMORY_AVAILABLE", "1000")
 node_disk_available = os.getenv("HEALTHY_NODE_ROOT_DISK_AVAILABLR_SPACE", "200")
 
 prometheus_url = prometheus + '/api/v1/query?'
+if thanos_query != "":
+    thanos_query_url = thanos_query + '/api/v1/query?'
 
 pods_with_resources_query = 'sum(kube_pod_container_resource_limits{namespace="'+ namespace +'",container!~"istio-proxy|", resource="cpu"}) by (pod) AND sum(kube_pod_container_resource_limits{namespace="'+ namespace +'",container!~"istio-proxy|", resource="memory"}) by (pod)'
 
@@ -223,7 +227,10 @@ def node_check():
 def slo_check():
     failed = []
     try:
-        response = requests.get(prometheus_url, params={'query': 'ALERTS{alertname=~".*availability.*|.*requests.*|.*latency.*|.*response time.*", severity="critical"}'})
+        if thanos_query_url != "":
+            response = requests.get(thanos_query_url, params={'query': 'ALERTS{alertname=~".*availability.*|.*requests.*|.*latency.*|.*response time.*", severity="critical"}'})
+        else:
+            response = requests.get(prometheus_url, params={'query': 'ALERTS{alertname=~".*availability.*|.*requests.*|.*latency.*|.*response time.*", severity="critical"}'})
         response_json = json.loads(response.text)
         if response_json['data']['result']:
             for result in response_json['data']['result']:
@@ -256,10 +263,27 @@ def pods_details():
 
 def main():
     errors = []
-    for failures in [pods_details(), pvc_check(), node_check(), slo_check()]:
-        for error in failures:
-            errors.append(error)
-    logger.info("health check errors %s",  str(errors))
+    if health_check_type == "namespace":
+        logger.info("Running health check for namespace - %s", str(namespace))
+        for failures in [pods_details(), pvc_check()]:
+            for error in failures:
+                errors.append(error)
+        logger.info("health check errors %s",  str(errors))
+    
+    if health_check_type == "node":
+        logger.info("Running health check for nodes")
+        for failures in [node_check()]:
+            for error in failures:
+                errors.append(error)
+        logger.info("health check errors %s",  str(errors))
+    
+    if health_check_type == "slo":
+        logger.info("Running health check for SLO")
+        for failures in [slo_check()]:
+            for error in failures:
+                errors.append(error)
+        logger.info("health check errors %s",  str(errors))
+
 
     if len(errors) > 0:
         logger.info("reporting failure")
