@@ -1,24 +1,22 @@
-imageRegistry: &imageRegistry "<CHANGE_THIS-Your Image Registry>"
+# This is a sample values file for the nopo11y-stack helm chart.
+# It is prepared considering that you will use the Istio ingress gateway for handling ingress traffic.
+# If you plan to use the NGINX ingress controller instead, please refer to the master values file (https://github.com/znsio/nopo11y/blob/main/charts/nopo11y-stack/values.yaml) for appropriate configurations.
+
 clusterLabel: &clusterLabel "<CHANGE_THIS-Your Cluster Label>"
-imagePullSecretName: &imagePullSecretName "<CHANGE_THIS-Your image pull secret name>"
+grafanaAdminPassowrd: &grafanaAdminPassword "<CHANGE_THIS-Admin Password for Grafana>"
+msTeamsWebhookConnector: &msTeamsWebHookConnector "<CHANGE_THIS-Your MS Team's Webhook Connector URL>"
+
+
 ## kube-prometheus-stack
 kube-prometheus-stack:
   enabled: true
-  global:
-    imagePullSecrets:
-    - name: *imagePullSecretName
 
   prometheus:
     prometheusSpec:
-      image:
-        registry: *imageRegistry
-        repository: prometheus/prometheus
-        tag: v2.51.2
-        sha: ""
       routePrefix: /prometheus
       externalLabels: 
         cluster: *clusterLabel
-      externalUrl: "<CHANGE_THIS-External URL to access prometheus>"
+      externalUrl: "<CHANGE_THIS-External URL to Access Prometheus>"
       retention: 2d
       storageSpec:
         volumeClaimTemplate:
@@ -28,7 +26,7 @@ kube-prometheus-stack:
               requests:
                 storage: 30Gi
       thanos:
-        image: *imageRegistry/thanos/thanos:v0.35.0
+        image: <CHANGE_THIS-Your Image Registry>/thanos/thanos:v0.35.0
         objectStorageConfig:
           existingSecret:
             name: nopo11y-stack-thanos-objstore-secret
@@ -44,21 +42,13 @@ kube-prometheus-stack:
         enabled: false
         jobLabel: jobLabel
 
-  prometheus-node-exporter:
-    image:
-      registry: *imageRegistry
-
-  kube-state-metrics:
-    image:
-      registry: *imageRegistry
-
   alertmanager:
     enabled: true
     config:
       global:
         resolve_timeout: 5m
         http_config:
-          proxy_url: '<CHANGE_THIS-Put your proxy URL if you are behind coporate firewall>'
+          proxy_url: '<CHANGE_THIS-Put Your Proxy URL If You Are Behind Corporate Firewall>'
       inhibit_rules:
         - source_matchers:
             - 'severity = critical'
@@ -101,12 +91,7 @@ kube-prometheus-stack:
       - '/etc/alertmanager/config/*.tmpl'
 
     alertmanagerSpec:
-      image:
-        registry: *imageRegistry
-        repository: prometheus/alertmanager
-        tag: v0.27.0
-        sha: ""
-      externalUrl: "<CHANGE_THIS-Your external URL for accessing alertmanager>"
+      externalUrl: "<CHANGE_THIS-Your External URL For Accessing Alertmanager>"
       routePrefix: /alertmanager
       resources:
         requests:
@@ -124,38 +109,15 @@ kube-prometheus-stack:
       limits:
         cpu: 500m
         memory: 1Gi
-    image:
-      registry: *imageRegistry
-      repository: grafana/grafana
-      tag: ""
-      sha: ""
-      pullPolicy: IfNotPresent
     testFramework:
       enabled: true
-      image:
-        registry: *imageRegistry
-        repository: bats/bats
-        tag: "v1.4.1"
-      imagePullPolicy: IfNotPresent
-    downloadDashboardsImage:
-      registry: *imageRegistry
-      repository: curlimages/curl
-      tag: 7.85.0
-      sha: ""
-      pullPolicy: IfNotPresent
     initChownData:
       enabled: true
-      image:
-        registry: *imageRegistry
-        repository: library/busybox
-        tag: "1.31.1"
-        sha: ""
-        pullPolicy: IfNotPresent
     assertNoLeakedSecrets: false
-    adminPassword: "<CHANGE_THIS-Admin password for Grafana>"
+    adminPassword: *grafanaAdminPassword
     grafana.ini:
       server:
-        root_url: <CHANGE_THIS-External URL to access Grafana>
+        root_url: <CHANGE_THIS-External URL to Access Grafana>
         serve_from_sub_path: true
       users:
         viewers_can_edit: true
@@ -180,8 +142,6 @@ kube-prometheus-stack:
         multicluster:
           global:
             enabled: true
-      image:
-        registry: *imageRegistry
       datasources:
         enabled: true
         defaultDatasourceEnabled: true
@@ -224,39 +184,15 @@ kube-prometheus-stack:
     enabled: true
     tls:
       enabled: false
-    prometheusConfigReloader:
-      image:
-        registry: *imageRegistry
-        repository: prometheus-operator/prometheus-config-reloader
     admissionWebhooks:
-      deployment:
-        image:
-          registry: *imageRegistry
-          repository: kube-webhook-certgen/amd64
-          tag: ""
-          sha: ""
-          pullPolicy: IfNotPresent
       patch:
         enabled: true
-        image:
-          registry: *imageRegistry
-          repository: ingress-nginx/kube-webhook-certgen
-          tag: v20221220-controller-v1.5.1-58-g787ea74b6
-          sha: ""
-          pullPolicy: IfNotPresent  
-    image:
-      registry: *imageRegistry
-      repository: prometheus-operator/prometheus-operator
-      # if not set appVersion field from Chart.yaml is used
-      tag: ""
-      sha: ""
-      pullPolicy: IfNotPresent
-      resources:
-        requests:
-          cpu: 126m
-          memory: 1Gi
-        limits:
-          memory: 2Gi
+    resources:
+      requests:
+        cpu: 126m
+        memory: 1Gi
+      limits:
+        memory: 2Gi
 
     additionalServiceMonitors:
     - name: istiod-monitor
@@ -298,10 +234,6 @@ kube-prometheus-stack:
   thanosRuler:
     enabled: true
     thanosRulerSpec:
-      image:
-        registry: *imageRegistry
-        repository: thanos/thanos
-        tag: v0.34.1
       ruleSelector:
         matchExpressions:
           - key: managedby
@@ -344,18 +276,11 @@ kube-prometheus-stack:
 # Thanos
 thanos:
   enabled: true
-  
-  image:
-    registry: *imageRegistry
-    repository: bitnami/thanos
-    tag: 0.34.1-debian-12-r3
-    pullSecrets:
-    - name: *imagePullSecretName
 
   objstoreConfig:
     type: GCS
     config:
-      bucket: <CHANGE_THIS-Your GCS bucket name>
+      bucket: <CHANGE_THIS-Your GCS Bucket Name>
       service_account: |-
         <CHNAGE_THIS-Your Service Account credentials json>
 
@@ -435,10 +360,6 @@ thanos:
 # Grafana-Loki
 grafana-loki:
   enabled: true
-  global:
-    imageRegistry: *imageRegistry
-    imagePullSecrets:
-      - name: *imagePullSecretName
 
   loki:
     configuration: |
@@ -493,9 +414,9 @@ grafana-loki:
 
       storage_config:
         gcs:
-          bucket_name: <CHANGE_THIS-Your GCS bucket name>
+          bucket_name: <CHANGE_THIS-Your GCS Bucket Name>
           service_account: |-
-              <CHANGE_THIS-Your Service Account credentials json>
+              <CHANGE_THIS-Your Service Account Credentials Json>
         boltdb_shipper:
           active_index_directory: {{ .Values.loki.dataDir }}/loki/index
           cache_location: {{ .Values.loki.dataDir }}/loki/cache
@@ -756,14 +677,6 @@ grafana-loki:
 
 promtail:
   enabled: true
-  image:
-    registry: *imageRegistry
-    repository: grafana/promtail
-    tag: null
-    pullPolicy: IfNotPresent
-
-  imagePullSecrets:
-    - name: *imagePullSecretName
 
   podAnnotations:
     prometheus.io/scrape: "true"
@@ -780,7 +693,7 @@ promtail:
   namespace: observability
 
   extraArgs:
-    - -client.external-labels=cluster=<CHANGE_THIS-Your cluster label>
+    - -client.external-labels=cluster=<CHANGE_THIS-Your Cluster Label>
 
   serviceMonitor:
     enabled: true
@@ -830,11 +743,6 @@ promtail:
 # Tempo
 tempo-distributed:
   enabled: true
-  global:
-    image:
-      registry: *imageRegistry
-      pullSecrets:
-      - pmtsecret
 
   tempo:
     securityContext:
@@ -1237,7 +1145,7 @@ tempo-distributed:
     trace:
       backend: gcs
       gcs:
-        bucket_name: <CHANGE_THIS-Your GCS bucket name>
+        bucket_name: <CHANGE_THIS-Your GCS Bucket Name>
         credentials_file: /tmp/credentials.json
 
   memcached:
@@ -1253,7 +1161,7 @@ tempo-distributed:
 sloth:
   enabled: true
   image:
-    repository: *imageRegistry/slok/sloth
+    repository: <CHANGE_THIS-Your Image Registry>/slok/sloth
     tag: v0.11.0
   resources:
     limits:
@@ -1262,8 +1170,6 @@ sloth:
     requests:
       cpu: 5m
       memory: 75Mi
-  imagePullSecrets:
-    - name: *imagePullSecretName
   commonPlugins:
     enabled: false
   metrics:
@@ -1273,11 +1179,11 @@ sloth:
 prom2teams:
   enabled: true
   image:
-    repository: *imageRegistry/idealista/prom2teams
+    repository: <CHANGE_THIS-Your Image Registry>/idealista/prom2teams
     tag: null
     pullPolicy: IfNotPresent
   prom2teams:
-      connector: <CHANGE_THIS-Your MS Team's webhook connector URL>
+      connector: *msTeamsWebhookConnector
 
 kiali-server:
   enabled: true
@@ -1288,10 +1194,8 @@ kiali-server:
     strategy: "anonymous"
 
   deployment:
-    image_name: *imageRegistry/kiali/kiali
+    image_name: <CHANGE_THIS-Your Image Registry>/kiali/kiali
     image_pull_policy: IfNotPresent
-    image_pull_secrets:
-    - name: *imagePullSecretName
     image_version: v1.83.0 
     replicas: 1
     resources:
@@ -1314,7 +1218,7 @@ kiali-server:
       enabled: true
       provider: "tempo"
       internal_url: http://nopo11y-stack-tempo-query-frontend.observability.svc.cluster.local:3100
-      external_url: <CHANGE_THIS-External URL accessing jaeger UI of Grafana Tempo>
+      external_url: <CHANGE_THIS-External URL of Jaeger UI From Grafana Tempo>
       health_check_url: http://nopo11y-stack-tempo-query-frontend.observability.svc.cluster.local:3100/status/services
       use_grpc: false
       tempo_config:
@@ -1358,13 +1262,6 @@ kuberhealthy:
       enabled: true
       release: nopo11y-stack
       namespace: observability
-
-  imageregistry: *imageRegistry
-
-  image:
-    registry: *imageRegistry
-    repository: kuberhealthy/kuberhealthy
-    tag:
   
   check:
     daemonset:
@@ -1375,10 +1272,6 @@ kuberhealthy:
       enabled: true
       runInterval: 2m
       timeout: 15m
-      image:
-        registry: *imageRegistry
-        repository: kuberhealthy/dns-resolution-check
-        tag: v1.5.0
       extraEnvs:
         HOSTNAME: "kubernetes.default"
       resources:
@@ -1388,24 +1281,21 @@ kuberhealthy:
 
 nopo11y_health_check:
   checks:
-  - name: <CHANGE_THIS-Your nopo11y health check name>
-    image: *imageRegistry/znsio/nopo11y/system-health-check:latest
-    imagePullPolicy: IfNotPresent
+  - name: <CHANGE_THIS-Your Nopo11y Health Check Name>
+    image: <CHANGE_THIS-Your Image Registry>/znsio/nopo11y/system-health-check:latest
     runInterval: 1m
     timeout: 5m
     env:
-      NAMESPACE: "<CHANGE_THIS-Namespace for which you want to create health check>"
+      NAMESPACE: "<CHANGE_THIS-Namespace For Which You Want to Create Health Check>"
 
 # Nopo11y operator
 nopo11y-operator:
   enabled: true
   image:
-    repository: *imageRegistry/znsio/nopo11y/nopo11y-operator
+    repository: <CHANGE_THIS-Your Image Registry>/znsio/nopo11y/nopo11y-operator
     pullPolicy: Always
     tag: "latest"
 
-  imagePullSecrets:
-    - name: *imagePullSecretName
   env:
     - name: LOG_LEVEL
       value: "INFO"
@@ -1438,22 +1328,18 @@ nopo11y-operator:
 nopo11y_ingress:
   enabled: true
   type: "istio"
-  host: <CHANGE_THIS-Domain name to access nopo11y-stack components>
+  host: <CHANGE_THIS-Domain Name to Access Nopo11y-Stack Components>
   istioGatewaySelector:
-    app: <CHANGE_THIS-App label value of your istio ingress gateway>
+    app: <CHANGE_THIS-App Label Value of Your Istio Ingress Gateway>
   istioNamespace: "istio-system"
   tls:
     enabled: true
-    tlsKey: <CHANGE_THIS-Base64 encoded SSL certificate key>
-    tlsCert: <CHANGE_THIS-Base64 encoded SSL certificate>
+    tlsKey: <CHANGE_THIS-Base64 Encoded SSL Certificate Key>
+    tlsCert: <CHANGE_THIS-Base64 Encoded SSL Certificate>
 
 ## Kubernetes event exporter
 kubernetes-event-exporter:
   enabled: true
-  image:
-    registry: *imageRegistry
-    repository: bitnami/kubernetes-event-exporter
-    tag: 1.7.0-debian-12-r10
 
   config:
     logLevel: warn
