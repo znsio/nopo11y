@@ -3,31 +3,29 @@
 # If you plan to use the NGINX ingress controller instead, please refer to the master values file (https://github.com/znsio/nopo11y/blob/main/charts/nopo11y-stack/values.yaml) for appropriate configurations.
 
 
+imageRegistry: &imageRegistry "<CHANGE_THIS-Your Image Registry>"
 clusterLabel: &clusterLabel "<CHANGE_THIS-Your Cluster Label>"
+imagePullSecretName: &imagePullSecretName "<CHANGE_THIS-Your Image Pull Secret Name>"
 grafanaAdminPassowrd: &grafanaAdminPassword "<CHANGE_THIS-Admin Password for Grafana>"
 msTeamsWebhookConnector: &msTeamsWebHookConnector "<CHANGE_THIS-Your MS Team's Webhook Connector URL>"
+
+
 ## kube-prometheus-stack
 kube-prometheus-stack:
   enabled: true
+  global:
+    imagePullSecrets:
+    - name: *imagePullSecretName
 
   prometheus:
     prometheusSpec:
-      ruleSelectorNilUsesHelmValues: false
-      serviceMonitorSelectorNilUsesHelmValues: false
-      podMonitorSelectorNilUsesHelmValues: false
-      probeSelectorNilUsesHelmValues: false
-      scrapeConfigSelectorNilUsesHelmValues: false
-      podMetadata:
-        labels:
-          istio.io/dataplane-mode: none
-      ruleSelector:
-        matchExpressions:
-          - key: managedby
-            operator: NotIn
-            values:
-              - nopo11y-operator
+      image:
+        registry: *imageRegistry
+        repository: prometheus/prometheus
+        tag: v2.51.2
+        sha: ""
       routePrefix: /prometheus
-      externalLabels:
+      externalLabels: 
         cluster: *clusterLabel
       externalUrl: "<CHANGE_THIS-External URL to Access Prometheus>"
       retention: 2d
@@ -38,64 +36,14 @@ kube-prometheus-stack:
             resources:
               requests:
                 storage: 30Gi
-      resources:
-        requests:
-          cpu: 500m
-          memory: 1Gi
-        limits:
-          cpu: 1500m
-          memory: 4Gi
       thanos:
+        image: <CHANGE_THIS-Your Image Registry>/thanos/thanos:v0.35.0
         objectStorageConfig:
           existingSecret:
             name: nopo11y-stack-thanos-objstore-secret
             key: objstore.yml
-        resources:
-          requests:
-            cpu: 200m
-            memory: 256Mi
-          limits:
-            cpu: 500m
-            memory: 1Gi
     thanosService:
       enabled: true
-    
-    additionalServiceMonitors:
-    - name: istiod-monitor
-      namespaceSelector:
-        matchNames:
-        - istio-system
-      selector:
-        matchLabels:
-          app: istiod
-      endpoints:
-      - port: http-monitoring
-        relabelings:
-          - action: labelmap
-            regex: __meta_kubernetes_pod_label_(.+)
-          
-    additionalPodMonitors:
-    - name: istio-enovy-monitor
-      namespaceSelector:
-        any: true
-      selector: {}
-      podMetricsEndpoints:
-      - port: http-envoy-prom
-        path: /stats/prometheus
-    - name: istio-ztunnel-monitor
-      namespaceSelector:
-        any: true
-      selector: {}
-      podMetricsEndpoints:
-      - port: ztunnel-stats
-        path: /stats/prometheus
-    - name: istio-waypoint-monitor
-      namespaceSelector:
-        any: true
-      selector: {}
-      podMetricsEndpoints:
-      - port: metrics
-        path: /stats/prometheus
 
   windowsMonitoring:
     enabled: false
@@ -103,6 +51,15 @@ kube-prometheus-stack:
     prometheus:
       monitor:
         enabled: false
+        jobLabel: jobLabel
+
+  prometheus-node-exporter:
+    image:
+      registry: *imageRegistry
+
+  kube-state-metrics:
+    image:
+      registry: *imageRegistry
 
   alertmanager:
     enabled: true
@@ -151,16 +108,21 @@ kube-prometheus-stack:
               http_config: {}
       templates:
       - '/etc/alertmanager/config/*.tmpl'
+
     alertmanagerSpec:
-      externalUrl: "<CHANGE_THIS-Your Rxternal URL For Accessing Alertmanager>"
+      image:
+        registry: *imageRegistry
+        repository: prometheus/alertmanager
+        tag: v0.27.0
+        sha: ""
+      externalUrl: "<CHANGE_THIS-Your External URL For Accessing Alertmanager>"
       routePrefix: /alertmanager
       resources:
         requests:
-          cpu: 100m
-          memory: 256Mi
+          cpu: 11m
+          memory: 53M
         limits:
-          memory: 512Mi
-          cpu: 500m
+          memory: 53M
 
   grafana:
     enabled: true
@@ -171,10 +133,33 @@ kube-prometheus-stack:
       limits:
         cpu: 500m
         memory: 1Gi
+    image:
+      registry: *imageRegistry
+      repository: grafana/grafana
+      tag: ""
+      sha: ""
+      pullPolicy: IfNotPresent
     testFramework:
       enabled: true
+      image:
+        registry: *imageRegistry
+        repository: bats/bats
+        tag: "v1.4.1"
+      imagePullPolicy: IfNotPresent
+    downloadDashboardsImage:
+      registry: *imageRegistry
+      repository: curlimages/curl
+      tag: 7.85.0
+      sha: ""
+      pullPolicy: IfNotPresent
     initChownData:
       enabled: true
+      image:
+        registry: *imageRegistry
+        repository: library/busybox
+        tag: "1.31.1"
+        sha: ""
+        pullPolicy: IfNotPresent
     assertNoLeakedSecrets: false
     adminPassword: *grafanaAdminPassword
     grafana.ini:
@@ -184,25 +169,9 @@ kube-prometheus-stack:
       users:
         viewers_can_edit: true
       auth:
-        disable_login_form: true
-      security:
-          disable_initial_admin_creation: true
-      auth.azuread:
-        name: Azure AD
-        enabled: true
-        allow_sign_up: true
-        auto_login: false
-        client_id: <CHANGE_THIS-Client ID of Grafana Azure App For SSO>
-        client_secret: <CHANGE_THIS-Client Secret of Grafana Azure App For SSO>
-        scopes: openid email profile
-        auth_url: <CHANGE_THIS-Auth-URL of Grafana Azure App>
-        token_url: <CHANGE_THIS-Token-URL of Grafana Azure App>
-        role_attribute_strict: false
-        allow_assign_grafana_admin: true
-        skip_org_role_sync: false
-        use_pkce: true
+        disable_login_form: false
       auth.anonymous:
-        enabled: false
+        enabled: true
       dashboards:
         default_home_dashboard_path: "/tmp/dashboards/home.json"
     sidecar:
@@ -220,6 +189,8 @@ kube-prometheus-stack:
         multicluster:
           global:
             enabled: true
+      image:
+        registry: *imageRegistry
       datasources:
         enabled: true
         defaultDatasourceEnabled: true
@@ -262,19 +233,84 @@ kube-prometheus-stack:
     enabled: true
     tls:
       enabled: false
+    prometheusConfigReloader:
+      image:
+        registry: *imageRegistry
+        repository: prometheus-operator/prometheus-config-reloader
     admissionWebhooks:
+      deployment:
+        image:
+          registry: *imageRegistry
+          repository: kube-webhook-certgen/amd64
+          tag: ""
+          sha: ""
+          pullPolicy: IfNotPresent
       patch:
         enabled: true
-    resources:
-      requests:
-        cpu: 126m
-        memory: 1Gi
-      limits:
-        memory: 2Gi
+        image:
+          registry: *imageRegistry
+          repository: ingress-nginx/kube-webhook-certgen
+          tag: v20221220-controller-v1.5.1-58-g787ea74b6
+          sha: ""
+          pullPolicy: IfNotPresent  
+    image:
+      registry: *imageRegistry
+      repository: prometheus-operator/prometheus-operator
+      # if not set appVersion field from Chart.yaml is used
+      tag: ""
+      sha: ""
+      pullPolicy: IfNotPresent
+      resources:
+        requests:
+          cpu: 126m
+          memory: 1Gi
+        limits:
+          memory: 2Gi
+
+    additionalServiceMonitors:
+    - name: istiod-monitor
+      namespaceSelector:
+        matchNames:
+        - istio-system
+      selector:
+        matchLabels:
+          app: istiod
+      endpoints:
+      - port: http-monitoring
+        relabelings:
+          - action: labelmap
+            regex: __meta_kubernetes_pod_label_(.+)
+          
+    additionalPodMonitors:
+    - name: istio-enovy-monitor
+      namespaceSelector:
+        any: true
+      selector: {}
+      podMetricsEndpoints:
+      - port: http-envoy-prom
+        path: /stats/prometheus
+    - name: istio-ztunnel-monitor
+      namespaceSelector:
+        any: true
+      selector: {}
+      podMetricsEndpoints:
+      - port: ztunnel-stats
+        path: /stats/prometheus
+    - name: istio-waypoint-monitor
+      namespaceSelector:
+        any: true
+      selector: {}
+      podMetricsEndpoints:
+      - port: metrics
+        path: /stats/prometheus
 
   thanosRuler:
     enabled: true
     thanosRulerSpec:
+      image:
+        registry: *imageRegistry
+        repository: thanos/thanos
+        tag: v0.34.1
       ruleSelector:
         matchExpressions:
           - key: managedby
@@ -313,18 +349,24 @@ kube-prometheus-stack:
               requests:
                 storage: 30Gi
 
+
 # Thanos
 thanos:
   enabled: true
+  
+  image:
+    registry: *imageRegistry
+    repository: bitnami/thanos
+    tag: 0.34.1-debian-12-r3
+    pullSecrets:
+    - name: *imagePullSecretName
 
   objstoreConfig:
-    type: AZURE
+    type: GCS
     config:
-      storage_account: <CHANGE_THIS-Your Azure StorageAccount Name>
-      storage_account_key: <CHANGE_THIS-Your Azure StorageAccount Access Key>
-      container: <CHANGE_THIS-Your Azure StroageAccount Container Name>
-      max_retries: 0
-      endpoint: blob.core.windows.net
+      bucket: <CHANGE_THIS-Your GCS Bucket Name>
+      service_account: |-
+        <CHNAGE_THIS-Your Service Account credentials json>
 
   query:
     enabled: true
@@ -337,19 +379,15 @@ thanos:
     extraFlags: 
     - "--web.external-prefix=/thanos-query"
     - "--web.route-prefix=/thanos-query"
-    - "--query.auto-downsampling"
     resources:
       limits:
-        memory: 2Gi
-        cpu: 1000m
+        memory: 1Gi
+        cpu: 300m
       requests:
         memory: 256Mi
         cpu: 200m
-    replicaCount: 2
     networkPolicy:
       enabled: false
-    stores:
-    - dnssrv+_grpc._tcp.thanos-ruler-operated.observability.svc.cluster.local
 
   queryFrontend:
     enabled: false
@@ -385,8 +423,8 @@ thanos:
     logFormat: logfmt
     resources:
       limits:
-        memory: 4Gi
-        cpu: 1500m
+        memory: 1Gi
+        cpu: 300m
       requests:
         memory: 256Mi
         cpu: 200m
@@ -406,6 +444,10 @@ thanos:
 # Grafana-Loki
 grafana-loki:
   enabled: true
+  global:
+    imageRegistry: *imageRegistry
+    imagePullSecrets:
+      - name: *imagePullSecretName
 
   loki:
     configuration: |
@@ -423,6 +465,7 @@ grafana-loki:
             store: memberlist
 
       memberlist:
+        bind_addr: ["${MY_POD_IP}"]
         join_members:
           - {{ include "grafana-loki.gossip-ring.fullname" . }}
 
@@ -446,36 +489,22 @@ grafana-loki:
         max_cache_freshness_per_query: 10m
         split_queries_by_interval: 15m
         allow_structured_metadata: false
-        max_global_streams_per_user: 10000
-        ingestion_rate_mb: 128
-        ingestion_burst_size_mb: 256
-        per_stream_rate_limit: 8MB
-        per_stream_rate_limit_burst: 24MB
 
       schema_config:
         configs:
-        - from: 2020-10-24
-          store: boltdb-shipper
-          object_store: azure
-          schema: v11
-          index:
-            prefix: index_
-            period: 24h
         - from: 2024-05-10
           store: boltdb-shipper
-          object_store: azure
+          object_store: gcs
           schema: v13
           index:
             prefix: index_
             period: 24h
 
       storage_config:
-        azure:
-          account_name: <CHANGE_THIS-Your Azure StroragAccount Name>
-          account_key: <CHANGE_THIS-Your Azure StorageAccount Access Key>
-          container_name: <CHANGE_THIS-Your Azure StorageAccount Container Name>
-          use_managed_identity: false
-          request_timeout: 0 
+        gcs:
+          bucket_name: <CHANGE_THIS-Your GCS Bucket Name>
+          service_account: |-
+              <CHANGE_THIS-Your Service Account Credentials Json>
         boltdb_shipper:
           active_index_directory: {{ .Values.loki.dataDir }}/loki/index
           cache_location: {{ .Values.loki.dataDir }}/loki/cache
@@ -569,7 +598,7 @@ grafana-loki:
         retention_enabled: true
         retention_delete_delay: 2h
         retention_delete_worker_count: 150
-        delete_request_store: azure
+        delete_request_store: gcs
 
       ruler:
         storage:
@@ -598,7 +627,14 @@ grafana-loki:
         memory: 1Gi
     networkPolicy:
       enabled: false
-
+    extraEnvVars:
+      - name: MY_POD_IP
+        valueFrom:
+          fieldRef:
+            fieldPath: status.podIP
+    extraArgs:
+      - -config.expand-env=true
+      
   gateway:
     enabled: true
     resources:
@@ -610,20 +646,15 @@ grafana-loki:
         memory: 512Mi
     networkPolicy:
       enabled: false
-
+    extraEnvVars:
+      - name: MY_POD_IP
+        valueFrom:
+          fieldRef:
+            fieldPath: status.podIP
+    extraArgs:
+      - -config.expand-env=true
+      
   distributor:
-    enabled: true
-    resources:
-      requests:
-        cpu: 100m
-        memory: 256Mi
-      limits:
-        cpu: 200m
-        memory: 512Mi
-    networkPolicy:
-      enabled: false
-
-  ingester:
     enabled: true
     resources:
       requests:
@@ -634,7 +665,32 @@ grafana-loki:
         memory: 1Gi
     networkPolicy:
       enabled: false
-    replicaCount: 5
+    extraEnvVars:
+      - name: MY_POD_IP
+        valueFrom:
+          fieldRef:
+            fieldPath: status.podIP
+    extraArgs:
+      - -config.expand-env=true
+
+  ingester:
+    enabled: true
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        cpu: 300m
+        memory: 1Gi
+    networkPolicy:
+      enabled: false
+    extraEnvVars:
+      - name: MY_POD_IP
+        valueFrom:
+          fieldRef:
+            fieldPath: status.podIP
+    extraArgs:
+      - -config.expand-env=true
 
   querier:
     enabled: true
@@ -645,11 +701,17 @@ grafana-loki:
       limits:
         cpu: 200m
         memory: 1Gi
-    extraEnvVars:
-      - name: LOG_LEVEL
-        value: INFO
     networkPolicy:
       enabled: false
+    extraEnvVars:
+      - name: LOG_LEVEL
+        value: DEBUG
+      - name: MY_POD_IP
+        valueFrom:
+          fieldRef:
+            fieldPath: status.podIP
+    extraArgs:
+      - -config.expand-env=true
 
   queryFrontend:
     enabled: true
@@ -660,11 +722,17 @@ grafana-loki:
       limits:
         cpu: 200m
         memory: 512Mi
-    extraEnvVars:
-      - name: LOG_LEVEL
-        value: INFO
     networkPolicy:
       enabled: false
+    extraEnvVars:
+      - name: LOG_LEVEL
+        value: DEBUG
+      - name: MY_POD_IP
+        valueFrom:
+          fieldRef:
+            fieldPath: status.podIP
+    extraArgs:
+      - -config.expand-env=true
     
   queryScheduler:
     enabled: true
@@ -677,8 +745,15 @@ grafana-loki:
         memory: 256Mi
     networkPolicy:
       enabled: false
+    extraEnvVars:
+      - name: MY_POD_IP
+        valueFrom:
+          fieldRef:
+            fieldPath: status.podIP
+    extraArgs:
+      - -config.expand-env=true
 
-  # Enabled via seperate helm chart
+  # Enabled via different helm chart
   promtail:
     enabled: false
   
@@ -690,9 +765,19 @@ grafana-loki:
 
 promtail:
   enabled: true
+  image:
+    registry: *imageRegistry
+    repository: grafana/promtail
+    tag: null
+    pullPolicy: IfNotPresent
+
+  imagePullSecrets:
+    - name: *imagePullSecretName
+
   podAnnotations:
     prometheus.io/scrape: "true"
     prometheus.io/port: "http-metrics"
+
   resources:
     limits:
       cpu: 200m
@@ -700,9 +785,12 @@ promtail:
     requests:
       cpu: 100m
       memory: 128Mi
+
   namespace: observability
+
   extraArgs:
     - -client.external-labels=cluster=<CHANGE_THIS-Your Cluster Label>
+
   serviceMonitor:
     enabled: true
     namespace: "observability"
@@ -736,6 +824,7 @@ promtail:
             {{ printf "%.2f" $value }}s 99th percentile latency.
             VALUE = {{ $value }}
             LABELS = {{ $labels }}
+
   config:
     clients:
       - url: http://nopo11y-stack-grafana-loki-gateway/loki/api/v1/push
@@ -750,6 +839,11 @@ promtail:
 # Tempo
 tempo-distributed:
   enabled: true
+  global:
+    image:
+      registry: *imageRegistry
+      pullSecrets:
+      - *imagePullSecretName
 
   tempo:
     securityContext:
@@ -762,6 +856,15 @@ tempo-distributed:
       size: 8Gi
     config:
       replication_factor: 1
+    extraVolumeMounts:
+    - name: gcs-credentials
+      mountPath: /tmp/credentials.json
+      subPath: credentials.json
+      readOnly: true
+    extraVolumes:
+    - name: gcs-credentials
+      secret:
+        secretName: gcs-credentials
 
   distributor:
     replicas: 2
@@ -769,6 +872,15 @@ tempo-distributed:
       log_received_traces: true
       log_received_spans:
         enabled: true
+    extraVolumeMounts:
+    - name: gcs-credentials
+      mountPath: /tmp/credentials.json
+      subPath: credentials.json
+      readOnly: true
+    extraVolumes:
+    - name: gcs-credentials
+      secret:
+        secretName: gcs-credentials
 
   compactor:
     replicas: 1
@@ -777,9 +889,27 @@ tempo-distributed:
         block_retention: 168h
         compacted_block_retention: 1h
         compaction_window: 1h
+    extraVolumeMounts:
+    - name: gcs-credentials
+      mountPath: /tmp/credentials.json
+      subPath: credentials.json
+      readOnly: true
+    extraVolumes:
+    - name: gcs-credentials
+      secret:
+        secretName: gcs-credentials
 
   querier:
     replicas: 2
+    extraVolumeMounts:
+    - name: gcs-credentials
+      mountPath: /tmp/credentials.json
+      subPath: credentials.json
+      readOnly: true
+    extraVolumes:
+    - name: gcs-credentials
+      secret:
+        secretName: gcs-credentials
 
   queryFrontend:
     replicas: 2
@@ -1102,15 +1232,22 @@ tempo-distributed:
           path: /var/tempo/traces
         wal:
           path: /var/tempo/wal
-
+  
+  extraObjects:
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: gcs-credentials
+    data:
+      credentials.json: |-
+        <CHNAGE_THIS-Your Service Account credentials json>
 
   storage:
     trace:
-      backend: azure
-      azure:
-        container_name: <CHANGE_THIS-Your Azure StorageAccount Container Name>
-        storage_account_name: <CHANGE_THIS-Your Azure StorageAccount Name>
-        storage_account_key: <CHANGE_THIS-Your Azure StorageAccount Access Key>
+      backend: gcs
+      gcs:
+        bucket_name: <CHANGE_THIS-Your GCS Bucket Name>
+        credentials_file: /tmp/credentials.json
 
   memcached:
     enabled: true
@@ -1124,7 +1261,9 @@ tempo-distributed:
 
 sloth:
   enabled: true
-
+  image:
+    repository: <CHANGE_THIS-Your Image Registry>/slok/sloth
+    tag: v0.11.0
   resources:
     limits:
       cpu: 50m
@@ -1132,18 +1271,22 @@ sloth:
     requests:
       cpu: 5m
       memory: 75Mi
-
+  imagePullSecrets:
+    - name: *imagePullSecretName
   commonPlugins:
     enabled: false
-
   metrics:
     enabled: true
 
 ### Prom2Teams
 prom2teams:
   enabled: true
+  image:
+    repository: <CHANGE_THIS-Your Image Registry>/idealista/prom2teams
+    tag: null
+    pullPolicy: IfNotPresent
   prom2teams:
-      connector: *msTeamsWebHookConnector
+      connector: *msTeamsWebhookConnector
 
 kiali-server:
   enabled: true
@@ -1151,20 +1294,14 @@ kiali-server:
   login_token:
     signing_key: "teOJZ1zTnXmnw3dB" # Random key
   auth:
-    strategy: "openid" # Kubernetes secret named kiali containing azure app client secret should already be created in same namespace as kiali
-    openid:
-      client_id: "<CHANGE_THIS-Client ID of Your Azure App For Kiali SSO>"
-      issuer_uri: "https://sts.windows.net/<CHANGE_THIS-Your Azure Tenant ID>/"
-      username_claim: email
-      scopes:
-      - email
-      - openid
-      api_token: access_token
-      disable_rbac: false
-      additional_request_params:
-        resource: "6dae42f8-4368-4678-94ff-3960e28e3630"
+    strategy: "anonymous"
 
   deployment:
+    image_name: <CHANGE_THIS-Your Image Registry>/kiali/kiali
+    image_pull_policy: IfNotPresent
+    image_pull_secrets:
+    - name: *imagePullSecretName
+    image_version: v1.83.0 
     replicas: 1
     resources:
       requests:
@@ -1184,18 +1321,18 @@ kiali-server:
       url: "http://nopo11y-stack-kube-prometh-prometheus.observability.svc.cluster.local:9090/prometheus"
     tracing:
       enabled: true
+      provider: "tempo"
       internal_url: http://nopo11y-stack-tempo-query-frontend.observability.svc.cluster.local:3100
       external_url: <CHANGE_THIS-External URL of Jaeger UI From Grafana Tempo>
       health_check_url: http://nopo11y-stack-tempo-query-frontend.observability.svc.cluster.local:3100/status/services
-      provider: "tempo"
+      use_grpc: false
       tempo_config:
         datasource_uid: "tempo"
-      use_grpc: false
-      # grpc_port: 9095
     grafana:
         enabled: true
         in_cluster_url: 'http://nopo11y-stack-grafana.observability.svc.cluster.local/grafana'
         url: '<CHANGE_THIS-External URL of Grafana>'
+
 
   server:
     port: 20001
@@ -1210,8 +1347,6 @@ kiali-server:
 ### Kuberhealthy
 kuberhealthy:
   enabled: true
-  checkReaper:
-    maxCompletedPodCount: 0
   prometheus:
     enabled: true
     name: "prometheus"
@@ -1221,15 +1356,24 @@ kuberhealthy:
       label: grafana_dashboard
       labelValue: "1"
 
+
     serviceMonitor:
       enabled: true
       release: nopo11y-stack
       namespace: observability
 
+
     prometheusRule:
       enabled: true
       release: nopo11y-stack
       namespace: observability
+
+  imageregistry: *imageRegistry
+
+  image:
+    registry: *imageRegistry
+    repository: kuberhealthy/kuberhealthy
+    tag:
   
   check:
     daemonset:
@@ -1237,11 +1381,25 @@ kuberhealthy:
     deployment: 
       enabled: false
     dnsInternal:
-      enabled: false
+      enabled: true
+      runInterval: 2m
+      timeout: 15m
+      image:
+        registry: *imageRegistry
+        repository: kuberhealthy/dns-resolution-check
+        tag: v1.5.0
+      extraEnvs:
+        HOSTNAME: "kubernetes.default"
+      resources:
+        requests:
+          cpu: 10m
+          memory: 50Mi
 
 nopo11y_health_check:
   checks:
   - name: <CHANGE_THIS-Your Nopo11y Health Check Name>
+    image: <CHANGE_THIS-Your Image Registry>/znsio/nopo11y/system-health-check:latest
+    imagePullPolicy: IfNotPresent
     runInterval: 1m
     timeout: 5m
     env:
@@ -1250,7 +1408,13 @@ nopo11y_health_check:
 # Nopo11y operator
 nopo11y-operator:
   enabled: true
+  image:
+    repository: <CHANGE_THIS-Your Image Registry>/znsio/nopo11y/nopo11y-operator
+    pullPolicy: Always
+    tag: "latest"
 
+  imagePullSecrets:
+    - name: *imagePullSecretName
   env:
     - name: LOG_LEVEL
       value: "INFO"
@@ -1279,6 +1443,7 @@ nopo11y-operator:
       cpu: 100m
       memory: 96Mi
 
+## Ingress for nopo11y-stack components 
 nopo11y_ingress:
   enabled: true
   type: "istio"
@@ -1289,11 +1454,15 @@ nopo11y_ingress:
   tls:
     enabled: true
     tlsKey: <CHANGE_THIS-Base64 Encoded SSL Certificate Key>
-    tlsCert: <CHANGE_THIS-Base64 encoded SSL Certificate>
+    tlsCert: <CHANGE_THIS-Base64 Encoded SSL Certificate>
 
 ## Kubernetes event exporter
 kubernetes-event-exporter:
   enabled: true
+  image:
+    registry: *imageRegistry
+    repository: bitnami/kubernetes-event-exporter
+    tag: 1.7.0-debian-12-r10
 
   config:
     logLevel: warn
