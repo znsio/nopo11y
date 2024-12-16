@@ -264,18 +264,21 @@ def pods_details():
 def main():
     errors = []
     if health_check_type == "namespace":
+        logger.info("Running health check for namespace - %s", str(namespace))
         for failures in [pods_details(), pvc_check()]:
             for error in failures:
                 errors.append(error)
         logger.info("health check errors %s",  str(errors))
     
     if health_check_type == "node":
+        logger.info("Running health check for nodes")
         for failures in [node_check()]:
             for error in failures:
                 errors.append(error)
         logger.info("health check errors %s",  str(errors))
     
     if health_check_type == "slo":
+        logger.info("Running health check for SLO")
         for failures in [slo_check()]:
             for error in failures:
                 errors.append(error)
