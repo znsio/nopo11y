@@ -1,4 +1,5 @@
 FROM python:3.12.4-alpine
+RUN apk update && apk upgrade --no-cache
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 COPY . .
