@@ -8,7 +8,7 @@ dependencies:
 - condition: thanos.enabled
   name: thanos
   repository: https://charts.bitnami.com/bitnami
-  version: 15.4.1
+  version: 15.9.2
 - condition: grafana-loki.enabled
   name: grafana-loki
   repository: https://charts.bitnami.com/bitnami
@@ -48,4 +48,4 @@ dependencies:
 description: A Helm chart for observability stack
 name: nopo11y-stack
 type: application
-version: 2.0.0
+version: 2.1.0
