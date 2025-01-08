@@ -5029,7 +5029,8 @@ thanos:
 
   ## @param global.imageRegistry Global Docker image registry
   ## @param global.imagePullSecrets Global Docker registry secret names as an array
-  ## @param global.storageClass Global StorageClass for Persistent Volume(s)
+  ## @param global.defaultStorageClass Global default StorageClass for Persistent Volume(s)
+  ## @param global.storageClass DEPRECATED: use global.defaultStorageClass instead
   ##
   global:
     imageRegistry: ""
@@ -5038,7 +5039,13 @@ thanos:
     ##   - myRegistryKeySecretName
     ##
     imagePullSecrets: []
+    defaultStorageClass: ""
     storageClass: ""
+    ## Security parameters
+    ##
+    security:
+      ## @param global.security.allowInsecureImages Allows skipping image verification
+      allowInsecureImages: false
     ## Compatibility adaptations for Kubernetes platforms
     ##
     compatibility:
@@ -5085,9 +5092,8 @@ thanos:
   image:
     registry: docker.io
     repository: bitnami/thanos
-    tag: 0.34.1-debian-12-r3
+    tag: 0.37.2-debian-12-r0
     digest: ""
-    ## Specify a imagePullPolicy. Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
     ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
     ##
     pullPolicy: IfNotPresent
@@ -5733,6 +5739,13 @@ thanos:
     ## @param query.autoscaling.maxReplicas Maximum number of Thanos Query replicas
     ## @param query.autoscaling.targetCPU Target CPU utilization percentage
     ## @param query.autoscaling.targetMemory Target Memory utilization percentage
+    ## @param query.autoscaling.targetPodMetrics [array] List of custom pod metrics name and averageValue to evaluate for scaling
+    ## e.g.
+    ## targetPodMetrics:
+    ## - name: thanos_query_range_query_duration
+    ##   averageValue: 2
+    ## - name: thanos_query_promql_duration_metric
+    ##   averageValue: 0.5
     ##
     autoscaling:
       enabled: false
@@ -5740,6 +5753,7 @@ thanos:
       maxReplicas: ""
       targetCPU: ""
       targetMemory: ""
+      targetPodMetrics: []
     ## Thanos Query Pod Disruption Budget configuration
     ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb
     ## @param query.pdb.create Enable/disable a Pod Disruption Budget creation for Thanos Query
@@ -5747,8 +5761,8 @@ thanos:
     ## @param query.pdb.maxUnavailable Maximum number/percentage of pods that may be made unavailable
     ##
     pdb:
-      create: false
-      minAvailable: 1
+      create: true
+      minAvailable: ""
       maxUnavailable: ""
     ## Configure the ingress resource that allows you to access Thanos Query
     ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
@@ -6380,8 +6394,8 @@ thanos:
     ## @param queryFrontend.pdb.maxUnavailable Maximum number/percentage of pods that may be made unavailable
     ##
     pdb:
-      create: false
-      minAvailable: 1
+      create: true
+      minAvailable: ""
       maxUnavailable: ""
     ## Configure the ingress resource that allows you to access Thanos Query Frontend
     ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
@@ -6888,8 +6902,8 @@ thanos:
     ## @param bucketweb.pdb.maxUnavailable Maximum number/percentage of pods that may be made unavailable
     ##
     pdb:
-      create: false
-      minAvailable: 1
+      create: true
+      minAvailable: ""
       maxUnavailable: ""
     ## Configure the ingress resource that allows you to access Thanos Bucketweb
     ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
@@ -6994,6 +7008,9 @@ thanos:
     ## @param compactor.logFormat Thanos Compactor log format
     ##
     logFormat: logfmt
+    ## @param compactor.dataDir Thanos Compactor data directory
+    ##
+    dataDir: /data
     ## Resolution and Retention flags
     ## @param compactor.retentionResolutionRaw Resolution and Retention flag
     ## @param compactor.retentionResolution5m Resolution and Retention flag
@@ -7002,6 +7019,8 @@ thanos:
     retentionResolutionRaw: 30d
     retentionResolution5m: 30d
     retentionResolution1h: 10y
+    ## @param compactor.concurrency Number of goroutines to use when compacting groups.
+    concurrency: 1
     ## @param compactor.consistencyDelay Minimum age of fresh (non-compacted) blocks before they are being processed
     ##
     consistencyDelay: 30m
@@ -7993,6 +8012,19 @@ thanos:
       ## If defined, PVC must be created manually before volume will be bound
       ##
       existingClaim: ""
+    ## Persistent Volume Claim Retention Policy
+    ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#persistentvolumeclaim-retention
+    ##
+    persistentVolumeClaimRetentionPolicy:
+      ## @param storegateway.persistentVolumeClaimRetentionPolicy.enabled Enable Persistent volume retention policy for Thanos Store Gateway Statefulset
+      ##
+      enabled: false
+      ## @param storegateway.persistentVolumeClaimRetentionPolicy.whenScaled Volume retention behavior when the replica count of the StatefulSet is reduced
+      ##
+      whenScaled: Retain
+      ## @param storegateway.persistentVolumeClaimRetentionPolicy.whenDeleted Volume retention behavior that applies when the StatefulSet is deleted
+      ##
+      whenDeleted: Retain
     ## @param storegateway.automountServiceAccountToken Enable/disable auto mounting of the service account token only for the sts
     ##
     automountServiceAccountToken: true
@@ -8028,8 +8060,8 @@ thanos:
     ## @param storegateway.pdb.maxUnavailable Maximum number/percentage of pods that may be made unavailable
     ##
     pdb:
-      create: false
-      minAvailable: 1
+      create: true
+      minAvailable: ""
       maxUnavailable: ""
     ## Configure the ingress resource that allows you to access Thanos Query Frontend
     ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
@@ -8223,6 +8255,12 @@ thanos:
     ## Sharded parameters
     ## @param storegateway.sharded.enabled Enable sharding for Thanos Store Gateway
     ## @param storegateway.sharded.hashPartitioning.shards Setting hashPartitioning will create multiple store statefulsets based on the number of shards specified using the hashmod of the blocks
+    ## @param storegateway.sharded.hashPartitioning.extraRelabelingConfigs Setting extra relabel config
+    ## e,g:
+    ## extraRelabelingConfigs:
+    ##   - action: keep
+    ##     source_labels: ["region"]
+    ##     regex: cn-zhangjiakou
     ## @param storegateway.sharded.timePartitioning [array] Setting time timePartitioning will create multiple store deployments based on the number of partitions
     ## @param storegateway.sharded.service.clusterIPs Array of cluster IPs for each Store Gateway service. Length must be the same as the number of shards
     ## e.g:
@@ -8249,6 +8287,7 @@ thanos:
       enabled: false
       hashPartitioning:
         shards: ""
+        extraRelabelingConfigs: []
       timePartitioning:
         - min: ""
           max: ""
@@ -8311,6 +8350,10 @@ thanos:
     ## Specify content for ruler.yml
     ##
     config: ""
+    ## @param ruler.dataPath Path to the data directory
+    ##
+    ## e.g. /data
+    dataPath: ""
     ## @param ruler.existingConfigmap Name of existing ConfigMap with Ruler configuration
     ## NOTE: This will override ruler.config
     ##
@@ -8720,6 +8763,19 @@ thanos:
       ## If defined, PVC must be created manually before volume will be bound
       ##
       existingClaim: ""
+    ## Persistent Volume Claim Retention Policy
+    ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#persistentvolumeclaim-retention
+    ##
+    persistentVolumeClaimRetentionPolicy:
+      ## @param ruler.persistentVolumeClaimRetentionPolicy.enabled Enable Persistent volume retention policy for Thanos Ruler Statefulset
+      ##
+      enabled: false
+      ## @param ruler.persistentVolumeClaimRetentionPolicy.whenScaled Volume retention behavior when the replica count of the StatefulSet is reduced
+      ##
+      whenScaled: Retain
+      ## @param ruler.persistentVolumeClaimRetentionPolicy.whenDeleted Volume retention behavior that applies when the StatefulSet is deleted
+      ##
+      whenDeleted: Retain
     ## @param ruler.automountServiceAccountToken Enable/disable auto mounting of the service account token only for the sts
     ##
     automountServiceAccountToken: true
@@ -8755,8 +8811,8 @@ thanos:
     ## @param ruler.pdb.maxUnavailable Maximum number/percentage of pods that may be made unavailable
     ##
     pdb:
-      create: false
-      minAvailable: 1
+      create: true
+      minAvailable: ""
       maxUnavailable: ""
     ## Configure the ingress resource that allows you to access Thanos Ruler
     ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
@@ -9341,8 +9397,8 @@ thanos:
     ## @param receive.pdb.maxUnavailable Maximum number/percentage of pods that may be made unavailable
     ##
     pdb:
-      create: false
-      minAvailable: 1
+      create: true
+      minAvailable: ""
       maxUnavailable: ""
     ## Persistence parameters
     ##
@@ -9374,6 +9430,19 @@ thanos:
       ## If defined, PVC must be created manually before volume will be bound
       ##
       existingClaim: ""
+    ## Persistent Volume Claim Retention Policy
+    ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#persistentvolumeclaim-retention
+    ##
+    persistentVolumeClaimRetentionPolicy:
+      ## @param receive.persistentVolumeClaimRetentionPolicy.enabled Enable Persistent volume retention policy for Thanos Receive Statefulset
+      ##
+      enabled: false
+      ## @param receive.persistentVolumeClaimRetentionPolicy.whenScaled Volume retention behavior when the replica count of the StatefulSet is reduced
+      ##
+      whenScaled: Retain
+      ## @param receive.persistentVolumeClaimRetentionPolicy.whenDeleted Volume retention behavior that applies when the StatefulSet is deleted
+      ##
+      whenDeleted: Retain
     ## Configure the ingress resource that allows you to access Thanos Receive
     ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
     ##
@@ -9626,6 +9695,9 @@ thanos:
     ## @param receiveDistributor.customStartupProbe Custom startupProbe that overrides the default one
     ##
     customStartupProbe: {}
+    ## @param receiveDistributor.terminationGracePeriodSeconds for the Thanos Receive containers(s) to extend the grace period
+    ##
+    terminationGracePeriodSeconds: ""
     ## @param receiveDistributor.initContainers Add additional init containers to the Thanos Receive Distributor pods
     ## ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
     ## e.g:
@@ -9772,8 +9844,8 @@ thanos:
     ## @param receiveDistributor.pdb.maxUnavailable Maximum number/percentage of pods that may be made unavailable
     ##
     pdb:
-      create: false
-      minAvailable: 1
+      create: true
+      minAvailable: ""
       maxUnavailable: ""
   ## @section Metrics parameters
 
@@ -9939,9 +10011,8 @@ thanos:
     image:
       registry: docker.io
       repository: bitnami/os-shell
-      tag: 12-debian-12-r18
+      tag: 12-debian-12-r34
       digest: ""
-      ## Specify a imagePullPolicy. Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
       ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
       ##
       pullPolicy: IfNotPresent
@@ -9954,7 +10025,7 @@ thanos:
       ##
       pullSecrets: []
   ## @section MinIO&reg; chart parameters
-  ## @extra minio For full list of MinIO&reg; values configurations please refere [here](https://github.com/bitnami/charts/tree/main/bitnami/minio)
+  ## @extra minio For full list of MinIO&reg; values configurations please refer [here](https://github.com/bitnami/charts/tree/main/bitnami/minio)
   minio:
     ## @param minio.enabled Enable/disable MinIO&reg; chart installation
     ## to be used as an objstore for Thanos
@@ -9993,6 +10064,7 @@ thanos:
     ##     memory: 1024Mi
     ##
     resources: {}
+
 
 # Grafana-Loki
 grafana-loki:
