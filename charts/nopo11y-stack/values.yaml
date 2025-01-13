@@ -18419,6 +18419,8 @@ kiali-server:
     openid: {}
     openshift: {}
     strategy: ""
+  
+  oidc_secret: ""
 
   clustering:
     autodetect_secrets:
