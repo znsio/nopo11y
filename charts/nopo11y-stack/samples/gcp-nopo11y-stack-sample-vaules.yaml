@@ -13,6 +13,12 @@ kube-prometheus-stack:
 
   prometheus:
     prometheusSpec:
+      ruleSelectorNilUsesHelmValues: false
+      serviceMonitorSelectorNilUsesHelmValues: false
+      podMonitorSelectorNilUsesHelmValues: false
+      probeSelectorNilUsesHelmValues: false
+      scrapeConfigSelectorNilUsesHelmValues: false
+
       routePrefix: /prometheus
       externalLabels: 
         cluster: *clusterLabel
@@ -26,7 +32,6 @@ kube-prometheus-stack:
               requests:
                 storage: 30Gi
       thanos:
-        image: <CHANGE_THIS-Your Image Registry>/thanos/thanos:v0.35.0
         objectStorageConfig:
           existingSecret:
             name: nopo11y-stack-thanos-objstore-secret
@@ -304,6 +309,8 @@ thanos:
         cpu: 200m
     networkPolicy:
       enabled: false
+    pdb:
+      create: false
 
   queryFrontend:
     enabled: false
@@ -332,6 +339,8 @@ thanos:
       accessModes:
         - ReadWriteOnce
       size: 10Gi
+    pdb:
+      create: false
 
   storegateway:
     enabled: true
@@ -351,6 +360,8 @@ thanos:
       accessModes:
         - ReadWriteOnce
       size: 10Gi
+    pdb:
+      create: false
 
   metrics:
     enabled: true
@@ -1160,9 +1171,6 @@ tempo-distributed:
 
 sloth:
   enabled: true
-  image:
-    repository: <CHANGE_THIS-Your Image Registry>/slok/sloth
-    tag: v0.11.0
   resources:
     limits:
       cpu: 50m
@@ -1178,10 +1186,6 @@ sloth:
 ### Prom2Teams
 prom2teams:
   enabled: true
-  image:
-    repository: <CHANGE_THIS-Your Image Registry>/idealista/prom2teams
-    tag: null
-    pullPolicy: IfNotPresent
   prom2teams:
       connector: *msTeamsWebhookConnector
 
@@ -1193,10 +1197,7 @@ kiali-server:
   auth:
     strategy: "anonymous"
 
-  deployment:
-    image_name: <CHANGE_THIS-Your Image Registry>/kiali/kiali
-    image_pull_policy: IfNotPresent
-    image_version: v1.83.0 
+  deployment: 
     replicas: 1
     resources:
       requests:
@@ -1205,7 +1206,6 @@ kiali-server:
       limits:
         memory: "512Mi"
         cpu: "200m"
-    version_label: v1.83.0
 
   external_services:
     custom_dashboards:
@@ -1282,7 +1282,6 @@ kuberhealthy:
 nopo11y_health_check:
   checks:
   - name: <CHANGE_THIS-Your Nopo11y Health Check Name>
-    image: <CHANGE_THIS-Your Image Registry>/znsio/nopo11y/system-health-check:latest
     runInterval: 1m
     timeout: 5m
     env:
@@ -1291,11 +1290,6 @@ nopo11y_health_check:
 # Nopo11y operator
 nopo11y-operator:
   enabled: true
-  image:
-    repository: <CHANGE_THIS-Your Image Registry>/znsio/nopo11y/nopo11y-operator
-    pullPolicy: Always
-    tag: "latest"
-
   env:
     - name: LOG_LEVEL
       value: "INFO"
