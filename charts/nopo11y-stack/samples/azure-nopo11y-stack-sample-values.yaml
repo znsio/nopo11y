@@ -317,6 +317,10 @@ kube-prometheus-stack:
 thanos:
   enabled: true
 
+  global:
+    security:
+      allowInsecureImages: true
+
   objstoreConfig:
     type: AZURE
     config:
@@ -350,6 +354,8 @@ thanos:
       enabled: false
     stores:
     - dnssrv+_grpc._tcp.thanos-ruler-operated.observability.svc.cluster.local
+    pdb:
+      create: false
 
   queryFrontend:
     enabled: false
@@ -378,6 +384,8 @@ thanos:
       accessModes:
         - ReadWriteOnce
       size: 10Gi
+    pdb:
+      create: false
 
   storegateway:
     enabled: true
@@ -397,6 +405,8 @@ thanos:
       accessModes:
         - ReadWriteOnce
       size: 10Gi
+    pdb:
+      create: false
 
   metrics:
     enabled: true
@@ -1173,7 +1183,6 @@ kiali-server:
       limits:
         memory: "512Mi"
         cpu: "200m"
-    version_label: v1.83.0
 
   external_services:
     custom_dashboards:
