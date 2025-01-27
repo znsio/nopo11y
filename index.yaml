@@ -45,6 +45,61 @@ entries:
   nopo11y-stack:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2025-01-27T13:29:33.989382689Z"
+    dependencies:
+    - condition: kube-prometheus-stack.enabled
+      name: kube-prometheus-stack
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 67.5.0
+    - condition: thanos.enabled
+      name: thanos
+      repository: https://charts.bitnami.com/bitnami
+      version: 15.9.2
+    - condition: grafana-loki.enabled
+      name: grafana-loki
+      repository: https://charts.bitnami.com/bitnami
+      version: 4.6.18
+    - condition: promtail.enabled
+      name: promtail
+      repository: https://grafana.github.io/helm-charts
+      version: 6.16.6
+    - condition: tempo-distributed.enabled
+      name: tempo-distributed
+      repository: https://grafana.github.io/helm-charts
+      version: 1.18.4
+    - condition: sloth.enabled
+      name: sloth
+      repository: ""
+      version: 0.7.0
+    - condition: kiali-server.enabled
+      name: kiali-server
+      repository: https://kiali.org/helm-charts
+      version: 2.1.0
+    - condition: prom2teams.enabled
+      name: prom2teams
+      repository: ""
+      version: 1.0.0
+    - condition: kuberhealthy.enabled
+      name: kuberhealthy
+      repository: https://kuberhealthy.github.io/kuberhealthy/helm-repos
+      version: "104"
+    - condition: kubernetes-event-exporter.enabled
+      name: kubernetes-event-exporter
+      repository: https://charts.bitnami.com/bitnami
+      version: 3.2.13
+    - condition: nopo11y-operator.enabled
+      name: nopo11y-operator
+      repository: ""
+      version: 1.0.0
+    description: A Helm chart for observability stack
+    digest: d603f90f196a0d8e277886a5ff63e00c59f84131b1785e118bf2d7a595016d99
+    name: nopo11y-stack
+    type: application
+    urls:
+    - https://github.com/znsio/nopo11y/releases/download/nopo11y-stack-2.2.1/nopo11y-stack-2.2.1.tgz
+    version: 2.2.1
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2025-01-13T14:05:45.032834761Z"
     dependencies:
     - condition: kube-prometheus-stack.enabled
@@ -996,4 +1051,4 @@ entries:
     urls:
     - https://github.com/znsio/nopo11y/releases/download/sentry-1.0.0/sentry-1.0.0.tgz
     version: 1.0.0
-generated: "2025-01-13T14:05:45.032969283Z"
+generated: "2025-01-27T13:29:33.989552585Z"
