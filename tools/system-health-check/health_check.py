@@ -111,7 +111,7 @@ node_health_query = """
     AND 
     (
     (
-        100 * avg(1 - rate(node_cpu_seconds_total{mode="idle"}[5m])) by (instance) <= """ + str(node_cpu_threshold) + """
+        100 * avg(1 - rate(node_cpu_seconds_total{mode="idle"}[5m])) by (instance) >= """ + str(node_cpu_threshold) + """
     )
     AND
     (
@@ -121,7 +121,7 @@ node_health_query = """
     AND
     (
     (
-        100 * avg(1 - ((avg_over_time(node_memory_MemFree_bytes[5m]) + avg_over_time(node_memory_Cached_bytes[5m]) + avg_over_time(node_memory_Buffers_bytes[5m])) / avg_over_time(node_memory_MemTotal_bytes[5m] ))) by (instance) <= """ + str(node_memory_threshold) + """
+        100 * avg(1 - ((avg_over_time(node_memory_MemFree_bytes[5m]) + avg_over_time(node_memory_Cached_bytes[5m]) + avg_over_time(node_memory_Buffers_bytes[5m])) / avg_over_time(node_memory_MemTotal_bytes[5m] ))) by (instance) >= """ + str(node_memory_threshold) + """
     )
     AND
     (
@@ -135,7 +135,7 @@ node_health_query = """
     ) 
     OR 
     (
-    ((sum(kube_node_status_condition{condition="Ready", status="false"} * on (node) group_left(instance) label_replace(kube_node_info,"instance", "$1:9100", "internal_ip", "(.*)")) by (instance)) == 0)
+    ((sum(kube_node_status_condition{condition="Ready", status="true"} * on (node) group_left(instance) label_replace(kube_node_info,"instance", "$1:9100", "internal_ip", "(.*)")) by (instance)) == 0)
     )
 ) == 0
 """
