@@ -110,27 +110,27 @@ node_health_query = """
 OR
 (
     (
-        100 * avg(1 - rate(node_cpu_seconds_total{mode="idle"}[5m])) by (instance) > """ + str(node_cpu_threshold) + """"
+        100 * avg(1 - rate(node_cpu_seconds_total{mode="idle"}[5m])) by (instance) > """ + str(node_cpu_threshold) + """
     )
     OR
     (
-        avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) by (instance) * (count (node_cpu_seconds_total{mode="idle"}) by (instance) * 1000) < """ + str(node_cpu_available) + """"
+        avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) by (instance) * (count (node_cpu_seconds_total{mode="idle"}) by (instance) * 1000) < """ + str(node_cpu_available) + """
     )
 )
 OR
 (
     (
-        100 * avg(1 - ((avg_over_time(node_memory_MemFree_bytes[5m]) + avg_over_time(node_memory_Cached_bytes[5m]) + avg_over_time(node_memory_Buffers_bytes[5m])) / avg_over_time(node_memory_MemTotal_bytes[5m] ))) by (instance) > """ + str(node_memory_threshold) + """"
+        100 * avg(1 - ((avg_over_time(node_memory_MemFree_bytes[5m]) + avg_over_time(node_memory_Cached_bytes[5m]) + avg_over_time(node_memory_Buffers_bytes[5m])) / avg_over_time(node_memory_MemTotal_bytes[5m] ))) by (instance) > """ + str(node_memory_threshold) + """
     )
     OR
     (
-        (avg(avg_over_time(node_memory_MemFree_bytes[5m]) + avg_over_time(node_memory_Cached_bytes[5m]) + avg_over_time(node_memory_Buffers_bytes[5m])) by (instance) / 1024 / 1024 ) < """ + str(node_memory_available) + """"
+        (avg(avg_over_time(node_memory_MemFree_bytes[5m]) + avg_over_time(node_memory_Cached_bytes[5m]) + avg_over_time(node_memory_Buffers_bytes[5m])) by (instance) / 1024 / 1024 ) < """ + str(node_memory_available) + """
     )
 )
 OR
 (
 
-    (sum(node_filesystem_avail_bytes{fstype!="tmpfs",job="node-exporter",mountpoint="/"}) by (instance) / 1024 / 1024 ) < """ + str(node_disk_available) + """"
+    (sum(node_filesystem_avail_bytes{fstype!="tmpfs",job="node-exporter",mountpoint="/"}) by (instance) / 1024 / 1024 ) < """ + str(node_disk_available) + """
 )
 """
 
