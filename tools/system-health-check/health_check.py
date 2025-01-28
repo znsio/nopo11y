@@ -206,13 +206,17 @@ def pvc_check():
 
 def node_check():
     failed = []
+    failed_unique = []
+
     try:
         response = requests.get(prometheus_url, params={'query': node_health_query})
         response_json = json.loads(response.text)
         if response_json['data']['result']:
             for result in response_json['data']['result']:
-                failed.append("Node - "+ result['metric']['instance'] + " is not healthy")
-            return failed
+                instance = str(result['metric']['instance']).split(":")
+                failed.append("Node - "+ instance[0] + " is not healthy")
+            failed_unique=list(set(failed))
+            return failed_unique
     except Exception as e:
         logger.error("%s Exception occured while checking nodes health", str(e))
     return failed
