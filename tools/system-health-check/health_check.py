@@ -105,39 +105,33 @@ pvc_health_query = '(sum(kubelet_volume_stats_available_bytes{namespace="' +name
 
 node_health_query = """
 (
+    (sum(kube_node_status_condition{condition="Ready", status="true"} * on (node) group_left(instance) label_replace(kube_node_info,"instance", "$1:9100", "internal_ip", "(.*)")) by (instance)) == 0
+)
+OR
+(
     (
-    (sum(kube_node_status_condition{condition="Ready", status="true"} * on (node) group_left(instance) label_replace(kube_node_info,"instance", "$1:9100", "internal_ip", "(.*)")) by (instance)) == 1 
+        100 * avg(1 - rate(node_cpu_seconds_total{mode="idle"}[5m])) by (instance) > """ + str(node_cpu_threshold) + """"
     )
-    AND 
+    OR
     (
-    (
-        100 * avg(1 - rate(node_cpu_seconds_total{mode="idle"}[5m])) by (instance) >= """ + str(node_cpu_threshold) + """
+        avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) by (instance) * (count (node_cpu_seconds_total{mode="idle"}) by (instance) * 1000) < """ + str(node_cpu_available) + """"
     )
-    AND
+)
+OR
+(
     (
-        avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) by (instance) * (count (node_cpu_seconds_total{mode="idle"}) by (instance) * 1000) >= """ + str(node_cpu_available) + """
+        100 * avg(1 - ((avg_over_time(node_memory_MemFree_bytes[5m]) + avg_over_time(node_memory_Cached_bytes[5m]) + avg_over_time(node_memory_Buffers_bytes[5m])) / avg_over_time(node_memory_MemTotal_bytes[5m] ))) by (instance) > """ + str(node_memory_threshold) + """"
     )
-    ) 
-    AND
+    OR
     (
-    (
-        100 * avg(1 - ((avg_over_time(node_memory_MemFree_bytes[5m]) + avg_over_time(node_memory_Cached_bytes[5m]) + avg_over_time(node_memory_Buffers_bytes[5m])) / avg_over_time(node_memory_MemTotal_bytes[5m] ))) by (instance) >= """ + str(node_memory_threshold) + """
+        (avg(avg_over_time(node_memory_MemFree_bytes[5m]) + avg_over_time(node_memory_Cached_bytes[5m]) + avg_over_time(node_memory_Buffers_bytes[5m])) by (instance) / 1024 / 1024 ) < """ + str(node_memory_available) + """"
     )
-    AND
-    (
-        (avg(avg_over_time(node_memory_MemFree_bytes[5m]) + avg_over_time(node_memory_Cached_bytes[5m]) + avg_over_time(node_memory_Buffers_bytes[5m])) by (instance) / 1024 / 1024 ) >= """ + str(node_memory_available) + """
-    )
-    ) 
-    AND 
-    (
+)
+OR
+(
 
-    (sum(node_filesystem_avail_bytes{fstype!="tmpfs",job="node-exporter",mountpoint="/"}) by (instance) / 1024 / 1024 ) >= """ + str(node_disk_available) + """
-    ) 
-    OR 
-    (
-    ((sum(kube_node_status_condition{condition="Ready", status="true"} * on (node) group_left(instance) label_replace(kube_node_info,"instance", "$1:9100", "internal_ip", "(.*)")) by (instance)) == 0)
-    )
-) == 0
+    (sum(node_filesystem_avail_bytes{fstype!="tmpfs",job="node-exporter",mountpoint="/"}) by (instance) / 1024 / 1024 ) < """ + str(node_disk_available) + """"
+)
 """
 
 pods_details_query = '''
@@ -212,13 +206,16 @@ def pvc_check():
 
 def node_check():
     failed = []
+    unique_failed = []
     try:
         response = requests.get(prometheus_url, params={'query': node_health_query})
         response_json = json.loads(response.text)
         if response_json['data']['result']:
             for result in response_json['data']['result']:
-                failed.append("Node - "+ result['metric']['instance'] + " is not healthy")
-            return failed
+                instance = str(result['metric']['instance']).split(":")
+                failed.append("Node - "+ instance[0] + " is not healthy")
+            [unique_failed.append(val) for val in failed if val not in unique_failed]
+            return unique_failed
     except Exception as e:
         logger.error("%s Exception occured while checking nodes health", str(e))
     return failed
