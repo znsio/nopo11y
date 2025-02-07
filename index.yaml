@@ -1,5 +1,39 @@
 apiVersion: v1
 entries:
+  istio-rate-limiter:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2025-02-07T07:43:28.305275501Z"
+    description: A Helm chart for implementing rate limiting using istio
+    digest: c3ea64d9c3403de7cf9b245b6bd5856ab809883e9e50c0b91c0ce670086df1b0
+    name: istio-rate-limiter
+    type: application
+    urls:
+    - https://github.com/znsio/nopo11y/releases/download/istio-rate-limiter-1.0.0/istio-rate-limiter-1.0.0.tgz
+    version: 1.0.0
+  jmx-exporter:
+  - apiVersion: v2
+    appVersion: 0.18.0
+    created: "2025-02-07T07:43:28.415197351Z"
+    description: A Helm chart for deploying Prometheus JMX Exporter using the Bitnami
+      image.
+    digest: 72d26965cb47edf8b292af01262ba2127ca9b68eddd1123f9bcb47bc43a9c68e
+    name: jmx-exporter
+    type: application
+    urls:
+    - https://github.com/znsio/nopo11y/releases/download/jmx-exporter-1.0.0/jmx-exporter-1.0.0.tgz
+    version: 1.0.0
+  k8s-networkpolicy-builder:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2025-02-07T07:43:28.493799086Z"
+    description: A Helm chart for building and deploying Kubernetes network policies
+    digest: d932b24e93650eb980dd4165103067a5ae9d6fbca986213d42309f8faccd13c3
+    name: k8s-networkpolicy-builder
+    type: application
+    urls:
+    - https://github.com/znsio/nopo11y/releases/download/k8s-networkpolicy-builder-1.0.0/k8s-networkpolicy-builder-1.0.0.tgz
+    version: 1.0.0
   nopo11y:
   - apiVersion: v2
     appVersion: 2.1.0
@@ -1106,4 +1140,4 @@ entries:
     urls:
     - https://github.com/znsio/nopo11y/releases/download/sentry-1.0.0/sentry-1.0.0.tgz
     version: 1.0.0
-generated: "2025-01-28T12:27:36.533474781Z"
+generated: "2025-02-07T07:43:28.493884796Z"
