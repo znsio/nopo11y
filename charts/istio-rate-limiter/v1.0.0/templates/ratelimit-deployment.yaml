@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ratelimit-service
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ratelimit-service
+  template:
+    metadata:
+      labels:
+        app: ratelimit-service
+    spec:
+      containers:
+      - name: ratelimit
+        image: {{ .Values.ratelimitService.image }}
+        command:
+        - /bin/ratelimit
+        ports:
+        - containerPort: 8080
+        - containerPort: 8081
+        - containerPort: 6070
+        env:
+        - name: LOG_LEVEL
+          value: debug
+        - name: REDIS_SOCKET_TYPE
+          value: tcp
+        - name: REDIS_URL
+          value: redis:6379
+        - name: USE_STATSD
+          value: "false"
+        - name: RUNTIME_ROOT
+          value: /data
+        - name: RUNTIME_SUBDIRECTORY
+          value: ratelimit
+        - name: RUNTIME_WATCH_ROOT
+          value: "false"
+        - name: RUNTIME_IGNOREDOTFILES
+          value: "true"
+        - name: HOST
+          value: "::"
+        - name: GRPC_HOST
+          value: "::"
+        {{- if .Values.namespaces }}
+        volumeMounts:
+        {{- range .Values.namespaces }}
+        {{- $namespace := .name }}
+        {{- range .services }}
+        {{- $name := printf "ratelimit-%s-%s" $namespace .name | trunc 63 | trimSuffix "-" }}
+        - name: {{ $name }}
+          mountPath: /data/ratelimit/config
+        {{- end }}
+        {{- end }}
+        {{- end }}
+      {{- if .Values.namespaces }}
+      volumes:
+      {{- range .Values.namespaces }}
+      {{- $namespace := .name }}
+      {{- range .services }}
+      {{- $name := printf "ratelimit-%s-%s" $namespace .name | trunc 63 | trimSuffix "-" }}
+      - name: {{ $name }}
+        configMap:
+          name: {{ $name }}
+      {{- end }}
+      {{- end }}
+      {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ratelimit-service
+  namespace: {{ .Release.Namespace }}
+spec:
+  ports:
+  - name: http-port
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  - name: grpc-port
+    port: 8081
+    targetPort: 8081
+    protocol: TCP
+  - name: http-debug
+    port: 6070
+    targetPort: 6070
+    protocol: TCP
+  selector:
+    app: ratelimit-service

@@ -1,0 +1,42 @@
+{{- if eq .Values.mode "ambient" }}
+{{- range .Values.namespaces }}
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: ratelimit-cluster
+  namespace: {{ .name }}
+spec:
+  workloadSelector:
+  {{- if and (hasKey . "waypointProxySelector") (.waypointProxySelector) }}
+    {{- toYaml .waypointProxySelector |nindent 4}}
+  {{- else }}
+    labels:
+      name: {{ .name }}-waypoint
+  {{- end }}
+  configPatches:
+  - applyTo: CLUSTER
+    match:
+      cluster:
+        service: ratelimit-service.{{ $.Release.Namespace }}.svc.cluster.local
+      context: SIDECAR_INBOUND
+      proxy: {}
+    patch:
+      operation: ADD
+      value:
+        connect_timeout: 10s
+        http2_protocol_options: {}
+        lb_policy: ROUND_ROBIN
+        load_assignment:
+          cluster_name: ratelimit-service
+          endpoints:
+          - lb_endpoints:
+            - endpoint:
+                address:
+                  socket_address:
+                    address: ratelimit-service.{{ $.Release.Namespace }}.svc.cluster.local
+                    port_value: 8081
+        name: ratelimit-service
+        type: STRICT_DNS
+---
+{{- end }}
+{{- end }}

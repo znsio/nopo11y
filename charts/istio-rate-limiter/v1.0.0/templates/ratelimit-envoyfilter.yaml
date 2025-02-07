@@ -1,0 +1,91 @@
+{{- $mode := .Values.mode }}
+{{- if and (ne $mode "sidecar") (ne $mode "ambient") }}
+{{- fail "Mode should be either sidecar or ambient" }}
+{{- end }}
+{{- $waypointSelector := "" }}
+{{- range .Values.namespaces }}
+{{- $namespace := .name }}
+{{- if and (hasKey . "waypointProxySelector") (.waypointProxySelector) }}
+{{- $waypointSelector = .waypointProxySelector }}
+{{- end }}
+{{- range .services }}
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: rate-limit-{{ .name }}
+  namespace: {{ $namespace }}
+spec:
+  {{- if eq $mode "ambient" }}
+  workloadSelector:
+    {{- if $waypointSelector }}
+    {{- toYaml $waypointSelector | nindent 4 }}
+    {{- else }}
+    labels:
+      name: {{ $namespace }}-waypoint
+    {{- end }}
+  {{- end }}
+  {{- if eq $mode "sidecar" }}
+  {{- if or (not (hasKey . "workloadSelector" )) (not .workloadSelector) }}
+  {{- fail (printf "Service %s does not have workload selector labels defined, if mode is sidecar then workload selector is required for each service" .name) }}
+  {{- end }}
+  workloadSelector:
+    {{- toYaml .workloadSelector |nindent 4 }}
+  {{- end }}
+  configPatches:
+    - applyTo: HTTP_FILTER
+      match:
+        context: SIDECAR_INBOUND
+        {{- if eq $mode "ambient" }}
+        {{- if or (not (hasKey . "port")) (not .port) }}
+        {{- fail (printf "Service %s does not have port defined, if mode is ambient then port is required for each service" .name) }}
+        {{- end }}
+        listener:
+          name: main_internal
+          filterChain:
+            name: "inbound-vip|{{ .port }}|http|{{ .name }}.{{ $namespace }}.svc.cluster.local"
+            filter:
+              name: "envoy.filters.network.http_connection_manager"
+              subFilter:
+                name: "envoy.filters.http.router"
+        {{- end }}
+      patch:
+        operation: INSERT_BEFORE
+        value:
+          name: envoy.filters.http.ratelimit
+          typed_config:
+            "@type": type.googleapis.com/envoy.extensions.filters.http.ratelimit.v3.RateLimit
+            {{- if and (hasKey . "domain") (.domain) }}
+            domain: "{{ .domain }}"
+            {{- else }}
+            domain: "{{ .name }}-limiter"
+            {{- end }}
+            failure_mode_deny: true
+            timeout: 10s
+            rate_limit_service:
+              grpc_service:
+                envoy_grpc:
+                  {{- if eq $mode "ambient" }}
+                  cluster_name: ratelimit-service
+                  {{- end }}
+                  {{- if eq $mode "sidecar" }}
+                  cluster_name: outbound|8081||ratelimit-service.{{ $.Release.Namespace }}.svc.cluster.local
+                  {{- end }}
+                  authority: ratelimit-service.{{ $.Release.Namespace }}.svc.cluster.local
+              transport_api_version: V3
+
+    - applyTo: VIRTUAL_HOST
+      match:
+        context: SIDECAR_INBOUND
+        {{- if eq $mode "ambient" }}
+        routeConfiguration:
+          name: "inbound-vip|{{ .port }}|http|{{ .name }}.{{ $namespace }}.svc.cluster.local"
+        {{- end }}
+      patch:
+        operation: MERGE
+        value:
+          rate_limits:
+            - actions:
+              {{- toYaml .actions | nindent 16 }}
+---
+{{- end }}
+{{- end }}

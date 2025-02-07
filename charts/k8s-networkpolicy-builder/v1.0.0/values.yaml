@@ -1,0 +1,30 @@
+sources: []
+# - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+#   type: StatefulSet
+#   namespace: observability
+#   ingress:
+#     - name: kuberhealthy
+#       namespace: observability
+#       type: Deployment
+#     - name: nopo11y-stack-promtail
+#       namespace: observability
+#       type: DaemonSet
+#   egress:
+#   - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+#     namespace: observability
+#     type: StatefulSet
+#   - name: kiali
+#     type: Deployment
+#     namespace: observability 
+
+# - name: nopo11y-stack-grafana
+#   type: Deployment
+#   namespace: observability
+#   ingress:
+#     - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+#       namespace: observability
+#       type: StatefulSet
+#     - name: kiali
+#       type: Deployment
+#       namespace: observability
+#   egress: {}

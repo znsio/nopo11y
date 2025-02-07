@@ -1,0 +1,90 @@
+{{- if .Values.sources }}
+{{- range .Values.sources }}
+{{- $name := printf "allow-ingress-to-%s" .name |trunc 63 |trimSuffix "-" }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ $name }}
+  namespace: {{ .namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- $source := lookup "apps/v1" .type .namespace .name }}
+      {{- if $source }}
+      {{- range $key, $value := $source.spec.template.metadata.labels }}
+      {{ $key }}: {{ $value | quote }}
+      {{- end }}
+      {{- else }}
+      app: {{ .name }} # Default label if source resource is not found
+      {{- end }}
+  {{- if and (hasKey . "ingress") .ingress }}
+  ingress:
+    {{- range .ingress }}
+    {{- if eq .type "labels" }}
+    - from:
+      - podSelector:
+          matchLabels:
+            {{- toYaml .labels | nindent 12 }}
+        namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ .namespace }}
+    {{- else if eq .type "namespace" }}
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: {{ .namespace }}
+    {{- else }}
+    - from:
+        - podSelector:
+            matchLabels:
+              {{- $ingressResource := lookup "apps/v1" .type .namespace .name }}
+              {{- if $ingressResource }}
+              {{- range $key, $value := $ingressResource.spec.template.metadata.labels }}
+              {{ $key }}: {{ $value | quote }}
+              {{- end }}
+              {{- else }}
+              app: {{ .name }} # Default label if ingress resource is not found
+              {{- end }}
+          namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ .namespace }}
+    {{- end }}
+    {{- end }}
+  {{- end }}
+  {{- if and (hasKey . "egress") .egress }}
+  egress:
+    {{- range .egress }}
+    {{- if eq .type "labels" }}
+    - to:
+      - podSelector:
+          matchLabels:
+            {{- toYaml .labels | nindent 12 }}
+        namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ .namespace }}
+    {{- else if eq .type "namespace" }}
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: {{ .namespace }}
+    {{- else }}
+    - to:
+        - podSelector:
+            matchLabels:
+              {{- $egressResource := lookup "apps/v1" .type .namespace .name }}
+              {{- if $egressResource }}
+              {{- range $key, $value := $egressResource.spec.template.metadata.labels }}
+              {{ $key }}: {{ $value | quote }}
+              {{- end }}
+              {{- else }}
+              app: {{ .name }} # Default label if ingress resource is not found
+              {{- end }}
+          namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ .namespace }}
+    {{- end }}
+    {{- end }}
+  {{- end }}
+---
+{{- end }}
+{{- end }}

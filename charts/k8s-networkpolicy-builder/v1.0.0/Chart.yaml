@@ -1,0 +1,7 @@
+apiVersion: v2
+name: k8s-networkpolicy-builder
+description: A Helm chart for building and deploying Kubernetes network policies
+
+type: application
+version: 1.0.0
+appVersion: "1.16.0"

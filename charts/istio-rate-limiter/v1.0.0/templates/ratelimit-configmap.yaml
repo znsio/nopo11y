@@ -1,0 +1,32 @@
+{{- if .Values.namespaces }}
+{{- range .Values.namespaces }}
+{{- $namespace := .name }}
+{{- range .services }}
+{{- if or (not (hasKey . "name")) (not .name) }}
+{{- fail "Each service should have named defined" }}
+{{- end }}
+{{- if or (not (hasKey . "descriptors")) (not .descriptors) }}
+{{- fail (printf "Service %s does not have any descriptors defined, atleast one descriptor is required for each service" .name) }}
+{{- end }}
+{{- if or (not (hasKey . "actions")) (not .actions) }}
+{{- fail (printf "Service %s does not have any actions defined, atleast one action is required for each service" .name) }}
+{{- end }}
+{{- $name := (printf "ratelimit-%s-%s" $namespace .name) | trunc 63 | trimSuffix "-" }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $name }}
+  namespace: {{ $.Release.Namespace }}
+data:
+  {{ $name }}.yaml: |
+    {{- if and (hasKey . "domain") (.domain) }}
+    domain: "{{ .domain }}"
+    {{- else }}
+    domain: "{{ .name }}-limiter"
+    {{- end }}
+    descriptors:
+      {{- toYaml .descriptors | nindent 6 }}
+---
+{{- end }}
+{{- end }}
+{{- end }}

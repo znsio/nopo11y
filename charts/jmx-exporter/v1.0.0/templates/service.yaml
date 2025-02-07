@@ -1,0 +1,20 @@
+{{- range .Values.configurations }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .name | replace ".yaml" "" }}-jmx-exporter
+  labels:
+    app: {{ $.Chart.Name }}
+    config: {{ .name | replace ".yaml" "" }}
+spec:
+  type: {{ $.Values.service.type }}
+  ports:
+    - port: {{ .port }}
+      targetPort: {{ .port }}
+      protocol: TCP
+      name: metrics
+  selector:
+    app: {{ $.Chart.Name }}
+    config: {{ .name | replace ".yaml" "" }}
+---
+{{- end }}

@@ -1,0 +1,53 @@
+replicaCount: 1
+
+image:
+  repository: devopsartifact.jio.com/docker-virtual-all/bitnami/jmx-exporter
+  tag: "0.18.0"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 5556
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 256Mi
+  requests:
+    cpu: 250m
+    memory: 128Mi
+
+configurations: []
+  # - name: config1.yaml
+  #   port: 5556
+  #   content: |
+  #     startDelaySeconds: 0
+  #     ssl: false
+  #     lowercaseOutputName: false
+  #     lowercaseOutputLabelNames: false
+  #     rules:
+  #       - pattern: ".*"
+  # - name: config2.yaml
+  #   port: 5557
+  #   content: |
+  #     startDelaySeconds: 5
+  #     ssl: true
+  #     lowercaseOutputName: true
+  #     lowercaseOutputLabelNames: true
+  #     rules:
+  #       - pattern: "java.lang<type=Memory><HeapMemoryUsage>"
+
+serviceMonitor:
+  enabled: false
+  namespace: observability
+  interval: 90s
+  labels: {}
+  scrapeTimeout: 30s
+  metricRelabelings: []
+  relabelings: []
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

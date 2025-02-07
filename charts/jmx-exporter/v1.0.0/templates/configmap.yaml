@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-jmx-exporter-config
+  labels:
+    app: {{ .Chart.Name }}
+data:
+{{- range .Values.configurations }}
+  {{ .name }}: |
+{{ .content | indent 4 }}
+{{- end }}

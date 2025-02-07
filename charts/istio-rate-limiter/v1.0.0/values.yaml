@@ -1,0 +1,47 @@
+## Default values
+## Istio operating mode either sidecar or ambient, default is sidecar
+mode: sidecar
+
+## Namespaces in which you want to do rate limting
+namespaces: []
+# - name: "components"
+#   # waypoint proxy selector if you set istio operating mode to ambient
+#   waypointProxySelector:
+#     labels:
+#       istio.io/gateway-name: "waypoint-proxy"  
+
+
+#   services:
+#   - domain: "service-a-limiter"
+#     name: "service-a"
+#     # Port is required if mode in ambient
+#     port: 8080
+
+#     # Workload selector, provide label of pod if mode is sidecar
+#     workloadSelector:
+#       app: service-a
+
+#     # Descriptors and actions
+#     descriptors:
+#       - key: "user_id"
+#         value: "user123"
+#         rateLimit:
+#           unit: "second"
+#           requestsPerUnit: 10
+#       - key: "path"
+#         value: "/api/data"
+#         rateLimit:
+#           unit: "minute"
+#           requestsPerUnit: 100
+#     actions:
+#       - header_name: "user_id"
+#         descriptor_key: "user_id"
+#       - request_headers:
+#           header_name: ":path"
+#           descriptor_key: "path"
+
+ratelimitService:
+  image: "devopsartifact.jio.com/docker-virtual-all/envoyproxy/ratelimit:latest"
+
+redis:
+  image: "devopsartifact.jio.com/docker-virtual-all/redis:alpine"

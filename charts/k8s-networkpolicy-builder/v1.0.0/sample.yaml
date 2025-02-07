@@ -1,0 +1,794 @@
+# Helm chart version to install
+helmChartVersion: 1.0.0
+# Provide namespace where to release helm chart
+helmReleaseNamespace: default
+
+sources:
+# Prometheus
+- name: prometheus-nopo11y-stack-kube-prometh-prometheus
+  type: StatefulSet
+  namespace: observability
+  ingress:
+  - name: ingressgateway
+    type: Deployment
+    namespace: istio-system
+  - name: nopo11y-stack-grafana
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-thanos-query
+    type: Deployment
+    namespace: observability
+  - name: kuberhealthy
+    type: Deployment
+    namespace: observability
+  - name: kiali
+    type: Deployment
+    namespace: observability
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+  - name: alertmanager-nopo11y-stack-kube-prometh-alertmanager
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-kube-prometh-operator
+    type: Deployment
+    namespace: observability
+  - name: kuberhealthy
+    type: Deployment
+    namespace: observability
+  - type: labels
+    labels:
+      app: kuberhealthy-check
+    namespace: observability
+
+# Alertmanager
+- name: alertmanager-nopo11y-stack-kube-prometh-alertmanager
+  type: StatefulSet
+  namespace: observability
+  ingress:
+  - name: ingressgateway
+    type: Deployment
+    namespace: istio-system
+  - name: nopo11y-stack-grafana
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-thanos-query
+    type: Deployment
+    namespace: observability
+  - name: kuberhealthy
+    type: Deployment
+    namespace: observability
+  - name: kiali
+    type: Deployment
+    namespace: observability
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-kube-prometh-operator
+    type: Deployment
+    namespace: observability
+
+# Prometheus Operator
+- name: nopo11y-stack-kube-prometh-operator
+  type: Deployment
+  namespace: observability
+  ingress:
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+  - name: alertmanager-nopo11y-stack-kube-prometh-alertmanager
+    type: StatefulSet
+    namespace: observability
+
+# Grafana
+- name: nopo11y-stack-grafana
+  type: Deployment
+  namespace: observability
+  ingress:
+  - name: ingressgateway
+    type: Deployment
+    namespace: istio-system
+  - name: kiali
+    type: Deployment
+    namespace: observability
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+
+# Node exporter
+- name: nopo11y-stack-prometheus-node-exporter
+  type: Daemonset
+  namespace: observability
+  ingress:
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+
+# Kubestate metrics
+- name: nopo11y-stack-kube-state-metrics
+  type: Deployment
+  namespace: observability
+  ingress:
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+
+# Kubernetes Event Exporter
+- name: nopo11y-stack-kubernetes-event-exporter
+  type: Deployment
+  namespace: observability
+  ingress:
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+
+# Prom2teams
+- name: nopo11y-stack-prom2teams
+  type: Deployment
+  namespace: observability
+  ingress:
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+  - name: alertmanager-nopo11y-stack-kube-prometh-alertmanager
+    type: StatefulSet
+    namespace: observability
+
+# Nopo11y operator
+- name: nopo11y-stack-nopo11y-operator
+  type: Deployment
+  namespace: observability
+  ingress:
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+
+# Sloth
+- name: sloth-nopo11y-stack
+  type: Deployment
+  namespace: observability
+  ingress:
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+
+# Kuberhealthy
+- name: kuberhealthy
+  type: Deployment
+  namespace: observability
+  ingress:
+  - name: ingressgateway
+    type: Deployment
+    namespace: istio-system
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+  - type: labels
+    labels:
+      app: kuberhealthy-check
+    namespace: observability
+
+
+# Kiali
+- name: kiali
+  type: Deployment
+  namespace: observability
+  ingress:
+  - name: ingressgateway
+    type: Deployment
+    namespace: istio-system
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+
+# Tempo
+- name: nopo11y-stack-tempo-distributor
+  type: Deployment
+  namespace: observability
+  ingress:
+  - name: nopo11y-stack-tempo-compactor
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-query-frontend
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-querier
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-metrics-generator
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-ingester
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-tempo-memcached
+    type: StatefulSet
+    namespace: observability
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+  - name: ingressgateway
+    type: Deployment
+    namespace: istio-system
+  - name: nopo11y-stack-tempo-distributor
+    type: Deployment
+    namespace: observability
+
+- name: nopo11y-stack-tempo-ingester
+  type: StatefulSet
+  namespace: observability
+  ingress:
+  - name: nopo11y-stack-tempo-compactor
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-query-frontend
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-querier
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-metrics-generator
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-distributor
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-memcached
+    type: StatefulSet
+    namespace: observability
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-tempo-ingester
+    type: StatefulSet
+    namespace: observability
+
+- name: nopo11y-stack-tempo-memcached
+  type: StatefulSet
+  namespace: observability
+  ingress:
+  - name: nopo11y-stack-tempo-compactor
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-query-frontend
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-querier
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-metrics-generator
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-distributor
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-ingester
+    type: StatefulSet
+    namespace: observability
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+
+- name: nopo11y-stack-tempo-compactor
+  type: Deployment
+  namespace: observability
+  ingress:
+  - name: nopo11y-stack-tempo-distributor
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-query-frontend
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-querier
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-metrics-generator
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-ingester
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-tempo-memcached
+    type: StatefulSet
+    namespace: observability
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+
+- name: nopo11y-stack-tempo-query-frontend
+  type: Deployment
+  namespace: observability
+  ingress:
+  - name: nopo11y-stack-tempo-distributor
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-compactor
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-querier
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-metrics-generator
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-ingester
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-tempo-memcached
+    type: StatefulSet
+    namespace: observability
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+  - name: kiali
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-query-frontend
+    type: Deployment
+    namespace: observability
+
+- name: nopo11y-stack-tempo-querier
+  type: Deployment
+  namespace: observability
+  ingress:
+  - name: nopo11y-stack-tempo-distributor
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-compactor
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-query-frontend
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-metrics-generator
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-ingester
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-tempo-memcached
+    type: StatefulSet
+    namespace: observability
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-tempo-querier
+    type: Deployment
+    namespace: observability
+
+- name: nopo11y-stack-tempo-metrics-generator
+  type: Deployment
+  namespace: observability
+  ingress:
+  - name: nopo11y-stack-tempo-distributor
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-compactor
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-query-frontend
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-querier
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-tempo-ingester
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-tempo-memcached
+    type: StatefulSet
+    namespace: observability
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-tempo-metrics-generator
+    type: Deployment
+    namespace: observability
+
+# Loki
+- name: nopo11y-stack-grafana-loki-distributor
+  type: Deployment
+  namespace: observability
+  ingress:
+  - name: nopo11y-stack-grafana-loki-compactor
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-query-frontend
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-query-scheduler
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-gateway
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-ingester
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-querier
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-memcachedchunks
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-memcachedfrontend
+    type: StatefulSet
+    namespace: observability
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-distributor
+    type: Deployment
+    namespace: observability
+
+- name: nopo11y-stack-grafana-loki-ingester
+  type: StatefulSet
+  namespace: observability
+  ingress:
+  - name: nopo11y-stack-grafana-loki-compactor
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-query-frontend
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-query-scheduler
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-gateway
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-distributor
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-querier
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-memcachedchunks
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-memcachedfrontend
+    type: StatefulSet
+    namespace: observability
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-ingester
+    type: StatefulSet
+    namespace: observability
+
+
+- name: nopo11y-stack-memcachedchunks
+  type: StatefulSet
+  namespace: observability
+  ingress:
+  - name: nopo11y-stack-grafana-loki-compactor
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-query-frontend
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-query-scheduler
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-gateway
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-distributor
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-querier
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-ingester
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-memcachedfrontend
+    type: StatefulSet
+    namespace: observability
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+
+- name: nopo11y-stack-memcachedfrontend
+  type: StatefulSet
+  namespace: observability
+  ingress:
+  - name: nopo11y-stack-grafana-loki-compactor
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-query-frontend
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-query-scheduler
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-gateway
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-distributor
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-querier
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-ingester
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-memcachedchunks
+    type: StatefulSet
+    namespace: observability
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+
+- name: nopo11y-stack-grafana-loki-querier
+  type: StatefulSet
+  namespace: observability
+  ingress:
+  - name: nopo11y-stack-grafana-loki-compactor
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-query-frontend
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-query-scheduler
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-gateway
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-distributor
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-memcachedfrontend
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-ingester
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-memcachedchunks
+    type: StatefulSet
+    namespace: observability
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-querier
+    type: StatefulSet
+    namespace: observability
+
+- name: nopo11y-stack-grafana-loki-compactor
+  type: Deployment
+  namespace: observability
+  ingress:
+  - name: nopo11y-stack-grafana-loki-distributor
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-query-frontend
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-query-scheduler
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-gateway
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-ingester
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-querier
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-memcachedchunks
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-memcachedfrontend
+    type: StatefulSet
+    namespace: observability
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+
+- name: nopo11y-stack-grafana-loki-query-frontend
+  type: Deployment
+  namespace: observability
+  ingress:
+  - name: nopo11y-stack-grafana-loki-distributor
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-compactor
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-query-scheduler
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-gateway
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-ingester
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-querier
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-memcachedchunks
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-memcachedfrontend
+    type: StatefulSet
+    namespace: observability
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-query-frontend
+    type: Deployment
+    namespace: observability
+
+- name: nopo11y-stack-grafana-loki-query-scheduler
+  type: Deployment
+  namespace: observability
+  ingress:
+  - name: nopo11y-stack-grafana-loki-distributor
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-compactor
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-query-frontend
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-gateway
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-ingester
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-querier
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-memcachedchunks
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-memcachedfrontend
+    type: StatefulSet
+    namespace: observability
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+
+- name: nopo11y-stack-grafana-loki-gateway
+  type: Deployment
+  namespace: observability
+  ingress:
+  - name: nopo11y-stack-grafana-loki-distributor
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-compactor
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-query-frontend
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-query-scheduler
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-ingester
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-querier
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-memcachedchunks
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-memcachedfrontend
+    type: StatefulSet
+    namespace: observability
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-grafana
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-promtail
+    type: DaemonSet
+    namespace: observability
+  - name: nopo11y-stack-grafana-loki-gateway
+    type: Deployment
+    namespace: observability
+
+- name: nopo11y-stack-promtail
+  type: DaemonSet
+  namespace: observability
+  ingress:
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+
+
+# Thanos
+- name: nopo11y-stack-thanos-query
+  type: Deployment
+  namespace: observability
+  ingress:
+  - name: nopo11y-stack-grafana
+    type: Deployment
+    namespace: observability
+  - name: ingressgateway
+    type: Deployment
+    namespace: istio-system
+  - name: kiali
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-thanos-compactor
+    type: Deployment
+    namespace: observability
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+  - name: thanos-ruler-nopo11y-stack-kube-promet-thanos-ruler
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-thanos-storegateway
+    type: StatefulSet
+    namespace: observability
+  - type: labels
+    labels:
+      app: kuberhealthy-check
+    namespace: observability
+
+- name: nopo11y-stack-thanos-compactor
+  type: Deployment
+  namespace: observability
+  ingress:
+  - name: nopo11y-stack-thanos-query
+    type: Deployment
+    namespace: observability
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+  - name: thanos-ruler-nopo11y-stack-kube-promet-thanos-ruler
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-thanos-storegateway
+    type: StatefulSet
+    namespace: observability
+
+- name: thanos-ruler-nopo11y-stack-kube-promet-thanos-ruler
+  type: StatefulSet
+  namespace: observability
+  ingress:
+  - name: ingressgateway
+    type: Deployment
+    namespace: istio-system
+  - name: nopo11y-stack-thanos-compactor
+    type: Deployment
+    namespace: observability
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-thanos-query
+    type: Deployment
+    namespace: observability
+  - name: nopo11y-stack-thanos-storegateway
+    type: StatefulSet
+    namespace: observability
+
+- name: nopo11y-stack-thanos-storegateway
+  type: StatefulSet
+  namespace: observability
+  ingress:
+  - name: nopo11y-stack-thanos-compactor
+    type: Deployment
+    namespace: observability
+  - name: prometheus-nopo11y-stack-kube-prometh-prometheus
+    type: StatefulSet
+    namespace: observability
+  - name: nopo11y-stack-thanos-query
+    type: Deployment
+    namespace: observability
+  - name: thanos-ruler-nopo11y-stack-kube-promet-thanos-ruler
+    type: StatefulSet
+    namespace: observability
