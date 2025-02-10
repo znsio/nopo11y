@@ -1,0 +1,24 @@
+{{- range .Values.namespaces }}
+{{- if .quota }}
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: {{ .name }}-quota
+  namespace: {{ .name }}
+spec:
+  hard:
+    {{ if .quota.cpuRequests }}requests.cpu: {{ .quota.cpuRequests }}{{ end }}
+    {{ if .quota.memoryRequests }}requests.memory: {{ .quota.memoryRequests }}{{ end }}
+    {{ if .quota.cpuLimits }}limits.cpu: {{ .quota.cpuLimits }}{{ end }}
+    {{ if .quota.memoryLimits }}limits.memory: {{ .quota.memoryLimits }}{{ end }}
+    {{ if .quota.maxPods }}pods: {{ .quota.maxPods }}{{ end }}
+    {{ if .quota.maxConfigMaps }}configmaps: {{ .quota.maxConfigMaps }}{{ end }}
+    {{ if .quota.maxPVCs }}persistentvolumeclaims: {{ .quota.maxPVCs }}{{ end }}
+    {{ if .quota.maxReplicationControllers }}replicationcontrollers: {{ .quota.maxReplicationControllers }}{{ end }}
+    {{ if .quota.maxServices }}services: {{ .quota.maxServices }}{{ end }}
+    {{ if .quota.maxLoadBalancers }}services.loadbalancers: {{ .quota.maxLoadBalancers }}{{ end }}
+    {{ if .quota.maxNodePorts }}services.nodeports: {{ .quota.maxNodePorts }}{{ end }}
+    {{ if .quota.maxSecrets }}secrets: {{ .quota.maxSecrets }}{{ end }}
+{{- end }}
+{{- end }}

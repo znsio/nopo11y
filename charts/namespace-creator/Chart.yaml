@@ -1,0 +1,4 @@
+apiVersion: v2
+name: namespace-creator
+description: A Helm chart to create multiple namespaces with optional resource quotas and labels
+version: 0.1.0
