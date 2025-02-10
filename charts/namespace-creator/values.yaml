@@ -1,0 +1,35 @@
+namespaces: []
+  # - name: namespace1
+  #   labels:
+  #     customLabel: "value1"
+  #     anotherLabel: "value2"
+  #   quota:
+  #     cpuRequests: "500m"
+  #     memoryRequests: "256Mi"
+  #     cpuLimits: "1"
+  #     memoryLimits: "512Mi"
+  #     maxPods: "10"
+  #     maxConfigMaps: "5"
+  #     maxPVCs: "5"
+  #     maxReplicationControllers: "5"
+  #     maxServices: "5"
+  #     maxLoadBalancers: "2"
+  #     maxNodePorts: "2"
+  #     maxSecrets: "10"
+  # - name: namespace2
+  #   labels:
+  #     anotherCustomLabel: "value3"
+  #   quota:
+  #     cpuRequests: "1"
+  #     memoryRequests: "512Mi"
+  #     cpuLimits: "2"
+  #     memoryLimits: "1Gi"
+  #     maxPods: "20"
+  #     maxConfigMaps: "10"
+  #     maxPVCs: "10"
+  #     maxReplicationControllers: "10"
+  #     maxServices: "10"
+  #     maxLoadBalancers: "4"
+  #     maxNodePorts: "4"
+  #     maxSecrets: "20"
+  # - name: namespace3
