@@ -34,6 +34,16 @@ entries:
     urls:
     - https://github.com/znsio/nopo11y/releases/download/k8s-networkpolicy-builder-1.0.0/k8s-networkpolicy-builder-1.0.0.tgz
     version: 1.0.0
+  namespace-creator:
+  - apiVersion: v2
+    created: "2025-02-24T16:08:49.840951294Z"
+    description: A Helm chart to create multiple namespaces with optional resource
+      quotas and labels
+    digest: e5f771a71298597b015df8812fdf1eee46387e314989d11398da3d903dc8ab77
+    name: namespace-creator
+    urls:
+    - https://github.com/znsio/nopo11y/releases/download/namespace-creator-0.1.0/namespace-creator-0.1.0.tgz
+    version: 0.1.0
   nopo11y:
   - apiVersion: v2
     appVersion: 2.1.0
@@ -1140,4 +1150,4 @@ entries:
     urls:
     - https://github.com/znsio/nopo11y/releases/download/sentry-1.0.0/sentry-1.0.0.tgz
     version: 1.0.0
-generated: "2025-02-07T07:43:28.493884796Z"
+generated: "2025-02-24T16:08:49.84103965Z"
