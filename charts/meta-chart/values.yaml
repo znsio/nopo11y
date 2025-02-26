@@ -22,7 +22,6 @@ o11y:
   specmatic:
     stub:
       enabled: true
-      pat: "__updated_pat__"
       servers:
       - type: http
         image: znsio/specmatic
