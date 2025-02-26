@@ -1,0 +1,36 @@
+FROM ubuntu:24.04
+
+RUN apt-get update \
+  && apt-get install -y jq git curl zip unzip file gnupg lsb-release wget \
+  && curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | tee /usr/share/keyrings/helm.gpg > /dev/null \
+  && apt-get install -y apt-transport-https \
+  && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | tee /etc/apt/sources.list.d/helm-stable-debian.list \
+  && apt-get update \
+  && apt-get install -y helm \
+  && wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq \
+  && chmod +x /usr/bin/yq \
+  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+COPY ./scripts/ /app/
+
+VOLUME /app/work
+VOLUME /app/apiRepo
+VOLUME /app/componentRepo
+VOLUME /app/apiArtifacts
+VOLUME /app/componentArtifacts
+
+RUN groupadd -r odacomg \
+  && useradd -r -g odacomg -m -d /home/odacomu odacomu \
+  && chown -R odacomu:odacomg /home/odacomu \
+  && chown -R odacomu:odacomg /app
+
+ENV API_PROJECT_PATH=/app/apiRepo
+ENV COMPONENT_CODE_CHECKOUT_PATH=/app/componentRepo
+ENV WORK_DIR_PATH=/app/work
+ENV API_ARTIFACT_FILE_STORAGE_PATH=/app/apiArtifacts
+ENV COMPONENT_ARTIFACTS_PATH=/app/componentArtifacts
+ENV RUNTIME_HOST=container
+ENV TERM=xterm-256color
+
+ENTRYPOINT ["./start.sh"]
