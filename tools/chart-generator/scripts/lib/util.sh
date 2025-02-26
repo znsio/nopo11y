@@ -109,7 +109,7 @@ function extractCompId() {
     exit 1
   fi
 
-  cat "$valuesFilePath" | yq '.jio-oda-common.component.id'
+  cat "$valuesFilePath" | yq 'oda-common.component.id'
 }
 
 function apiNamesAsSsv() {

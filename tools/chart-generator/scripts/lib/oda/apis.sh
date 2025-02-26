@@ -51,7 +51,7 @@ injectNetworkPolicyLabels() {
     show "Before"
     cat $k8sDeployment | yq '.spec.template.metadata.labels' | head -n 5
 
-    yq -i '.spec.template.metadata.labels.component = "{{ include \"oda.compName\" (index .Subcharts \"jio-oda-common\") }}"' $k8sDeployment
+    yq -i '.spec.template.metadata.labels.component = "{{ include \"oda.compName\" (index .Subcharts \"oda-common\") }}"' $k8sDeployment
 
     show "After"
     cat $k8sDeployment | yq '.spec.template.metadata.labels' | head -n 5
@@ -71,7 +71,7 @@ function injectNecessaryConfigs() {
   tempFile=$(tempFileIn $svcDirByEnv "1")
 
   show "Generating [image-url] config for api '$svcName' by env '$env'" "h3"
-  imageUrl=$(cat "$valuesYaml" | yq '.api.service | with_entries(select(.key == "name" or .key == "version" or .key == "spec")) | "devopsartifact.jio.com/featurehub_docker/" + .name + "-" + .spec + ":" + .version')
+  imageUrl=$(cat "$valuesYaml" | yq '.api.service | with_entries(select(.key == "name" or .key == "version" or .key == "spec")) | "your-domain.com/docker-repo/" + .name + "-" + .spec + ":" + .version')
   if [[ -z "$imageUrl" ]]; then
     show "Could not generate image-url for api '$svcName' by env '$env'" "x"
     show "Check api.component.service[name, version, spec] values to be present in values file '$valuesYaml'" "i"

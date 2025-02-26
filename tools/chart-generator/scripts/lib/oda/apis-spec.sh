@@ -8,7 +8,7 @@ function apiSpecVer() {
   local serviceName="$2"
   
   apiCompMergedValuesFile=$(apisNCompMergedValuesFile $(chartsDirIn "$compDirByEnv"))
-  cat "$apiCompMergedValuesFile" | SVC="$serviceName" yq '.jio-oda-common.apis[] | select(.service.name == strenv(SVC)) | .service.spec'
+  cat "$apiCompMergedValuesFile" | SVC="$serviceName" yq 'oda-common.apis[] | select(.service.name == strenv(SVC)) | .service.spec'
 }
 
 function apiSpecVerOrDefault() {
@@ -35,7 +35,7 @@ function apiAppTag() {
   local serviceName="$2"
   
   apiCompMergedValuesFile=$(apisNCompMergedValuesFile $(chartsDirIn "$compDirByEnv"))
-  cat "$apiCompMergedValuesFile" | SVC="$serviceName" yq '.jio-oda-common.apis[] | select(.service.name == strenv(SVC)) | .k8s.app'
+  cat "$apiCompMergedValuesFile" | SVC="$serviceName" yq 'oda-common.apis[] | select(.service.name == strenv(SVC)) | .k8s.app'
 }
 
 function apiImplTag() {
@@ -43,7 +43,7 @@ function apiImplTag() {
   local serviceName="$2"
   
   apiCompMergedValuesFile=$(apisNCompMergedValuesFile $(chartsDirIn "$compDirByEnv"))
-  cat "$apiCompMergedValuesFile" | SVC="$serviceName" yq '.jio-oda-common.apis[] | select(.service.name == strenv(SVC)) | .k8s.impl'
+  cat "$apiCompMergedValuesFile" | SVC="$serviceName" yq 'oda-common.apis[] | select(.service.name == strenv(SVC)) | .k8s.impl'
 }
 
 function apiSpecInfo() {

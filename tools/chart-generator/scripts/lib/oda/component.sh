@@ -20,7 +20,7 @@ function configureSpecmaticStubbing() {
   valuesFile=$(valuesFileIn "$compChartsDirByEnv")
   tempFile=$(tempFileIn "$compChartsDirByEnv" "1")
 
-  ymlPath=".jio-oda-common.component.specmatic.stub.enabled"
+  ymlPath="oda-common.component.specmatic.stub.enabled"
   if [[ "$env" == "$ENV_EAT" ]]; then
     cat "$valuesFile" | yq "$ymlPath=true" > "$tempFile"
   else
@@ -59,7 +59,7 @@ function mergeApiValueHelms() {
   show "Merging all api values.yaml from '$apisDirByEnv' into '$compMergedValuesFileByEnv'" "h3"
 
   find "$apisDirByEnv" -type f -name 'values.yaml' -print | xargs -I{} yq '. | with_entries(select(.key == "api"))' "{}" | sed 's/^api:.*$/- /g' | APP_LABEL="$(prefixAppLabel $compSpecInfoFile)" IMPL_LABEL="$(prefixImplLabel $compSpecInfoFile)" yq '. | map(. + {"k8s": {"app": (strenv(APP_LABEL) + "-" + (.service.name | downcase)), "impl": (strenv(IMPL_LABEL) + "-" + (.service.name | downcase))}})' > "$tempFile"
-  cat "$compValuesFileByEnv" | PFX="$(prefixImplLabel $compSpecInfoFile)" yq '.jio-oda-common.component.apiDeploymentNamePrefix = (strenv(PFX) + "-")' | ODA_FILE_NAME="$tempFile" yq eval '.jio-oda-common.apis *= load(strenv(ODA_FILE_NAME))' > "$compMergedValuesFileByEnv"
+  cat "$compValuesFileByEnv" | PFX="$(prefixImplLabel $compSpecInfoFile)" yq 'oda-common.component.apiDeploymentNamePrefix = (strenv(PFX) + "-")' | ODA_FILE_NAME="$tempFile" yq eval 'oda-common.apis *= load(strenv(ODA_FILE_NAME))' > "$compMergedValuesFileByEnv"
   rm -f "$tempFile"
   head -n 15 "$compMergedValuesFileByEnv"
 }
@@ -75,7 +75,7 @@ function mergeApiNCompSpecInfo() {
   cat $(tempFileIn "$compDirByEnv" "1") $(tempFileIn "$compDirByEnv" "2") | yq '{"apis": .}' > $(tempFileIn "$compDirByEnv" "3")
   cat $(compSpecInfoFile "$compDirByEnv") $(tempFileIn "$compDirByEnv" "3") | yq '{"genOdaComp": .}' > $(tempFileIn "$compDirByEnv" "4")
   cat $(nopollyInfoFile "$compDirByEnv") | yq '{"nopo11y": .}' > $(tempFileIn "$compDirByEnv" "5")
-  cat $(tempFileIn "$compDirByEnv" "4") $(tempFileIn "$compDirByEnv" "5") | yq '{"jio-oda-common": .}' > $(tempFileIn "$compDirByEnv" "6")
+  cat $(tempFileIn "$compDirByEnv" "4") $(tempFileIn "$compDirByEnv" "5") | yq '{"oda-common": .}' > $(tempFileIn "$compDirByEnv" "6")
   cat $(tempFileIn "$compDirByEnv" "6") | sed 's/swagger/openapi/g' | sed 's/publicationDate:.*/publicationDate: 2023-08-18T00:00:00.000Z/g' > "$apiNCompValuesFileByEnv"
 
   for i in {1..6}

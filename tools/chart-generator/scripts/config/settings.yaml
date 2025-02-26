@@ -23,7 +23,7 @@ action:
     output:
       artifact:
         artifactory:
-          url: https://devops.znsio.com/artifactory/tmf
+          url: https://your-domain.com/artifactory/tmf
           cred: uname:pwd
         fileSystem:
           envVar: API_ARTIFACT_FILE_STORAGE_PATH
@@ -42,11 +42,11 @@ action:
             envVar: ON_SPEC_MISMATCH_OF_DEPENDENT_APIS
       repo:
         odac:
-          url: https://github.com/znsio/_git/oda-component-spec
+          url: https://your-domain.com/_git/oda-component-spec
           branch: master
           version: latest
         odaa:
-          url: https://github.com/znsio/_git/contracts
+          url: https://your-domain.com/_git/tmf-api-contracts
           branch: main
           specBaseDir: ODA
           ctkBaseDir: OpenApiTable
@@ -57,7 +57,7 @@ action:
             envVar: SPEC_CHECKOUT_MODE
         connection:
           ado:
-            proxy: http://proxy.znsio.com:8080
+            proxy: http://proxy.your-domain.com:8080
             auth:
               envVar: SYSTEM_ACCESS_TOKEN
           local:
@@ -84,8 +84,8 @@ action:
             name: localhost
             ip: 127.0.0.1
           eat:
-            name: eat.canvas.jio.com
-            ip: 10.173.89.11
+            name: eat.canvas.your-domain.com
+            ip: 10.170.88.11
           prod:
-            name: canvas.jio.com
-            ip: 10.173.207.10
+            name: prod.canvas.your-domain.com
+            ip: 10.170.89.12
