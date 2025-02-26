@@ -1,0 +1,91 @@
+action:
+  common:
+    command:
+      envVar: REQUESTED_ACTION # one of [generateComponentArtifacts, generateApiArtifacts, runApiCtk]
+    workDir:
+      envVar: WORK_DIR_PATH
+    deploymentEnvs:
+      - eat
+      - sit
+      - replica
+      - prod
+    runtime:
+      mode:
+        default: local # one of [ado, local]
+        envVar: RUNTIME_MODE
+      host:
+        default: local_or_vm # one of [local_or_vm, container]
+        envVar: RUNTIME_HOST
+  apiBuild:
+    input:
+      codebase:
+        envVar: API_PROJECT_PATH
+    output:
+      artifact:
+        artifactory:
+          url: https://devops.znsio.com/artifactory/tmf
+          cred: uname:pwd
+        fileSystem:
+          envVar: API_ARTIFACT_FILE_STORAGE_PATH
+  compBuild:
+    input:
+      codebase:
+        envVar: COMPONENT_CODE_CHECKOUT_PATH
+    spec:
+      verification:
+        mismatchActionForApiType:
+          exposed:
+            default: error # one of [error, warn]
+            envVar: ON_SPEC_MISMATCH_OF_EXPOSED_APIS
+          dependent:
+            default: error # one of [error, warn]
+            envVar: ON_SPEC_MISMATCH_OF_DEPENDENT_APIS
+      repo:
+        odac:
+          url: https://github.com/znsio/_git/oda-component-spec
+          branch: master
+          version: latest
+        odaa:
+          url: https://github.com/znsio/_git/contracts
+          branch: main
+          specBaseDir: ODA
+          ctkBaseDir: OpenApiTable
+      repoSettings:
+        checkout:
+          mode:
+            default: useLocalRepoIfPresent # one of [doFreshRepoClone, useLocalRepoIfPresent]
+            envVar: SPEC_CHECKOUT_MODE
+        connection:
+          ado:
+            proxy: http://proxy.znsio.com:8080
+            auth:
+              envVar: SYSTEM_ACCESS_TOKEN
+          local:
+            auth:
+              envVar: AZURE_PAT
+  apiCtks:
+    input:
+      compArtifactsPath:
+        envVar: COMPONENT_ARTIFACTS_PATH
+      onCtkFailure:
+        default: error # one of [error, warn]
+        envVar: ON_CTK_FAILURE
+      app:
+        host:
+          envVar: APP_HOST_NAME_OR_URL
+        protocol:
+          default: http
+          envVar: APP_HOST_PROTOCOL
+        env:
+          default: local
+          envVar: APP_HOST_ENV
+        hostInfoByEnv:
+          local:
+            name: localhost
+            ip: 127.0.0.1
+          eat:
+            name: eat.canvas.jio.com
+            ip: 10.173.89.11
+          prod:
+            name: canvas.jio.com
+            ip: 10.173.207.10
