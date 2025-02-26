@@ -34,6 +34,16 @@ entries:
     urls:
     - https://github.com/znsio/nopo11y/releases/download/k8s-networkpolicy-builder-1.0.0/k8s-networkpolicy-builder-1.0.0.tgz
     version: 1.0.0
+  meta-chart:
+  - apiVersion: v2
+    created: "2025-02-26T08:04:06.666418994Z"
+    description: Common helm charts for deploying services with nopo11y
+    digest: 2e29b53a2b055bf2a7787c3362a4dfb663fa2755b3615371ab8f22c2c9ad6bf6
+    name: meta-chart
+    type: application
+    urls:
+    - https://github.com/znsio/nopo11y/releases/download/meta-chart-1.0.0/meta-chart-1.0.0.tgz
+    version: 1.0.0
   namespace-creator:
   - apiVersion: v2
     created: "2025-02-24T16:08:49.840951294Z"
@@ -1150,4 +1160,4 @@ entries:
     urls:
     - https://github.com/znsio/nopo11y/releases/download/sentry-1.0.0/sentry-1.0.0.tgz
     version: 1.0.0
-generated: "2025-02-24T16:08:49.84103965Z"
+generated: "2025-02-26T08:04:06.876570106Z"
