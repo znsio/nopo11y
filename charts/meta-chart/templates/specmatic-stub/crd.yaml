@@ -1,0 +1,28 @@
+{{- if and (.Values.o11y.specmatic.stub.enabled) }}
+apiVersion: znsio.specmatic.io/v1alpha1
+kind: SpecmaticStub
+metadata:
+  name: {{ include "npl.svc.name" . }}
+  namespace: {{ include "npl.svc.namespace" . }}
+spec:
+  {{- if hasKey .Values.o11y.specmatic.stub "pat" }}
+  pat:
+    name: {{.Release.Name}}-specmatic-stub-repo-checkout-secret
+    key: pat
+  {{- end }}
+  {{- if hasKey .Values.o11y.specmatic.stub "servers" }}
+  server:
+    {{- range $aServer := .Values.o11y.specmatic.stub.servers }}
+    {{ $aServer.type }}:
+      image: {{ $aServer.image }}
+      port: {{ $aServer.port }}
+      resources:
+        {{- toYaml $aServer.resources | nindent 8 }}
+    {{- end }}
+  {{- end }}
+  configs:
+    {{- if and (hasKey .Values.api "specmatic") (hasKey .Values.api.specmatic "config") }}
+    - config: |
+    {{- .Values.api.specmatic.config | toYaml | nindent 8 }}
+    {{- end }}
+{{- end }}

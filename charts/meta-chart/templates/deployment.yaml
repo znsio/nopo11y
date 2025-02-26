@@ -1,0 +1,131 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.api.k8s.impl }}
+  labels:
+    znsio.nopo11y.com/serviceName: {{ include "npl.svc.name" . }}
+  {{- if .Values.api.service.sentry.enabled }}
+  annotations:
+    znsio.nopo11y.com/enable-sentry: "true"
+    znsio.nopo11y.com/sentry-team: {{ required "api.service.sentry.team is required but not provided" .Values.api.service.sentry.team }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.api.pod.replicas }}
+  selector:
+    matchLabels:
+      impl: {{ .Values.api.k8s.impl }}
+  template:
+    metadata:
+      labels:
+        component: {{ include "npl.svc.name" . }}
+        app: {{ .Values.api.k8s.app }}
+        impl: {{ .Values.api.k8s.impl }}
+        version: {{.Values.api.service.version}}
+        {{- if .Values.api.service.istio.enabled }}
+        sidecar.istio.io/inject: "true"
+        {{- end }}
+        {{- if .Values.api.service.security.vault.enabled }}
+        oda.tmforum.org/secretsmanagement: "sidecar"
+        {{- end }}
+        {{- if hasKey .Values.api.pod "labels" }}
+          {{- range $key, $value := .Values.api.pod.labels }}
+            {{- if not (has $key (list "app" "impl" "version" "sidecar.istio.io/inject")) }}
+        {{ $key }}: {{ $value }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+      {{- if hasKey .Values.api.pod "annotations" }}
+      annotations:
+        {{- toYaml .Values.api.pod.annotations | nindent 8 -}}
+      {{- end }}
+    spec:
+      serviceAccountName: {{ include "npl.svc.name" . }}-sa
+      affinity:
+        {{- if hasKey .Values.api.pod "affinity" }}
+          {{- range $key, $value := .Values.api.pod.affinity }}
+            {{- if not (has $key (list "podAntiAffinity")) }}
+              {{- $key | nindent 8 -}}:
+              {{- toYaml (get .Values.api.pod.affinity $key) | nindent 10 -}}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+        podAntiAffinity:
+        {{- if hasKey .Values.api.pod "affinity" }}
+          {{- if hasKey .Values.api.pod.affinity "podAntiAffinity" }}
+          {{- toYaml .Values.api.pod.affinity.podAntiAffinity | nindent 10 -}}
+          {{- end }}  
+        {{- else }}
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: impl
+                  operator: In
+                  values:
+                  - {{ .Values.api.k8s.impl }}
+              topologyKey: kubernetes.io/hostname
+        {{- end }}
+      containers:
+      - name: {{ .Values.api.k8s.impl }}
+        image: {{ .Values.api.container.image | default .Values.api.container.imageGenerated }}
+        imagePullPolicy: Always
+        env:
+        - name: OTL_EXPORTER_TRACE_PROTO_COLLECTOR_URL
+          value: {{ .Values.api.service.otlp.protobuffCollector.url }}
+        {{- if hasKey .Values.api.container "env" }}
+        {{- toYaml .Values.api.container.env | nindent 8 }}
+        {{- end }}
+        {{- if hasKey .Values.api.container "envFrom" }}
+        envFrom:
+        {{- toYaml .Values.api.container.envFrom | nindent 8 }}
+        {{- end }}
+        {{- if hasKey .Values.api.container "command" }}
+        command:
+        {{- toYaml .Values.api.container.command | nindent 8 }}
+        {{- end }}
+        {{- if hasKey .Values.api.container "args" }}
+        args:
+        {{- toYaml .Values.api.container.args | nindent 8 }}
+        {{- end }}
+        resources:
+          requests:
+            cpu: {{ required "api.container.resources.requests.cpu is required." .Values.api.container.resources.requests.cpu }}
+            memory: {{ required "api.container.resources.requests.memory is required." .Values.api.container.resources.requests.memory }}
+          limits:
+            cpu: {{ required "api.container.resources.limits.cpu is required." .Values.api.container.resources.limits.cpu }}
+            memory: {{ required "api.container.resources.limits.memory is required." .Values.api.container.resources.limits.memory }}
+        ports:
+        - name: {{ include "npl.svc.portRef" . }}
+          containerPort: {{ .Values.api.container.port }}
+        {{- if hasKey .Values.api.container.metrics "port" }}
+        - name: {{ include "npl.svc.metricsPortRef" . }}
+          containerPort: {{ required "api.container.metrics.port is required" .Values.api.container.metrics.port }}
+        {{- end }}
+        {{- if hasKey .Values.api.container "volumeMounts" }}
+        volumeMounts:
+        {{- toYaml .Values.api.container.volumeMounts | nindent 8 }}
+        {{- end }}
+        {{- range $probe := list "startup" "readiness" "liveness" }}
+          {{- if hasKey $.Values.api.container.probes $probe }}
+          {{- if and (has $probe (list "readiness" "liveness")) (get (get $.Values.api.container.probes $probe) "enabled")}}
+        {{ $probe }}Probe:
+          httpGet:
+            path: {{ required ".basePath is required" (get (get $.Values.api.container.probes $probe) "basePath") }}/{{ $probe }}
+            port: {{ $.Values.api.container.port }}
+              {{- range $key := list "initialDelaySeconds" "periodSeconds" "timeoutSeconds" "successThreshold" "failureThreshold" "terminationGracePeriodSeconds" }}
+                {{- if hasKey (get $.Values.api.container.probes $probe) $key }}
+          {{ $key }}: {{ get (get $.Values.api.container.probes $probe) $key }}
+                {{- end }}
+              {{- end }}
+          {{- end }}
+          {{- end }}
+        {{- end }}
+      {{- if hasKey .Values.api.container "volumes" }}
+      volumes:
+      {{- toYaml .Values.api.container.volumes | nindent 6 }}
+      {{- end }}
+      {{- if hasKey .Values.api.container "imagePullSecrets" }}
+      imagePullSecrets:
+      {{- toYaml .Values.api.container.imagePullSecrets | nindent 6 }}
+      {{- end }}

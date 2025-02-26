@@ -1,0 +1,9 @@
+.idea
+**/.DS_Store
+output
+_temp
+*.tgz
+values-*.yaml
+.vscode
+Chart.lock
+publish.sh

@@ -1,0 +1,18 @@
+{{- if .Capabilities.APIVersions.Has "monitoring.coreos.com/v1" }}
+{{- if hasKey .Values.api.container.metrics "port" }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "npl.svc.metricsName" .Values.api.k8s.app }}
+  labels:
+    app: {{ .Values.api.k8s.app }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.api.k8s.app }}
+  endpoints:
+  - port: {{ include "npl.svc.metricsPortRef" . }}
+    interval: {{ .Values.api.container.metrics.interval }}
+---
+{{- end }}
+{{- end }}

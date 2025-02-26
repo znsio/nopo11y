@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.api.k8s.impl }}
+  labels:
+    app: {{ .Values.api.k8s.app }}
+    znsio.nopo11y.com/serviceName: {{ include "npl.svc.name" . }}
+spec:
+  ports:
+  - port: {{ .Values.api.service.port }}
+    targetPort: {{ include "npl.svc.portRef" . }}
+    name: http-{{ .Values.api.k8s.impl }}
+  {{- if hasKey .Values.api.container "ports" }}
+  {{- toYaml .Values.api.container.ports | nindent 2 }}
+  {{- end }}
+  type: ClusterIP
+  selector:
+    impl: {{ .Values.api.k8s.impl }}
