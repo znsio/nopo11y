@@ -41,7 +41,7 @@ namespaces: []
 #           descriptor_key: "path"
 
 ratelimitService:
-  image: "devopsartifact.jio.com/docker-virtual-all/envoyproxy/ratelimit:latest"
+  image: "envoyproxy/ratelimit:latest"
 
 redis:
-  image: "devopsartifact.jio.com/docker-virtual-all/redis:alpine"
+  image: "redis:alpine"
