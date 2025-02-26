@@ -1,0 +1,132 @@
+o11y:
+  istio:
+    namespace: "istio-system"
+  nopo11y:
+    enabled: true
+    namespace: "observability"
+    defaultConfig:
+      slo:
+        availability: 99.9
+        latency: 99
+      alertThresholds:
+        latencyMs: 1000
+        errorRate4xx: 5
+        errorRate5xx: 0.5
+  security:
+    vault:
+      port: 5000
+      namespace: "canvas-vault"
+      podLabel: "vault-hc"
+    networkPolicy:
+      failIfNoExposedApiMatchForDependentApi: false
+  specmatic:
+    stub:
+      enabled: true
+      servers:
+      - type: http
+        image: znsio/specmatic
+        port: 9090
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+      - type: kafka
+        image: znsio/specmatic-kafka-trial
+        port: 9092
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 1500m
+            memory: 2048Mi
+      - type: grpc
+        image: znsio/specmatic-grpc-trial
+        port: 9000
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+      - type: graphql
+        image: znsio/specmatic-graphql-trial
+        port: 9001
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+
+api:
+  namespace: "services"
+  container:
+    port: 8080
+    resources:
+      requests:
+        cpu: 100m
+        memory: 512Mi
+      limits:
+        cpu: 500m
+        memory: 768Mi
+    probes:
+      readiness:
+        basePath: "/health"
+        initialDelaySeconds: 10
+        periodSeconds: 5
+        failureThreshold: 3
+      liveness:
+        basePath: "/health"
+        initialDelaySeconds: 10
+        periodSeconds: 5
+        failureThreshold: 3
+    metrics:
+      pathSuffix: "/metrics"
+      interval: 15s
+  pod:
+    replicas: 1
+    hpa:
+      replicas:
+        min: 2
+        max: 6
+      averageUtilizationPercentage:
+        cpu: 75
+        memory: 75
+      scaleUp:
+        stabilizationWindowSeconds: 10
+        pods:
+          count: 1
+          periodSeconds: 5
+        percent:
+          value: 10
+          periodSeconds: 5
+      scaleDown:
+        stabilizationWindowSeconds: 300
+        pods:
+          count: 1
+          periodSeconds: 30
+        percent:
+          value: 10
+          periodSeconds: 30
+  service:
+    version: "0.1.0"
+    port: 8080
+    istio:
+      enabled: false
+    security:
+      vault:
+        enabled: false
+    sentry:
+      enabled: false
+    otlp:
+      console:
+        enabled: false
+      protobuffCollector:
+        enabled: true
+        url: "http://nopo11y-stack-jaeger-collector.observability.svc.cluster.local:4318/v1/traces"

@@ -333,7 +333,7 @@ kube-prometheus-stack:
           memory: 2Gi
 
     thanosImage:
-      registry: devopsartifact.jio.com/docker-virtual-all
+      registry: *imageRegistry
       repository: thanos/thanos
 
   thanosRuler:

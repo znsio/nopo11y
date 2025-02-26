@@ -1,0 +1,10 @@
+.helmignore
+.git
+_temp/
+output*/*
+index.yaml
+values-*.yaml
+readme.*
+*/.DS_Store
+Chart.lock
+publish.sh

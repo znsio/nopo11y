@@ -1,0 +1,19 @@
+{{- if and (.Values.o11y.nopo11y.enabled)}}
+apiVersion: znsio.nopo11y.com/v1alpha
+kind: Nopo11yConfig
+metadata:
+  name: {{ include "npl.crdName" . }}-nopo11y-config
+  namespace: {{ .Values.o11y.nopo11y.namespace }}
+spec:
+  {{- if hasKey .Values.o11y.nopo11y "defaultConfig" }}
+  defaults:
+    {{- .Values.o11y.nopo11y.defaultConfig | toYaml | nindent 4 }}
+  {{- end }}
+  services:
+  - namespace: {{ include "npl.svc.namespace" . }}
+    serviceName: {{ .Values.api.k8s.impl }}
+    {{- if hasKey .Values.api.service "nopo11y" }}
+      {{- .Values.api.service.nopo11y | toYaml | nindent 4 }}
+    {{- end }}
+{{- end }}
+
