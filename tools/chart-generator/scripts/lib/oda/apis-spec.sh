@@ -59,7 +59,7 @@ function apiSpecInfo() {
   specRelativeLocation=$(echo "$specFile" | sed 's/.*\/ODA/\/ODA/g')
   tempFile=$(tempFileIn "$compDirByEnv" "9")
   
-  cat "$specFile" | sed 's/"x-api-id":/"xApiId":/g' | jq --arg APP "$appTag" -r '{id: .info.xApiId, version: .info.version, apiType: (if has("swagger") then "swagger" elif has("openapi") then "openapi" else "unknown" end), name: (.info.title | gsub(" "; "")), path: (if has("swagger") then ("/" + $APP + .basePath) elif has("openapi") then ("/" + $APP + .servers[].url) else "unknown" end | sub("https://serverRoot/";"/") | sub("https://serverRoot";"/") | sub("{apiRoot}";""))}' | jq --arg IMPL "$implTag" --arg SPEC "$specRelativeLocation" '. + {developerUI: (.path + "docs/"), specification: ("https://devops.jio.com/XNSio/TmForum/_git/contracts" + $SPEC), implementation: $IMPL, port: "8080"}' | yq eval -P | sed 's/^/  /g' | sed 's/  id: /- id: /g' >> "$tempFile"
+  cat "$specFile" | sed 's/"x-api-id":/"xApiId":/g' | jq --arg APP "$appTag" -r '{id: .info.xApiId, version: .info.version, apiType: (if has("swagger") then "swagger" elif has("openapi") then "openapi" else "unknown" end), name: (.info.title | gsub(" "; "")), path: (if has("swagger") then ("/" + $APP + .basePath) elif has("openapi") then ("/" + $APP + .servers[].url) else "unknown" end | sub("https://serverRoot/";"/") | sub("https://serverRoot";"/") | sub("{apiRoot}";""))}' | jq --arg IMPL "$implTag" --arg SPEC "$specRelativeLocation" '. + {developerUI: (.path + "docs/"), specification: ("https://your-domain.com/_git/tmf-api-contracts" + $SPEC), implementation: $IMPL, port: "8080"}' | yq eval -P | sed 's/^/  /g' | sed 's/  id: /- id: /g' >> "$tempFile"
 
   result=""
   if [[ "$apiKind" == "$KEY_DEPENDENT" ]]; then
