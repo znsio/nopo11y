@@ -29,7 +29,7 @@ function setupNopo11yWorkspace() {
 function generateNopo11yApiArtifacts() {
 
   function generateInitialHelmCharts() {
-    show "Generating initial helm charts based on provided nopo11y config" "h2"
+    show "Generating initial helm charts based on provided meta-chart config" "h2"
     
     show "Creating Chart.yaml '$chartsFile'" "h3"
     mkdir -p "$tmpChartsDir"
@@ -38,13 +38,13 @@ function generateNopo11yApiArtifacts() {
 
     show "Creating default and env wise values.yaml" "h3"
     show "Creating default values.yaml"
-    cat $(nopo11yConfigFileIn $(inputDir) "default") | yq '{"nopo11y": .}' > $(valuesFileIn $tmpChartsDir)
+    cat $(nopo11yConfigFileIn $(inputDir) "default") | yq '{"meta-chart": .}' > $(valuesFileIn $tmpChartsDir)
     for env in $(echo -n "$ALL_ENVS")
     do
       srcFile=$(nopo11yConfigFileIn $(inputDir) "$env")
       if [[ -r "$srcFile" ]]; then
         show "Creating values.yaml for env '$env'"
-        cat "$srcFile" | yq '{"nopo11y": .}' > $(valuesFileIn $tmpChartsDir "$env")
+        cat "$srcFile" | yq '{"meta-chart": .}' > $(valuesFileIn $tmpChartsDir "$env")
       else
         show "Skipping values.yaml for env '$env' as it does not exist"
       fi
@@ -76,13 +76,13 @@ function generateNopo11yApiArtifacts() {
     valuesFileTemp="$valuesFile.tmp"
     
     show "Adding k8s labels to '$valuesFile'"
-    shortName=$(cat "$valuesFile" | yq '.nopo11y.api.service.name' | tr '[:upper:]' '[:lower:]' | sed 's/[-_]/ /g' | awk '{for(i=1;i<=NF;i++)printf("%c", substr($i,1,1))}' | xargs)
-    cat "$valuesFile" | APP_LABEL="$shortName" IMPL_LABEL="$shortName" yq '.nopo11y.api.k8s = {"app": (strenv(APP_LABEL) + "-app"), "impl": (strenv(IMPL_LABEL) + "-impl")}' > "$valuesFileTemp"
+    shortName=$(cat "$valuesFile" | yq '.meta-chart.api.service.name' | tr '[:upper:]' '[:lower:]' | sed 's/[-_]/ /g' | awk '{for(i=1;i<=NF;i++)printf("%c", substr($i,1,1))}' | xargs)
+    cat "$valuesFile" | APP_LABEL="$shortName" IMPL_LABEL="$shortName" yq '.meta-chart.api.k8s = {"app": (strenv(APP_LABEL) + "-app"), "impl": (strenv(IMPL_LABEL) + "-impl")}' > "$valuesFileTemp"
     cp "$valuesFileTemp" "$valuesFile"
     cat "$valuesFile" | grep -A5 'k8s'
 
     show "Adding specmatic config to '$valuesFile'"
-    cat "$valuesFile" | SPECMATIC_FILE_NAME=$(specmaticYamlFileIn $srcDirByEnv) yq eval '.nopo11y.api.specmatic.config *= load(strenv(SPECMATIC_FILE_NAME))' > "$valuesFileTemp"
+    cat "$valuesFile" | SPECMATIC_FILE_NAME=$(specmaticYamlFileIn $srcDirByEnv) yq eval '.meta-chart.api.specmatic.config *= load(strenv(SPECMATIC_FILE_NAME))' > "$valuesFileTemp"
     cp "$valuesFileTemp" "$valuesFile"
     cat "$valuesFile" | grep -A5 'specmatic'
   }
