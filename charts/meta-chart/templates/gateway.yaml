@@ -5,7 +5,7 @@ metadata:
   name: {{ include "npl.svc.name" . }}-gw
 spec:
   selector:
-    app: {{ .Values.o11y.istio.gateway }}
+    app: {{ .Values.o11y.istio.ingress.selector }}
   servers:
   - port:
       number: 80
