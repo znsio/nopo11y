@@ -81,6 +81,13 @@ function generateNopo11yApiArtifacts() {
     cp "$valuesFileTemp" "$valuesFile"
     cat "$valuesFile" | grep -A5 'k8s'
 
+    show "Adding generated image name to '$valuesFile'"
+    imgName=$(nonBlankValOrDefault "$APP_IMAGE_NAME" $(cat "$valuesFile" | yq '.meta-chart.api.service.name'))
+    imgTag=$(nonBlankValOrDefault "$APP_IMAGE_TAG" $(cat "$valuesFile" | yq '.meta-chart.api.service.version'))
+    cat "$valuesFile" | IMG_URL=$(dockerImageUrl "$imgName" "$imgTag" "$APP_IMAGE_REPO") yq '.meta-chart.api.container.imageGenerated = strenv(IMG_URL)' > "$valuesFileTemp"
+    cp "$valuesFileTemp" "$valuesFile"
+    cat "$valuesFile" | grep -A1 'imageGenerated'
+
     show "Adding specmatic config to '$valuesFile'"
     cat "$valuesFile" | SPECMATIC_FILE_NAME=$(specmaticYamlFileIn $srcDirByEnv) yq eval '.meta-chart.api.specmatic.config *= load(strenv(SPECMATIC_FILE_NAME))' > "$valuesFileTemp"
     cp "$valuesFileTemp" "$valuesFile"

@@ -70,3 +70,7 @@ readonly ON_CTK_FAILURE=$(onCtkFailure)
 readonly APP_HOST=$(appHost)
 readonly APP_PROTOCOL=$(appProtocol)
 readonly APP_ENV=$(appEnv)
+
+readonly APP_IMAGE_NAME=$(appImageName)
+readonly APP_IMAGE_TAG=$(appImageTag)
+readonly APP_IMAGE_REPO=$(appImageRepo)
