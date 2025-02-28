@@ -16,6 +16,16 @@ action:
       host:
         default: local_or_vm # one of [local_or_vm, container]
         envVar: RUNTIME_HOST
+  nopo11yApiBuild:
+    input:
+      appImage:
+        name:
+          envVar: APP_IMAGE_NAME
+        tag:
+          default: latest
+          envVar: APP_IMAGE_TAG
+        repo:
+          envVar: APP_IMAGE_REPO
   apiBuild:
     input:
       codebase:
