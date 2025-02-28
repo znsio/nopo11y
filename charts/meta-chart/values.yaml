@@ -1,6 +1,8 @@
 o11y:
   istio:
     namespace: "istio-system"
+    ingress:
+      selector: "istio-gateway"
   nopo11y:
     enabled: true
     namespace: "observability"

@@ -1,0 +1,23 @@
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: {{ include "npl.svc.name" . }}-vs
+spec:
+  gateways:
+  {{- if not (hasKey .Values.api.service "gateways") }}
+  - {{ include "npl.svc.name" . }}-gw
+  {{- else }}
+    {{- toYaml .Values.api.service.gateways | nindent 2 }}
+  {{- end }}
+  hosts:
+  - '*'
+  http:
+  - name: {{ .Values.api.k8s.impl }}-default-route
+    match:
+    - uri:
+        prefix: "/"
+    route:
+    - destination:
+        host: {{ .Values.api.k8s.impl }}.{{ include "npl.svc.namespace" . }}.svc.cluster.local
+        port:
+          number: {{ .Values.api.container.port }}
