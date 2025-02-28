@@ -159,3 +159,15 @@ function appHostNameByEnv() {
   local env=$(appEnv)
   configuredValOf "action.apiCtks.input.app.hostInfoByEnv.$env.name"
 }
+
+function appImageName() {
+  envValOf "action.nopo11yApiBuild.input.appImage.name"
+}
+
+function appImageTag() {
+  envValOf "action.nopo11yApiBuild.input.appImage.tag"
+}
+
+function appImageRepo() {
+  envValOf "action.nopo11yApiBuild.input.appImage.repo"
+}

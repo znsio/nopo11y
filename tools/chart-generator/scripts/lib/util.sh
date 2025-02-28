@@ -183,3 +183,26 @@ function showWarningOrFail() {
     exit 1
   fi
 }
+
+function nonBlankValOrDefault() {
+  local value="$1"
+  local defaultValue="$2"
+
+  if [[ -z "$value" ]]; then
+    echo -n "$defaultValue"
+  else
+    echo -n "$value"
+  fi
+}
+
+function dockerImageUrl() {
+  local imgName="$1"
+  local imgTag="$2"
+  local imgRepo="$3"
+
+  if [[ -z "$imgRepo" ]]; then
+    echo -n "$imgName:$imgTag"
+  else
+    echo -n "$imgRepo/$imgName:$imgTag"
+  fi
+}
