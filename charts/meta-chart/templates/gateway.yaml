@@ -1,0 +1,16 @@
+{{- if not (hasKey .Values.api.service "gateways") }}
+apiVersion: networking.istio.io/v1
+kind: Gateway
+metadata:
+  name: {{ include "npl.svc.name" . }}-gw
+spec:
+  selector:
+    app: {{ .Values.o11y.istio.gateway }}
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP2
+    hosts:
+    - '*'
+{{- end }}
