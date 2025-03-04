@@ -131,4 +131,9 @@ api:
         enabled: false
       protobuffCollector:
         enabled: true
-        url: "http://nopo11y-stack-jaeger-collector.observability.svc.cluster.local:4318/v1/traces"
+        url: "http://nopo11y-stack-tempo-distributor.observability.svc.cluster.local:4318/v1/traces"
+      exporter:
+        metrics: none
+        logs: none
+      resourceProvider:
+        aws: true
