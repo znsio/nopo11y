@@ -85,7 +85,7 @@ spec:
         {{- end }}
         {{- if .Values.api.service.otlp.resourceProvider.aws }}
         - name: OTEL_RESOURCE_PROVIDERS_AWS_ENABLED
-          value: true
+          value: "true"
         {{- end }}
         {{- if hasKey .Values.api.container "env" }}
         {{- toYaml .Values.api.container.env | nindent 8 }}
