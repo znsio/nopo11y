@@ -15,9 +15,9 @@ spec:
   - name: {{ .Values.api.k8s.impl }}-default-route
     match:
     - uri:
-        prefix: "/"
+        prefix: {{ include "npl.svc.name" . }}
     route:
     - destination:
         host: {{ .Values.api.k8s.impl }}.{{ include "npl.svc.namespace" . }}.svc.cluster.local
         port:
-          number: {{ .Values.api.container.port }}
+          number: {{ .Values.api.service.port }}
