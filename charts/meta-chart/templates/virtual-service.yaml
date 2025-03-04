@@ -16,8 +16,8 @@ spec:
     match:
     - uri:
         prefix: {{ printf "/%s" (include "npl.svc.name" .) | quote }}
-      rewrite:
-        uri: "/"
+    rewrite:
+      uri: "/"
     route:
     - destination:
         host: {{ .Values.api.k8s.impl }}.{{ include "npl.svc.namespace" . }}.svc.cluster.local
