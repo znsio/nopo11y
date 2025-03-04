@@ -15,7 +15,7 @@ spec:
   - name: {{ .Values.api.k8s.impl }}-default-route
     match:
     - uri:
-        prefix: {{ include "npl.svc.name" . }}
+        prefix: {{ printf "/%s" (include "npl.svc.name" .) | quote }}
       rewrite:
         uri: "/"
     route:
