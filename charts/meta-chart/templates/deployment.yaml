@@ -71,8 +71,22 @@ spec:
         image: {{ .Values.api.container.image | default .Values.api.container.imageGenerated }}
         imagePullPolicy: Always
         env:
-        - name: OTL_EXPORTER_TRACE_PROTO_COLLECTOR_URL
+        - name: OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
           value: {{ .Values.api.service.otlp.protobuffCollector.url }}
+        - name: OTEL_SERVICE_NAME
+          value: {{ .Values.api.service.name }}
+        {{- if hasKey .Values.api.service.otlp.exporter "metrics" }}
+        - name: OTEL_METRICS_EXPORTER
+          value: {{ .Values.api.service.otlp.exporter.metrics }}
+        {{- end }}
+        {{- if hasKey .Values.api.service.otlp.exporter "logs" }}
+        - name: OTEL_LOGS_EXPORTER
+          value: {{ .Values.api.service.otlp.exporter.logs }}
+        {{- end }}
+        {{- if .Values.api.service.otlp.resourceProvider.aws }}
+        - name: OTEL_RESOURCE_PROVIDERS_AWS_ENABLED
+          value: true
+        {{- end }}
         {{- if hasKey .Values.api.container "env" }}
         {{- toYaml .Values.api.container.env | nindent 8 }}
         {{- end }}
