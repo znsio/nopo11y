@@ -11,7 +11,7 @@ spec:
   {{- end }}
   services:
   - namespace: {{ include "npl.svc.namespace" . }}
-    serviceName: {{ .Values.api.k8s.impl }}
+    serviceName: {{ .Values.api.service.nameGenerated.readable }}
     {{- if hasKey .Values.api.service "nopo11y" }}
       {{- .Values.api.service.nopo11y | toYaml | nindent 4 }}
     {{- end }}

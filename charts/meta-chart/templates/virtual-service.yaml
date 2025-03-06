@@ -12,7 +12,7 @@ spec:
   hosts:
   - '*'
   http:
-  - name: {{ .Values.api.k8s.impl }}-default-route
+  - name: {{ .Values.api.service.nameGenerated.readable }}-default-route
     match:
     - uri:
         prefix: {{ printf "/%s/" (include "npl.svc.name" .) | quote }}
@@ -20,6 +20,6 @@ spec:
       uri: "/"
     route:
     - destination:
-        host: {{ .Values.api.k8s.impl }}.{{ include "npl.svc.namespace" . }}.svc.cluster.local
+        host: {{ .Values.api.service.nameGenerated.readable }}.{{ include "npl.svc.namespace" . }}.svc.cluster.local
         port:
           number: {{ .Values.api.service.port }}
