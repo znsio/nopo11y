@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: {{ .Values.api.service.nameGenerated.readable }}
   labels:
-    app: {{ .Values.api.service.nameGenerated.short }}
+    app: {{ .Values.api.service.nameGenerated.readable }}
     znsio.nopo11y.com/serviceName: {{ include "npl.svc.name" . }}
 spec:
   ports:
