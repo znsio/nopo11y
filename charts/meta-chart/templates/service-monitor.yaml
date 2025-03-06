@@ -3,13 +3,13 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ include "npl.svc.metricsName" .Values.api.k8s.app }}
+  name: {{ include "npl.svc.metricsName" .Values.api.service.nameGenerated.short }}
   labels:
-    app: {{ .Values.api.k8s.app }}
+    app: {{ .Values.api.service.nameGenerated.short }}
 spec:
   selector:
     matchLabels:
-      app: {{ .Values.api.k8s.app }}
+      app: {{ .Values.api.service.nameGenerated.short }}
   endpoints:
   - port: {{ include "npl.svc.metricsPortRef" . }}
     interval: {{ .Values.api.container.metrics.interval }}

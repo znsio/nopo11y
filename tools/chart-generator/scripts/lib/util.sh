@@ -206,3 +206,30 @@ function dockerImageUrl() {
     echo -n "$imgRepo/$imgName:$imgTag"
   fi
 }
+
+function tagTokensAsSSV() {
+  local tag=$1
+  echo -n "$tag" | sed -E 's/([A-Z])/-\1/g' | tr '[:upper:]' '[:lower:]' | sed -e 's/^-//' -e 's/-$//' | sed 's/[-_]/ /g'
+}
+
+function shortenedTag() {
+  local text="$1"
+  echo -n "$(tagTokensAsSSV $text)" | awk '{for(i=1;i<=NF;i++)printf("%c", substr($i,1,1))}' | xargs
+}
+
+function readableTag() {
+  local text="$1"
+
+  result=""
+  for token in $(tagTokensAsSSV $text); do
+    if [[ ${#token} -le 4 ]]; then
+      result+="$token-"
+    else
+      firstChar=$(echo -n "$token" | cut -c1)
+      remaining2Chars=$(echo -n "$token" | cut -c2- | sed 's/[aeiouAEIOU]//g' | cut -c1-2)
+      result+="$firstChar$remaining2Chars-"
+    fi
+  done
+
+  echo -n ${result%-}
+}

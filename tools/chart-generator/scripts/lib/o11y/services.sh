@@ -75,11 +75,11 @@ function generateNopo11yApiArtifacts() {
     valuesFile=$(valuesFileWithin "$srcDirByEnv")
     valuesFileTemp="$valuesFile.tmp"
     
-    show "Adding k8s labels to '$valuesFile'"
-    shortName=$(cat "$valuesFile" | yq '.meta-chart.api.service.name' | tr '[:upper:]' '[:lower:]' | sed 's/[-_]/ /g' | awk '{for(i=1;i<=NF;i++)printf("%c", substr($i,1,1))}' | xargs)
-    cat "$valuesFile" | APP_LABEL="$shortName" IMPL_LABEL="$shortName" yq '.meta-chart.api.k8s = {"app": (strenv(APP_LABEL) + "-app"), "impl": (strenv(IMPL_LABEL) + "-impl")}' > "$valuesFileTemp"
+    show "Adding initial k8s name tags to '$valuesFile'"
+    serviceName=$(cat "$valuesFile" | yq '.meta-chart.api.service.name')
+    cat "$valuesFile" | SHORT_TAG="$(shortenedTag $serviceName)" READABLE_TAG="$(readableTag $serviceName)" yq '.meta-chart.api.service.nameGenerated = {"short": strenv(SHORT_TAG), "readable": strenv(READABLE_TAG)}' > "$valuesFileTemp"
     cp "$valuesFileTemp" "$valuesFile"
-    cat "$valuesFile" | grep -A5 'k8s'
+    cat "$valuesFile" | grep -A5 'nameGenerated'
 
     show "Adding generated image name to '$valuesFile'"
     imgName=$(nonBlankValOrDefault "$APP_IMAGE_NAME" $(cat "$valuesFile" | yq '.meta-chart.api.service.name'))

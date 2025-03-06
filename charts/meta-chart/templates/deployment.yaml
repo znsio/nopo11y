@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.api.k8s.impl }}
+  name: {{ .Values.api.service.nameGenerated.readable }}
   labels:
     znsio.nopo11y.com/serviceName: {{ include "npl.svc.name" . }}
   {{- if .Values.api.service.sentry.enabled }}
@@ -13,13 +13,13 @@ spec:
   replicas: {{ .Values.api.pod.replicas }}
   selector:
     matchLabels:
-      impl: {{ .Values.api.k8s.impl }}
+      impl: {{ .Values.api.service.nameGenerated.readable }}
   template:
     metadata:
       labels:
         component: {{ include "npl.svc.name" . }}
-        app: {{ .Values.api.k8s.app }}
-        impl: {{ .Values.api.k8s.impl }}
+        app: {{ .Values.api.service.nameGenerated.short }}
+        impl: {{ .Values.api.service.nameGenerated.readable }}
         version: {{.Values.api.service.version}}
         {{- if .Values.api.service.istio.enabled }}
         sidecar.istio.io/inject: "true"
@@ -63,11 +63,11 @@ spec:
                 - key: impl
                   operator: In
                   values:
-                  - {{ .Values.api.k8s.impl }}
+                  - {{ .Values.api.service.nameGenerated.readable }}
               topologyKey: kubernetes.io/hostname
         {{- end }}
       containers:
-      - name: {{ .Values.api.k8s.impl }}
+      - name: {{ .Values.api.service.nameGenerated.readable }}
         image: {{ .Values.api.container.image | default .Values.api.container.imageGenerated }}
         imagePullPolicy: Always
         env:

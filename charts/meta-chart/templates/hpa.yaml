@@ -1,27 +1,27 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ .Values.api.k8s.impl }}-hpa
+  name: {{ .Values.api.service.nameGenerated.readable }}-hpa
   namespace: {{ include "npl.svc.namespace" . }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ .Values.api.k8s.impl }}
+    name: {{ .Values.api.service.nameGenerated.readable }}
   minReplicas: {{ .Values.api.pod.hpa.replicas.min }}
   maxReplicas: {{ .Values.api.pod.hpa.replicas.max }}
   metrics:
   - type: ContainerResource
     containerResource:
       name: cpu
-      container: {{ .Values.api.k8s.impl }}
+      container: {{ .Values.api.service.nameGenerated.readable }}
       target:
         type: Utilization
         averageUtilization: {{ .Values.api.pod.hpa.averageUtilizationPercentage.cpu }}
   - type: ContainerResource
     containerResource:
       name: memory
-      container: {{ .Values.api.k8s.impl }}
+      container: {{ .Values.api.service.nameGenerated.readable }}
       target:
         type: Utilization
         averageUtilization: {{ .Values.api.pod.hpa.averageUtilizationPercentage.memory }}
