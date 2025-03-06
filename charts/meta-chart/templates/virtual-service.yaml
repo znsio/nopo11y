@@ -15,7 +15,7 @@ spec:
   - name: {{ .Values.api.service.nameGenerated.readable }}-default-route
     match:
     - uri:
-        prefix: {{ printf "/%s/" (include "npl.svc.name" .) | quote }}
+        prefix: {{ printf "/%s/" (.Values.api.service.name) | quote }}
     rewrite:
       uri: "/"
     route:
