@@ -120,7 +120,7 @@ api:
     version: "0.1.0"
     port: 8080
     istio:
-      enabled: false
+      enabled: true
     security:
       vault:
         enabled: false
@@ -131,9 +131,13 @@ api:
         enabled: false
       protobuffCollector:
         enabled: true
-        url: "http://nopo11y-stack-tempo-distributor.observability.svc.cluster.local:4318/v1/traces"
+        url:
+          http: "http://nopo11y-stack-tempo-distributor.observability.svc.cluster.local:4318/v1/traces"
+          grpc: "http://nopo11y-stack-tempo-distributor.observability.svc.cluster.local:4317"
       exporter:
         metrics: none
         logs: none
+        allowInsecure: true
+        protocol: http
       resourceProvider:
         aws: true
