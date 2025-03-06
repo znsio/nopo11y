@@ -18,7 +18,7 @@ spec:
     metadata:
       labels:
         component: {{ include "npl.svc.name" . }}
-        app: {{ .Values.api.service.nameGenerated.short }}
+        app: {{ .Values.api.service.nameGenerated.readable }}
         impl: {{ .Values.api.service.nameGenerated.readable }}
         version: {{.Values.api.service.version}}
         {{- if .Values.api.service.istio.enabled }}

@@ -15,7 +15,7 @@ ODA related names/tags
 {{- end }}
 
 {{- define "npl.svc.metricsName" -}}
-{{- printf "%s-%s" . "sm" | lower | trunc 63 | trimSuffix "-" }}
+{{- printf "%s-%s" (.Values.api.service.nameGenerated.readable | trunc 60) "sm" | lower | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{- define "npl.svc.metricsPortRef" -}}
