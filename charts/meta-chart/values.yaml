@@ -138,6 +138,6 @@ api:
         metrics: none
         logs: none
         allowInsecure: true
-        protocol: http
+        protocol: grpc
       resourceProvider:
         aws: true
