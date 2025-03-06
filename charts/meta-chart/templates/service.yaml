@@ -9,7 +9,7 @@ spec:
   ports:
   - port: {{ .Values.api.service.port }}
     targetPort: {{ include "npl.svc.portRef" . }}
-    name: http-{{ .Values.api.k8s.impl }}
+    name: http-{{ .Values.api.service.nameGenerated.short }}
   {{- if hasKey .Values.api.container "ports" }}
   {{- toYaml .Values.api.container.ports | nindent 2 }}
   {{- end }}

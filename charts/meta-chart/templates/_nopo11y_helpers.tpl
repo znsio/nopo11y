@@ -11,7 +11,7 @@ ODA related names/tags
 {{- end }}
 
 {{- define "npl.svc.portRef" -}}
-{{- printf "%s-prt" (.Values.api.k8s.impl | trunc 10) | lower | trunc 14 | trimSuffix "-" }}
+{{- printf "%s-prt" (.Values.api.service.nameGenerated.short | trunc 10) | lower | trunc 14 | trimSuffix "-" }}
 {{- end }}
 
 {{- define "npl.svc.metricsName" -}}
@@ -19,7 +19,7 @@ ODA related names/tags
 {{- end }}
 
 {{- define "npl.svc.metricsPortRef" -}}
-{{- printf "%s-%s-prt" (.Values.api.k8s.impl | trunc 7) "sm" | lower | trunc 14 | trimSuffix "-" }}
+{{- printf "%s-%s-prt" (.Values.api.service.nameGenerated.short | trunc 7) "sm" | lower | trunc 14 | trimSuffix "-" }}
 {{- end }}
 
 {{- define "npl.crdName" -}}
