@@ -124,7 +124,7 @@ function generateNopo11yApiArtifacts() {
       show "Publishing artifact '$zipFile' to '$API_ARTIFACTS_PATH'"
 
       mkdir -p "$API_ARTIFACTS_PATH"
-      cp "$zipFile" "$API_ARTIFACTS_PATH"
+      mv "$zipFile" "$API_ARTIFACTS_PATH"
 
       show "Contents of destination '$API_ARTIFACTS_PATH' (after copying artifact)"
       ls -lah "$API_ARTIFACTS_PATH"

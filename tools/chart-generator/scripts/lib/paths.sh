@@ -18,6 +18,8 @@ function baseWorkDir() {
     echo -n "$WORKDIR/$WORKDIR_SUfFIX_AA"
   elif [[ "$ACTION" == "$GENERATE_NOPOLLY_API_ARTIFACTS" ]]; then
     echo -n "$WORKDIR/$WORKDIR_SUfFIX_NAA"
+  elif [[ "$ACTION" == "$GENERATE_ARAZZO_WORKFLOW_ARTIFACTS" ]]; then
+    echo -n "$WORKDIR/$WORKDIR_SUfFIX_AZW"
   elif [[ "$ACTION" == "$RUN_API_CTKS_FROM_COMP_ARTIFACTS" ]]; then
     echo -n "$WORKDIR/$WORKDIR_SUfFIX_CR"
   else
@@ -384,4 +386,14 @@ function nopo11yConfigFileIn() {
   local prefix="$1"
   local env="$2"
   createPath $(nopo11yConfigDirIn $prefix) "$env.yaml"
+}
+
+function arazzoConfigDirIn() {
+  local prefix="$1"
+  createPath $prefix "arazzo"
+}
+
+function metaConfigFileIn() {
+  local prefix="$1"
+  createPath $prefix "meta-config.yaml"
 }
