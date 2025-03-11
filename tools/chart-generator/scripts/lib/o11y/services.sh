@@ -82,7 +82,7 @@ function generateNopo11yApiArtifacts() {
 
     show "Adding generated image name to '$valuesFile'"
     imgName=$(nonBlankValOrDefault "$APP_IMAGE_NAME" "$serviceName")
-    imgTag=$(nonBlankValOrDefault "$APP_IMAGE_TAG" $(cat "$valuesFile" | yq '.meta-chart.api.service.version'))
+    imgTag=$(nonBlankValOrDefault "$APP_IMAGE_TAG" "$serviceVer")
     cat "$valuesFile" | IMG_URL=$(dockerImageUrl "$imgName" "$imgTag" "$APP_IMAGE_REPO") yq '.meta-chart.api.container.imageGenerated = strenv(IMG_URL)' > "$valuesFileTemp"
     cp "$valuesFileTemp" "$valuesFile"
     cat "$valuesFile" | grep -A1 'imageGenerated'
@@ -108,7 +108,7 @@ function generateNopo11yApiArtifacts() {
   }
 
   function publishArtifacts() {
-    local zipName="$serviceName.zip"
+    local zipName="$serviceName-$serviceVer.zip"
     local artifactsDir=$(artifactsDirIn $(outputDir))
     local zipFile=$(createPath "$artifactsDir" "$zipName")
 
@@ -134,6 +134,7 @@ function generateNopo11yApiArtifacts() {
   tmpChartsDir=$(chartsDirIn $(tempDir))
   chartsFile=$(chartsFileIn $tmpChartsDir)
   serviceName=$(cat $(nopo11yConfigFileIn $(inputDir) "default") | yq '.api.service.name')
+  serviceVer=$(cat $(nopo11yConfigFileIn $(inputDir) "default") | yq '.api.service.version'))
   generateInitialHelmCharts
 
   for env in $(echo -n "$ALL_ENVS")
