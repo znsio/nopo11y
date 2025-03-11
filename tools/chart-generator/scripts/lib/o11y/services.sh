@@ -116,6 +116,19 @@ function generateNopo11yApiArtifacts() {
     currentDir=($pwd)
     cd "$artifactsDir" && zip -r "$zipFile" . && cd "$currentDir"
     unzip -l "$zipFile"
+
+    if [[ "$RUNTIME_MODE" == "$RUNTIME_MODE_LOCAL" ]]; then
+      if [[ -z "$API_ARTIFACTS_PATH" ]]; then
+        show "Invalid artifacts file path provided '$API_ARTIFACTS_PATH'" "x"
+      fi
+      show "Publishing artifact '$zipFile' to '$API_ARTIFACTS_PATH'"
+
+      mkdir -p "$API_ARTIFACTS_PATH"
+      cp "$zipFile" "$API_ARTIFACTS_PATH"
+
+      show "Contents of destination '$API_ARTIFACTS_PATH' (after copying artifact)"
+      ls -lah "$API_ARTIFACTS_PATH"
+    fi
   }
 
   tmpChartsDir=$(chartsDirIn $(tempDir))
