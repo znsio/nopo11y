@@ -134,7 +134,7 @@ function generateNopo11yApiArtifacts() {
   tmpChartsDir=$(chartsDirIn $(tempDir))
   chartsFile=$(chartsFileIn $tmpChartsDir)
   serviceName=$(cat $(nopo11yConfigFileIn $(inputDir) "default") | yq '.api.service.name')
-  serviceVer=$(cat $(nopo11yConfigFileIn $(inputDir) "default") | yq '.api.service.version'))
+  serviceVer=$(cat $(nopo11yConfigFileIn $(inputDir) "default") | yq '.api.service.version')
   generateInitialHelmCharts
 
   for env in $(echo -n "$ALL_ENVS")
