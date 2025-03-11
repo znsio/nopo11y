@@ -107,6 +107,17 @@ function generateNopo11yApiArtifacts() {
     ls -lah $(chartsDirIn $trgDirByEnv)
   }
 
+  function publishArtifacts() {
+    local zipName="$serviceName.zip"
+    local artifactsDir=$(artifactsDirIn $(outputDir))
+    local zipFile=$(createPath "$artifactsDir" "$zipName")
+
+    show "Creating artifact '$zipName' in '$artifactsDir'" "h2"
+    currentDir=($pwd)
+    cd "$artifactsDir" && zip -r "$zipFile" . && cd "$currentDir"
+    unzip -l "$zipFile"
+  }
+
   tmpChartsDir=$(chartsDirIn $(tempDir))
   chartsFile=$(chartsFileIn $tmpChartsDir)
   serviceName=$(cat $(nopo11yConfigFileIn $(inputDir) "default") | yq '.api.service.name')
@@ -119,4 +130,6 @@ function generateNopo11yApiArtifacts() {
     modifyValuesByEnv
     finalizeArtifactsByEnv
   done
+
+  publishArtifacts
 }
