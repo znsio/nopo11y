@@ -76,13 +76,12 @@ function generateNopo11yApiArtifacts() {
     valuesFileTemp="$valuesFile.tmp"
     
     show "Adding initial k8s name tags to '$valuesFile'"
-    serviceName=$(cat "$valuesFile" | yq '.meta-chart.api.service.name')
     cat "$valuesFile" | SHORT_TAG="$(shortenedTag $serviceName)" READABLE_TAG="$(readableTag $serviceName)" yq '.meta-chart.api.service.nameGenerated = {"short": strenv(SHORT_TAG), "readable": strenv(READABLE_TAG)}' > "$valuesFileTemp"
     cp "$valuesFileTemp" "$valuesFile"
     cat "$valuesFile" | grep -A5 'nameGenerated'
 
     show "Adding generated image name to '$valuesFile'"
-    imgName=$(nonBlankValOrDefault "$APP_IMAGE_NAME" $(cat "$valuesFile" | yq '.meta-chart.api.service.name'))
+    imgName=$(nonBlankValOrDefault "$APP_IMAGE_NAME" "$serviceName")
     imgTag=$(nonBlankValOrDefault "$APP_IMAGE_TAG" $(cat "$valuesFile" | yq '.meta-chart.api.service.version'))
     cat "$valuesFile" | IMG_URL=$(dockerImageUrl "$imgName" "$imgTag" "$APP_IMAGE_REPO") yq '.meta-chart.api.container.imageGenerated = strenv(IMG_URL)' > "$valuesFileTemp"
     cp "$valuesFileTemp" "$valuesFile"
@@ -110,6 +109,7 @@ function generateNopo11yApiArtifacts() {
 
   tmpChartsDir=$(chartsDirIn $(tempDir))
   chartsFile=$(chartsFileIn $tmpChartsDir)
+  serviceName=$(cat $(nopo11yConfigFileIn $(inputDir) "default") | yq '.api.service.name')
   generateInitialHelmCharts
 
   for env in $(echo -n "$ALL_ENVS")
