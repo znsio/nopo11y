@@ -74,3 +74,7 @@ readonly APP_ENV=$(appEnv)
 readonly APP_IMAGE_NAME=$(appImageName)
 readonly APP_IMAGE_TAG=$(appImageTag)
 readonly APP_IMAGE_REPO=$(appImageRepo)
+
+readonly NOPO11Y_HELM_NAME=$(nopo11yHelmName)
+readonly NOPO11Y_HELM_VERSION=$(nopo11yHelmVersion)
+readonly NOPO11Y_HELM_REPO=$(nopo11yHelmRepo)

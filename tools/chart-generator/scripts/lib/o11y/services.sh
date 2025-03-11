@@ -33,7 +33,7 @@ function generateNopo11yApiArtifacts() {
     
     show "Creating Chart.yaml '$chartsFile'" "h3"
     mkdir -p "$tmpChartsDir"
-    cat $(nopo11yConfigFileIn $(inputDir) "default") | yq '{"apiVersion": "v2", "name": .api.service.name, "description": .api.service.description, "type": "application", "version": "1.0.0", "appVersion": .api.service.version, "dependencies": [{"name": "meta-chart", "version": "1.0.0", "repository": "https://znsio.github.io/nopo11y"}]}' > "$chartsFile"
+    cat $(nopo11yConfigFileIn $(inputDir) "default") | NAME="$NOPO11Y_HELM_NAME" VER="$NOPO11Y_HELM_VERSION" REPO="$NOPO11Y_HELM_REPO" yq '{"apiVersion": "v2", "name": .api.service.name, "description": .api.service.description, "type": "application", "version": "1.0.0", "appVersion": .api.service.version, "dependencies": [{"name": strenv(NAME), "version": strenv(VER), "repository": strenv(REPO)}]}' > "$chartsFile"
     cat "$chartsFile"
 
     show "Creating default and env wise values.yaml" "h3"
