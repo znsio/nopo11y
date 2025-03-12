@@ -4,7 +4,7 @@ function scriptsForDisplay() {
 
   if [[ $mode == "$RUNTIME_MODE_LOCAL" ]]; then
     echo -n "./lib/display/colored.sh"
-  elif [[ $mode == "$RUNTIME_MODE_ADO" ]]; then
+  elif [[ $mode == "$RUNTIME_MODE_PIPELINE" ]]; then
     echo -n "./lib/display/basic.sh"
   else
     echo -e "\n\n#### Runtime mode '$mode' not supported! Exiting... ####\n\n"

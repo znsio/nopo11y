@@ -106,7 +106,7 @@ function initialiseInputDirs() {
       show "Fetching artifact '$zipFile' to '$API_ARTIFACTS_PATH'"
       zipFile=$(createPath "$API_ARTIFACTS_PATH" "$zipName")
       cp "$zipFile" "$trgDir"
-    elif [[ "$RUNTIME_MODE" == "$RUNTIME_MODE_ADO" ]]; then
+    elif [[ "$RUNTIME_MODE" == "$RUNTIME_MODE_PIPELINE" ]]; then
       show "Fetching artifact '$zipName' from '$API_ARTIFACT_REPO_URL'"
       zipFile=$(createPath "$API_ARTIFACTS_PATH" "$zipName")
       curl -k -u "$API_ARTIFACT_REPO_CRED" "$API_ARTIFACT_REPO_URL/$zipName" -o "$trgZipFile"

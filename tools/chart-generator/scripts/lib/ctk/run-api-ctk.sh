@@ -38,7 +38,7 @@ function updateConfigFile() {
 function updateNpmProxyConfig() {
   local unzippedCtkBasePath="$1"
 
-  if [[ "$RUNTIME_MODE" == "$RUNTIME_MODE_ADO" ]]; then
+  if [[ "$RUNTIME_MODE" == "$RUNTIME_MODE_PIPELINE" ]]; then
     unzippedCtkPath=$(ctkUnzipDir $unzippedCtkBasePath)
     srcProxyFile=$(npmProxyConfigFile $CONFIG_PATH)
     trgProxyFile=$(npmProxyConfigFile $(ctkNodeJsBaseDir $unzippedCtkPath))
