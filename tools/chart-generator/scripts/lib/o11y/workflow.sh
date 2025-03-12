@@ -54,7 +54,7 @@ function generateArazzoWorkflowArtifacts() {
     cd "$artifactsDir" && zip -r "$zipFile" . && cd "$currentDir"
     unzip -l "$zipFile"
 
-    if [[ "$RUNTIME_MODE" == "$RUNTIME_MODE_LOCAL" ]]; then
+    if [[ "$(runtimeMode)" == "$RUNTIME_MODE_LOCAL" ]]; then
       if [[ -z "$API_ARTIFACTS_PATH" ]]; then
         show "Invalid artifacts file path provided '$API_ARTIFACTS_PATH'" "x"
       fi
@@ -71,7 +71,7 @@ function generateArazzoWorkflowArtifacts() {
   function displayReleaseInfo() {
     local zipName="$componentName.zip"
 
-    if [[ "$RUNTIME_MODE" == "$RUNTIME_MODE_LOCAL" ]]; then
+    if [[ "$(runtimeMode)" == "$RUNTIME_MODE_LOCAL" ]]; then
       zipFile=$(createPath "$API_ARTIFACTS_PATH" "$zipName")
       trgDirName=$(basename "$zipFile" ".zip")
       trgDir="$API_ARTIFACTS_PATH/$trgDirName"

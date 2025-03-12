@@ -1,6 +1,6 @@
 
 function scriptsForDisplay() {
-  local mode="$RUNTIME_MODE"
+  local mode="$(runtimeMode)"
 
   if [[ $mode == "$RUNTIME_MODE_LOCAL" ]]; then
     echo -n "./lib/display/colored.sh"

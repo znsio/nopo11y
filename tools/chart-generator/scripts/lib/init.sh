@@ -99,19 +99,19 @@ function initialiseInputDirs() {
     trgZipFile="$trgDir/$zipName"
     mkdir -p "$trgDir"
 
-    if [[ "$RUNTIME_MODE" == "$RUNTIME_MODE_LOCAL" ]]; then
+    if [[ "$(runtimeMode)" == "$RUNTIME_MODE_LOCAL" ]]; then
       if [[ -z "$API_ARTIFACTS_PATH" ]]; then
         show "Invalid artifacts file path provided '$API_ARTIFACTS_PATH'" "x"
       fi
       show "Fetching artifact '$zipFile' to '$API_ARTIFACTS_PATH'"
       zipFile=$(createPath "$API_ARTIFACTS_PATH" "$zipName")
       cp "$zipFile" "$trgDir"
-    elif [[ "$RUNTIME_MODE" == "$RUNTIME_MODE_PIPELINE" ]]; then
+    elif [[ "$(runtimeMode)" == "$RUNTIME_MODE_PIPELINE" ]]; then
       show "Fetching artifact '$zipName' from '$API_ARTIFACT_REPO_URL'"
       zipFile=$(createPath "$API_ARTIFACTS_PATH" "$zipName")
       curl -k -u "$API_ARTIFACT_REPO_CRED" "$API_ARTIFACT_REPO_URL/$zipName" -o "$trgZipFile"
     else
-      show "Runtime mode '$RUNTIME_MODE' not supported! Exiting..." "x"
+      show "Runtime mode '$(runtimeMode)' not supported! Exiting..." "x"
       exit 1
     fi
 

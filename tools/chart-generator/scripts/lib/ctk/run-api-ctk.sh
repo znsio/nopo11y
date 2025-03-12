@@ -38,7 +38,7 @@ function updateConfigFile() {
 function updateNpmProxyConfig() {
   local unzippedCtkBasePath="$1"
 
-  if [[ "$RUNTIME_MODE" == "$RUNTIME_MODE_PIPELINE" ]]; then
+  if [[ "$(runtimeMode)" == "$RUNTIME_MODE_PIPELINE" ]]; then
     unzippedCtkPath=$(ctkUnzipDir $unzippedCtkBasePath)
     srcProxyFile=$(npmProxyConfigFile $CONFIG_PATH)
     trgProxyFile=$(npmProxyConfigFile $(ctkNodeJsBaseDir $unzippedCtkPath))
@@ -58,7 +58,7 @@ function updateNpmProxyConfig() {
     show "Contents of '$trgProxyFile'"
     cat "$trgProxyFile" | head -n 2
   else
-    show "Skipping setting up npm proxy config for runtime mode '$RUNTIME_MODE'" "h3"
+    show "Skipping setting up npm proxy config for runtime mode '$(runtimeMode)'" "h3"
   fi
 }
 

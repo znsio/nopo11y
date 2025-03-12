@@ -46,11 +46,8 @@ readonly WORKDIR=$(workDir)
 
 readonly ACTION=$(requestedAction)
 
-readonly RUNTIME_MODE=$(runtimeMode)
 readonly RUNTIME_MODE_LOCAL="local"
 readonly RUNTIME_MODE_PIPELINE="pipeline"
-
-readonly RUNTIME_HOST=$(runtimeHost)
 readonly RUNTIME_HOST_STANDALONE="local_or_vm"
 readonly RUNTIME_HOST_CONTAINER="container"
 

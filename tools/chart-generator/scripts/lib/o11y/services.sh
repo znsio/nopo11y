@@ -117,7 +117,7 @@ function generateNopo11yApiArtifacts() {
     cd "$artifactsDir" && zip -r "$zipFile" . && cd "$currentDir"
     unzip -l "$zipFile"
 
-    if [[ "$RUNTIME_MODE" == "$RUNTIME_MODE_LOCAL" ]]; then
+    if [[ "$(runtimeMode)" == "$RUNTIME_MODE_LOCAL" ]]; then
       if [[ -z "$API_ARTIFACTS_PATH" ]]; then
         show "Invalid artifacts file path provided '$API_ARTIFACTS_PATH'" "x"
       fi
