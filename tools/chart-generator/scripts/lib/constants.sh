@@ -44,8 +44,6 @@ readonly INPUT_ODAA_PROJECT_PATH=$(apiProjectPath)
 readonly INPUT_ODAC=$(compCodeCheckoutDir)
 readonly WORKDIR=$(workDir)
 
-readonly ACTION=$(requestedAction)
-
 readonly RUNTIME_MODE_LOCAL="local"
 readonly RUNTIME_MODE_PIPELINE="pipeline"
 readonly RUNTIME_HOST_STANDALONE="local_or_vm"
