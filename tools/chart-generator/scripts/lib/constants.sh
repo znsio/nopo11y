@@ -13,12 +13,6 @@ readonly GENERATE_NOPOLLY_API_ARTIFACTS="generateNopo11yApiArtifacts"
 readonly GENERATE_ARAZZO_WORKFLOW_ARTIFACTS="generateArazzoWorkflowArtifacts"
 readonly RUN_API_CTKS_FROM_COMP_ARTIFACTS="runApiCtksFromComponentArtifacts"
 
-readonly WORKDIR_SUfFIX_CA="comp-build"
-readonly WORKDIR_SUfFIX_AA="api-build"
-readonly WORKDIR_SUfFIX_NAA="api-build-np"
-readonly WORKDIR_SUfFIX_AZW="arz-workflow-build"
-readonly WORKDIR_SUfFIX_CR="ctk-run"
-
 readonly ENV_EAT="eat"
 readonly ENV_PROD="prod"
 readonly ENV_LOCAL="local"

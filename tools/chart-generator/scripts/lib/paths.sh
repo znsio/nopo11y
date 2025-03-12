@@ -14,15 +14,15 @@ function createPath() {
 function baseWorkDir() {
   local action="$(requestedAction)"
   if [[ "$action" == "$GENERATE_COMP_ARTIFACTS" ]]; then
-    echo -n "$(workDir)/$WORKDIR_SUfFIX_CA"
+    echo -n "$(workDir)/comp-build"
   elif [[ "$action" == "$GENERATE_API_ARTIFACTS" ]]; then
-    echo -n "$(workDir)/$WORKDIR_SUfFIX_AA"
+    echo -n "$(workDir)/api-build"
   elif [[ "$action" == "$GENERATE_NOPOLLY_API_ARTIFACTS" ]]; then
-    echo -n "$(workDir)/$WORKDIR_SUfFIX_NAA"
+    echo -n "$(workDir)/api-build-np"
   elif [[ "$action" == "$GENERATE_ARAZZO_WORKFLOW_ARTIFACTS" ]]; then
-    echo -n "$(workDir)/$WORKDIR_SUfFIX_AZW"
+    echo -n "$(workDir)/arz-workflow-build"
   elif [[ "$action" == "$RUN_API_CTKS_FROM_COMP_ARTIFACTS" ]]; then
-    echo -n "$(workDir)/$WORKDIR_SUfFIX_CR"
+    echo -n "$(workDir)/ctk-run"
   else
     show "Action '$action' not supported for building work dir paths" "x"
   fi
