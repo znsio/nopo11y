@@ -11,7 +11,7 @@ action:
       - prod
     runtime:
       mode:
-        default: local # one of [ado, local]
+        default: pipeline # one of [pipeline, local]
         envVar: RUNTIME_MODE
       host:
         default: local_or_vm # one of [local_or_vm, container]

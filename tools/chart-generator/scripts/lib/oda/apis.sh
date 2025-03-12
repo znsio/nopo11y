@@ -239,7 +239,7 @@ function publishArtifacts() {
     show "Contents of destination '$API_ARTIFACTS_PATH' (after copying artifact)"
     ls -lah "$API_ARTIFACTS_PATH"
 
-  elif [[ "$RUNTIME_MODE" == "$RUNTIME_MODE_ADO" ]]; then
+  elif [[ "$RUNTIME_MODE" == "$RUNTIME_MODE_PIPELINE" ]]; then
     show "Publishing artifact '$zipFile' to '$API_ARTIFACT_REPO_URL'"
     curl -k -i -X PUT -T "$zipFile" -u "$API_ARTIFACT_REPO_CRED" "$API_ARTIFACT_REPO_URL/$zipName"
   else
