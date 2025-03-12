@@ -63,9 +63,3 @@ readonly API_ARTIFACT_REPO_CRED=$(apiArtifactRepoCred)
 readonly CTK_EXEC_FILE_NAME="Mac-Linux-RUNCTK.sh"
 readonly CTK_RESULTS_JSON_FILE_NAME="jsonResults.json"
 readonly CTK_RESULTS_HTML_FILE_NAME="htmlResults.html"
-
-readonly CMP_ARTIFACTS_PATH=$(compArtifactsPath)
-readonly ON_CTK_FAILURE=$(onCtkFailure)
-readonly APP_HOST=$(appHost)
-readonly APP_PROTOCOL=$(appProtocol)
-readonly APP_ENV=$(appEnv)

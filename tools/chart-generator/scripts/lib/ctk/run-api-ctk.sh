@@ -92,7 +92,7 @@ function runCtk() {
 
   totalTests=$(cat "$jsonResultsFile" | jq '.run.stats.assertions.total')
   failedTests=$(cat "$jsonResultsFile" | jq '.run.stats.assertions.failed')
-  showWarningOrFail "$ON_CTK_FAILURE" "CTK ran total '$totalTests' tests, out of which '$failedTests' failed"
+  showWarningOrFail "$(onCtkFailure)" "CTK ran total '$totalTests' tests, out of which '$failedTests' failed"
 }
 
 function processCtk() {

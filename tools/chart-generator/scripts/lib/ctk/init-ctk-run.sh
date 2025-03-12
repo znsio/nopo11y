@@ -18,8 +18,8 @@ function extractCompIdFromArtifact() {
 
 function determineAppHost() {
   appHost=""
-  if [[ ! -z "$APP_HOST" ]]; then
-    appHost="$APP_HOST"
+  if [[ ! -z "$(appHost)" ]]; then
+    appHost="$(appHost)"
   else
     appHost=$(appHostIpByEnv)
   fi
@@ -30,16 +30,16 @@ function appServiceUrl() {
   local ctkFile="$1"
   
   urlFile=$(apiCTKServiceUrlFileByCtkFile $ctkFile)
-  echo -n "$APP_PROTOCOL://$(determineAppHost)$(cat $urlFile)"
+  echo -n "$(appProtocol)://$(determineAppHost)$(cat $urlFile)"
 }
 
 function runApiCtksFromCompArtifacts() {
-  show "Running CTKs from component artifacts in - '$CMP_ARTIFACTS_PATH'" "h1"
-  ls -lah "$CMP_ARTIFACTS_PATH"
+  show "Running CTKs from component artifacts in - '$(compArtifactsPath)'" "h1"
+  ls -lah "$(compArtifactsPath)"
   
   setupCtksWorkspace
   
-  ctksDir=$(ctkInfoDirWithin $(compDirIn $(envDirIn "$CMP_ARTIFACTS_PATH" "$ENV_EAT")))
+  ctksDir=$(ctkInfoDirWithin $(compDirIn $(envDirIn "$(compArtifactsPath)" "$ENV_EAT")))
   show "Found ctks dir to be - '$ctksDir'"
   ls -lah "$ctksDir"
 
