@@ -1,11 +1,8 @@
 
 readonly CONFIG_PATH="./config"
+readonly CONFIG=$(cat $CONFIG_PATH/settings.yaml)
 readonly ENV_VAR_NAME_KEY="envVar"
 readonly DEFAULT_VAL_KEY="default"
-
-function config() {
-  cat "$CONFIG_PATH/settings.yaml"
-}
 
 function envValOrDefault() {
   local envVar="$1"
@@ -21,7 +18,7 @@ function envValOrDefault() {
 
 function configuredValOf() {
   local path="$1"
-  config | yq ".$path"
+  echo "$CONFIG" | yq ".$path"
 }
 
 function envValOf() {
