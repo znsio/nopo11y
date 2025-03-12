@@ -33,7 +33,7 @@ function generateNopo11yApiArtifacts() {
     
     show "Creating Chart.yaml '$chartsFile'" "h3"
     mkdir -p "$tmpChartsDir"
-    cat $(nopo11yConfigFileIn $(inputDir) "default") | NAME="$NOPO11Y_HELM_NAME" VER="$NOPO11Y_HELM_VERSION" REPO="$NOPO11Y_HELM_REPO" yq '{"apiVersion": "v2", "name": .api.service.name, "description": .api.service.description, "type": "application", "version": "1.0.0", "appVersion": .api.service.version, "dependencies": [{"name": strenv(NAME), "version": strenv(VER), "repository": strenv(REPO)}]}' > "$chartsFile"
+    cat $(nopo11yConfigFileIn $(inputDir) "default") | NAME="$(nopo11yHelmName)" VER="$(nopo11yHelmVersion)" REPO="$(nopo11yHelmRepo)" yq '{"apiVersion": "v2", "name": .api.service.name, "description": .api.service.description, "type": "application", "version": "1.0.0", "appVersion": .api.service.version, "dependencies": [{"name": strenv(NAME), "version": strenv(VER), "repository": strenv(REPO)}]}' > "$chartsFile"
     cat "$chartsFile"
 
     show "Creating default and env wise values.yaml" "h3"
@@ -81,9 +81,9 @@ function generateNopo11yApiArtifacts() {
     cat "$valuesFile" | grep -A5 'nameGenerated'
 
     show "Adding generated image name to '$valuesFile'"
-    imgName=$(nonBlankValOrDefault "$APP_IMAGE_NAME" "$serviceName")
-    imgTag=$(nonBlankValOrDefault "$APP_IMAGE_TAG" "$serviceVer")
-    cat "$valuesFile" | IMG_URL=$(dockerImageUrl "$imgName" "$imgTag" "$APP_IMAGE_REPO") yq '.meta-chart.api.container.imageGenerated = strenv(IMG_URL)' > "$valuesFileTemp"
+    imgName=$(nonBlankValOrDefault "$(appImageName)" "$serviceName")
+    imgTag=$(nonBlankValOrDefault "$(appImageTag)" "$serviceVer")
+    cat "$valuesFile" | IMG_URL=$(dockerImageUrl "$imgName" "$imgTag" "$(appImageRepo)") yq '.meta-chart.api.container.imageGenerated = strenv(IMG_URL)' > "$valuesFileTemp"
     cp "$valuesFileTemp" "$valuesFile"
     cat "$valuesFile" | grep -A1 'imageGenerated'
 
