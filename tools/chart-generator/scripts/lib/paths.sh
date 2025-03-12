@@ -12,18 +12,19 @@ function createPath() {
 }
 
 function baseWorkDir() {
-  if [[ "$ACTION" == "$GENERATE_COMP_ARTIFACTS" ]]; then
+  local action="$(requestedAction)"
+  if [[ "$action" == "$GENERATE_COMP_ARTIFACTS" ]]; then
     echo -n "$WORKDIR/$WORKDIR_SUfFIX_CA"
-  elif [[ "$ACTION" == "$GENERATE_API_ARTIFACTS" ]]; then
+  elif [[ "$action" == "$GENERATE_API_ARTIFACTS" ]]; then
     echo -n "$WORKDIR/$WORKDIR_SUfFIX_AA"
-  elif [[ "$ACTION" == "$GENERATE_NOPOLLY_API_ARTIFACTS" ]]; then
+  elif [[ "$action" == "$GENERATE_NOPOLLY_API_ARTIFACTS" ]]; then
     echo -n "$WORKDIR/$WORKDIR_SUfFIX_NAA"
-  elif [[ "$ACTION" == "$GENERATE_ARAZZO_WORKFLOW_ARTIFACTS" ]]; then
+  elif [[ "$action" == "$GENERATE_ARAZZO_WORKFLOW_ARTIFACTS" ]]; then
     echo -n "$WORKDIR/$WORKDIR_SUfFIX_AZW"
-  elif [[ "$ACTION" == "$RUN_API_CTKS_FROM_COMP_ARTIFACTS" ]]; then
+  elif [[ "$action" == "$RUN_API_CTKS_FROM_COMP_ARTIFACTS" ]]; then
     echo -n "$WORKDIR/$WORKDIR_SUfFIX_CR"
   else
-    show "Action '$ACTION' not supported for building work dir paths" "x"
+    show "Action '$action' not supported for building work dir paths" "x"
   fi
 }
 

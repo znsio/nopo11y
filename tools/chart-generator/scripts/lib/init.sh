@@ -52,7 +52,7 @@ function prepGitRepo() {
 }
 
 function dirsToClean() {
-  if [[ "$ACTION" == "$GENERATE_COMP_ARTIFACTS" && ! "$CHECKOUT_OPTION" == "doFreshRepoClone" ]]; then
+  if [[ "$(requestedAction)" == "$GENERATE_COMP_ARTIFACTS" && ! "$CHECKOUT_OPTION" == "doFreshRepoClone" ]]; then
       echo -n "$(pathOf 'IP') $(pathOf 'OP') $(pathOf 'TMP')"
   else
     echo -n "$(baseWorkDir)"
