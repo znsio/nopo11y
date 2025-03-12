@@ -19,6 +19,9 @@ function performAction() {
   elif [[ "$ACTION" == "$GENERATE_NOPOLLY_API_ARTIFACTS" ]]; then
     setupNopo11yWorkspace
     generateNopo11yApiArtifacts
+  elif [[ "$ACTION" == "$GENERATE_ARAZZO_WORKFLOW_ARTIFACTS" ]]; then
+    setupArazzoWorkflowWorkspace
+    generateArazzoWorkflowArtifacts
   elif [[ "$ACTION" == "$RUN_API_CTKS_FROM_COMP_ARTIFACTS" ]]; then
     runApiCtksFromCompArtifacts
   else

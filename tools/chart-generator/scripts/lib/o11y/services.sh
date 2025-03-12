@@ -33,7 +33,7 @@ function generateNopo11yApiArtifacts() {
     
     show "Creating Chart.yaml '$chartsFile'" "h3"
     mkdir -p "$tmpChartsDir"
-    cat $(nopo11yConfigFileIn $(inputDir) "default") | yq '{"apiVersion": "v2", "name": .api.service.name, "description": .api.service.description, "type": "application", "version": "1.0.0", "appVersion": .api.service.version, "dependencies": [{"name": "meta-chart", "version": "1.0.0", "repository": "https://znsio.github.io/nopo11y"}]}' > "$chartsFile"
+    cat $(nopo11yConfigFileIn $(inputDir) "default") | NAME="$NOPO11Y_HELM_NAME" VER="$NOPO11Y_HELM_VERSION" REPO="$NOPO11Y_HELM_REPO" yq '{"apiVersion": "v2", "name": .api.service.name, "description": .api.service.description, "type": "application", "version": "1.0.0", "appVersion": .api.service.version, "dependencies": [{"name": strenv(NAME), "version": strenv(VER), "repository": strenv(REPO)}]}' > "$chartsFile"
     cat "$chartsFile"
 
     show "Creating default and env wise values.yaml" "h3"
@@ -76,14 +76,13 @@ function generateNopo11yApiArtifacts() {
     valuesFileTemp="$valuesFile.tmp"
     
     show "Adding initial k8s name tags to '$valuesFile'"
-    serviceName=$(cat "$valuesFile" | yq '.meta-chart.api.service.name')
     cat "$valuesFile" | SHORT_TAG="$(shortenedTag $serviceName)" READABLE_TAG="$(readableTag $serviceName)" yq '.meta-chart.api.service.nameGenerated = {"short": strenv(SHORT_TAG), "readable": strenv(READABLE_TAG)}' > "$valuesFileTemp"
     cp "$valuesFileTemp" "$valuesFile"
     cat "$valuesFile" | grep -A5 'nameGenerated'
 
     show "Adding generated image name to '$valuesFile'"
-    imgName=$(nonBlankValOrDefault "$APP_IMAGE_NAME" $(cat "$valuesFile" | yq '.meta-chart.api.service.name'))
-    imgTag=$(nonBlankValOrDefault "$APP_IMAGE_TAG" $(cat "$valuesFile" | yq '.meta-chart.api.service.version'))
+    imgName=$(nonBlankValOrDefault "$APP_IMAGE_NAME" "$serviceName")
+    imgTag=$(nonBlankValOrDefault "$APP_IMAGE_TAG" "$serviceVer")
     cat "$valuesFile" | IMG_URL=$(dockerImageUrl "$imgName" "$imgTag" "$APP_IMAGE_REPO") yq '.meta-chart.api.container.imageGenerated = strenv(IMG_URL)' > "$valuesFileTemp"
     cp "$valuesFileTemp" "$valuesFile"
     cat "$valuesFile" | grep -A1 'imageGenerated'
@@ -108,8 +107,34 @@ function generateNopo11yApiArtifacts() {
     ls -lah $(chartsDirIn $trgDirByEnv)
   }
 
+  function publishArtifacts() {
+    local zipName="$serviceName.zip"
+    local artifactsDir=$(artifactsDirIn $(outputDir))
+    local zipFile=$(createPath "$artifactsDir" "$zipName")
+
+    show "Creating artifact '$zipName' in '$artifactsDir'" "h2"
+    currentDir=($pwd)
+    cd "$artifactsDir" && zip -r "$zipFile" . && cd "$currentDir"
+    unzip -l "$zipFile"
+
+    if [[ "$RUNTIME_MODE" == "$RUNTIME_MODE_LOCAL" ]]; then
+      if [[ -z "$API_ARTIFACTS_PATH" ]]; then
+        show "Invalid artifacts file path provided '$API_ARTIFACTS_PATH'" "x"
+      fi
+      show "Publishing artifact '$zipFile' to '$API_ARTIFACTS_PATH'"
+
+      mkdir -p "$API_ARTIFACTS_PATH"
+      mv "$zipFile" "$API_ARTIFACTS_PATH"
+
+      show "Contents of destination '$API_ARTIFACTS_PATH' (after copying artifact)"
+      ls -lah "$API_ARTIFACTS_PATH"
+    fi
+  }
+
   tmpChartsDir=$(chartsDirIn $(tempDir))
   chartsFile=$(chartsFileIn $tmpChartsDir)
+  serviceName=$(cat $(nopo11yConfigFileIn $(inputDir) "default") | yq '.api.service.name')
+  serviceVer=$(cat $(nopo11yConfigFileIn $(inputDir) "default") | yq '.api.service.version')
   generateInitialHelmCharts
 
   for env in $(echo -n "$ALL_ENVS")
@@ -119,4 +144,6 @@ function generateNopo11yApiArtifacts() {
     modifyValuesByEnv
     finalizeArtifactsByEnv
   done
+
+  publishArtifacts
 }

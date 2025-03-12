@@ -10,11 +10,13 @@ readonly KEY_ERROR="error"
 readonly GENERATE_COMP_ARTIFACTS="generateComponentArtifacts"
 readonly GENERATE_API_ARTIFACTS="generateApiArtifacts"
 readonly GENERATE_NOPOLLY_API_ARTIFACTS="generateNopo11yApiArtifacts"
+readonly GENERATE_ARAZZO_WORKFLOW_ARTIFACTS="generateArazzoWorkflowArtifacts"
 readonly RUN_API_CTKS_FROM_COMP_ARTIFACTS="runApiCtksFromComponentArtifacts"
 
 readonly WORKDIR_SUfFIX_CA="comp-build"
 readonly WORKDIR_SUfFIX_AA="api-build"
 readonly WORKDIR_SUfFIX_NAA="api-build-np"
+readonly WORKDIR_SUfFIX_AZW="arz-workflow-build"
 readonly WORKDIR_SUfFIX_CR="ctk-run"
 
 readonly ODAC_REPO_URL=$(compSpecRepoUrl)
@@ -74,3 +76,7 @@ readonly APP_ENV=$(appEnv)
 readonly APP_IMAGE_NAME=$(appImageName)
 readonly APP_IMAGE_TAG=$(appImageTag)
 readonly APP_IMAGE_REPO=$(appImageRepo)
+
+readonly NOPO11Y_HELM_NAME=$(nopo11yHelmName)
+readonly NOPO11Y_HELM_VERSION=$(nopo11yHelmVersion)
+readonly NOPO11Y_HELM_REPO=$(nopo11yHelmRepo)

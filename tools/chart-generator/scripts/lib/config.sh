@@ -171,3 +171,15 @@ function appImageTag() {
 function appImageRepo() {
   envValOf "action.nopo11yApiBuild.input.appImage.repo"
 }
+
+function nopo11yHelmName() {
+  envOrConfiguredValOf "action.nopo11yApiBuild.input.nopo11yHelm.name"
+}
+
+function nopo11yHelmVersion() {
+  envOrConfiguredValOf "action.nopo11yApiBuild.input.nopo11yHelm.version"
+}
+
+function nopo11yHelmRepo() {
+  envOrConfiguredValOf "action.nopo11yApiBuild.input.nopo11yHelm.repo"
+}

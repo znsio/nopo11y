@@ -26,6 +26,16 @@ action:
           envVar: APP_IMAGE_TAG
         repo:
           envVar: APP_IMAGE_REPO
+      nopo11yHelm:
+        name:
+          default: meta-chart
+          envVar: NOPO11Y_HELM_NAME
+        version:
+          default: "1.0.0"
+          envVar: NOPO11Y_HELM_VERSION
+        repo:
+          default: https://znsio.github.io/nopo11y
+          envVar: NOPO11Y_HELM_REPO
   apiBuild:
     input:
       codebase:
