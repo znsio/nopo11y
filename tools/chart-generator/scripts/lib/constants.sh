@@ -34,7 +34,6 @@ readonly GIT_AUTH_TOKEN_ADO=$(specRepoAdoAuth)
 readonly GIT_AUTH_TOKEN_LOCAL=$(specRepoLocalAuth)
 readonly GIT_REPO_PROXY=$(specRepoProxy)
 
-readonly ALL_ENVS=$(allEnvsAsSsv)
 readonly ENV_EAT="eat"
 readonly ENV_PROD="prod"
 readonly ENV_LOCAL="local"

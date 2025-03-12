@@ -63,7 +63,7 @@ function createInitialDirs() {
   show "Creating initial set of directories under '$(baseWorkDir)'"
   mkdir -p $(tmfSpecDir) $(apisDirIn $(inputDir)) $(compDirIn $(inputDir))
 
-  for env in $(echo -n "$ALL_ENVS")
+  for env in $(echo -n "$(allEnvsAsSsv)")
   do
     mkdir -p $(envDirIn $(tempDir) "$env") $(envDirIn $(artifactsDirIn $(outputDir)) "$env")
   done
@@ -73,7 +73,7 @@ function createInitialDirs() {
 function createApiInitialDirs() {
   show "Creating initial set of directories under '$(baseWorkDir)'"
   mkdir -p $(inputDir)
-  for env in $(echo -n "$ALL_ENVS")
+  for env in $(echo -n "$(allEnvsAsSsv)")
   do
     mkdir -p $(envDirIn $(tempDir) "$env") $(envDirIn $(artifactsDirIn $(outputDir)) "$env")
   done

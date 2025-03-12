@@ -40,7 +40,7 @@ function generateNopo11yApiArtifacts() {
     show "Creating default and env wise values.yaml" "h3"
     show "Creating default values.yaml"
     cat $(nopo11yConfigFileIn $(inputDir) "default") | yq '{"meta-chart": .}' > $(valuesFileIn $tmpChartsDir)
-    for env in $(echo -n "$ALL_ENVS")
+    for env in $(echo -n "$(allEnvsAsSsv)")
     do
       srcFile=$(nopo11yConfigFileIn $(inputDir) "$env")
       if [[ -r "$srcFile" ]]; then
@@ -138,7 +138,7 @@ function generateNopo11yApiArtifacts() {
   serviceVer=$(cat $(nopo11yConfigFileIn $(inputDir) "default") | yq '.api.service.version')
   generateInitialHelmCharts
 
-  for env in $(echo -n "$ALL_ENVS")
+  for env in $(echo -n "$(allEnvsAsSsv)")
   do
     show "Generating Nopo11y artifacts by env '$env'" "h1"
     generateArtifactsByEnv
