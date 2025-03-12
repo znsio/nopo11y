@@ -108,7 +108,7 @@ function generateNopo11yApiArtifacts() {
   }
 
   function publishArtifacts() {
-    local zipName="$serviceName-$serviceVer.zip"
+    local zipName="$serviceName.zip"
     local artifactsDir=$(artifactsDirIn $(outputDir))
     local zipFile=$(createPath "$artifactsDir" "$zipName")
 

@@ -90,7 +90,7 @@ function generateArazzoWorkflowArtifacts() {
 
       show "API artifacts to download"
       metaCnfigFile=$(metaConfigFileIn "$trgDir")
-      cat $metaCnfigFile | yq '.apis[] | "\(.name)-\(.version).zip"'
+      cat $metaCnfigFile | yq '.apis[] | "\(.name).zip"'
 
       show "Arazzo command to use"
       metaCnfigFile=$(metaConfigFileIn "$trgDir")
