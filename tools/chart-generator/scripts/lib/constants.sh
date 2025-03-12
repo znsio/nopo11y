@@ -39,8 +39,6 @@ readonly ENV_EAT="eat"
 readonly ENV_PROD="prod"
 readonly ENV_LOCAL="local"
 
-readonly WORKDIR=$(workDir)
-
 readonly RUNTIME_MODE_LOCAL="local"
 readonly RUNTIME_MODE_PIPELINE="pipeline"
 readonly RUNTIME_HOST_STANDALONE="local_or_vm"
