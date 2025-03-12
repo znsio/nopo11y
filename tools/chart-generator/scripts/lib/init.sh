@@ -32,7 +32,7 @@ function prepGitRepo() {
   local repoDir="$3"
   local repoCheckoutDirs="$4"
 
-  if [[ "$CHECKOUT_OPTION" == "doFreshRepoClone" || ! -d "$repoDir" ]]; then
+  if [[ "$(specRepoCheckoutMode)" == "doFreshRepoClone" || ! -d "$repoDir" ]]; then
     show "Sparsely checking out '$repoUrl' (branch='$repoBranch', dirs='$repoCheckoutDirs') into '$repoDir'" "h2"
 
     show "Cloning '$repoUrl' ('$repoBranch')"
@@ -52,7 +52,7 @@ function prepGitRepo() {
 }
 
 function dirsToClean() {
-  if [[ "$(requestedAction)" == "$GENERATE_COMP_ARTIFACTS" && ! "$CHECKOUT_OPTION" == "doFreshRepoClone" ]]; then
+  if [[ "$(requestedAction)" == "$GENERATE_COMP_ARTIFACTS" && ! "$(specRepoCheckoutMode)" == "doFreshRepoClone" ]]; then
       echo -n "$(pathOf 'IP') $(pathOf 'OP') $(pathOf 'TMP')"
   else
     echo -n "$(baseWorkDir)"
@@ -82,11 +82,11 @@ function createApiInitialDirs() {
 
 function initialiseInputDirs() {
   show "Copying required artifacts under - '$(baseWorkDir)'" "h2"
-  show "Contents of source: '$INPUT_ODAC'"
-  ls -lah "$INPUT_ODAC"
+  show "Contents of source: '$(compCodeCheckoutDir)'"
+  ls -lah "$(compCodeCheckoutDir)"
   compDir=$(createPath $(compDirIn $(inputDir)) $(extractCompId))
   mkdir -p "$compDir"
-  cp -r "$INPUT_ODAC/." "$compDir"
+  cp -r "$(compCodeCheckoutDir)/." "$compDir"
   show "Contents of destination: '$compDir'"
   ls -lah "$compDir"
 
@@ -128,16 +128,17 @@ function initialiseInputDirs() {
 }
 
 function initialiseApiInputDirs() {
-  # trgPath=$(createPath $(inputDir) $(projectChartName "$INPUT_ODAA_PROJECT_PATH"))
+  local repoPath="$(apiProjectPath)"
+  # trgPath=$(createPath $(inputDir) $(projectChartName "$repoPath"))
   trgPath=$(inputDir)
-  show "Copying required source content from '$INPUT_ODAA_PROJECT_PATH' under - '$trgPath'" "h2"
+  show "Copying required source content from '$repoPath' under - '$trgPath'" "h2"
 
   mkdir -p "$trgPath"
-  cp -r $(chartsDirIn "$INPUT_ODAA_PROJECT_PATH") "$trgPath"
-  copySpecmaticFilesIfPresent "$INPUT_ODAA_PROJECT_PATH" "$trgPath"
+  cp -r $(chartsDirIn "$repoPath") "$trgPath"
+  copySpecmaticFilesIfPresent "$repoPath" "$trgPath"
 
-  show "Contents of source: '$INPUT_ODAA_PROJECT_PATH'"
-  ls -lah "$INPUT_ODAA_PROJECT_PATH"
+  show "Contents of source: '$repoPath'"
+  ls -lah "$repoPath"
 
   show "Contents of destination: '"$trgPath"'"
   ls -lah "$trgPath"

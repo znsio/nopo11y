@@ -39,9 +39,6 @@ readonly ENV_EAT="eat"
 readonly ENV_PROD="prod"
 readonly ENV_LOCAL="local"
 
-readonly CHECKOUT_OPTION=$(specRepoCheckoutMode)
-readonly INPUT_ODAA_PROJECT_PATH=$(apiProjectPath)
-readonly INPUT_ODAC=$(compCodeCheckoutDir)
 readonly WORKDIR=$(workDir)
 
 readonly RUNTIME_MODE_LOCAL="local"

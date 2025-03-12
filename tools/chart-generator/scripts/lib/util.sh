@@ -101,7 +101,7 @@ function extractCompProjDirName() {
 }
 
 function extractCompId() {
-  valuesFilePath=$(findValuesFileWithin "$INPUT_ODAC")
+  valuesFilePath=$(findValuesFileWithin "$(compCodeCheckoutDir)")
 
   countOfFiles=$(ls $valuesFilePath | wc -l | xargs)
   if [[ $countOfFiles -gt 1 ]]; then

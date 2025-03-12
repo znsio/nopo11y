@@ -3,16 +3,17 @@ function setupNopo11yWorkspace() {
   show "Setting up workspace under directory - '$(baseWorkDir)'" "h1"
 
   function initialiseInputDirs() {
-    # trgPath=$(createPath $(inputDir) $(projectChartName "$INPUT_ODAA_PROJECT_PATH"))
+    local repoPath="$(apiProjectPath)"
+    # trgPath=$(createPath $(inputDir) $(projectChartName "$repoPath"))
     trgPath=$(inputDir)
-    show "Copying required source content from '$INPUT_ODAA_PROJECT_PATH' under - '$trgPath'" "h2"
+    show "Copying required source content from '$repoPath' under - '$trgPath'" "h2"
 
     mkdir -p "$trgPath"
-    cp -r $(nopo11yConfigDirIn "$INPUT_ODAA_PROJECT_PATH") "$trgPath"
-    copySpecmaticFilesIfPresent "$INPUT_ODAA_PROJECT_PATH" "$trgPath"
+    cp -r $(nopo11yConfigDirIn "$repoPath") "$trgPath"
+    copySpecmaticFilesIfPresent "$repoPath" "$trgPath"
 
-    show "Contents of source: '$INPUT_ODAA_PROJECT_PATH'"
-    ls -lah "$INPUT_ODAA_PROJECT_PATH"
+    show "Contents of source: '$repoPath'"
+    ls -lah "$repoPath"
 
     show "Contents of destination: '"$trgPath"'"
     ls -lah "$trgPath"

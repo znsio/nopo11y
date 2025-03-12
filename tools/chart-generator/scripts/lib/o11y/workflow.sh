@@ -9,16 +9,17 @@ function setupArazzoWorkflowWorkspace() {
   }
 
   function initialiseInputDirs() {
+    local repoPath="$(compCodeCheckoutDir)"
     trgPath=$(inputDir)
-    show "Copying required source content from '$INPUT_ODAC' under - '$trgPath'" "h2"
+    show "Copying required source content from '$repoPath' under - '$trgPath'" "h2"
 
     mkdir -p "$trgPath"
-    cp -r $(arazzoConfigDirIn "$INPUT_ODAC") "$trgPath"
-    copySpecmaticFilesIfPresent "$INPUT_ODAC" "$trgPath"
-    cp $(metaConfigFileIn "$INPUT_ODAC") $(metaConfigFileIn $trgPath)
+    cp -r $(arazzoConfigDirIn "$repoPath") "$trgPath"
+    copySpecmaticFilesIfPresent "$repoPath" "$trgPath"
+    cp $(metaConfigFileIn "$repoPath") $(metaConfigFileIn $trgPath)
 
-    show "Contents of source: '$INPUT_ODAC'"
-    ls -lah "$INPUT_ODAC"
+    show "Contents of source: '$repoPath'"
+    ls -lah "$repoPath"
 
     show "Contents of destination: '"$trgPath"'"
     ls -lah "$trgPath"
