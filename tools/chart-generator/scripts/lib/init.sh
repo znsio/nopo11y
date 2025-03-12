@@ -149,8 +149,8 @@ function initialiseSpecDirs() {
   show "Prepping git client for git operations" "h2"
   configureGitClient
 
-  prepGitRepo "$ODAC_REPO_URL" "$ODAC_REPO_BRANCH" $(compDirIn $(tmfSpecDir)) "$ODAC_REPO_CO_DIRS"
-  prepGitRepo "$ODAA_REPO_URL" "$ODAA_REPO_BRANCH" $(apisDirIn $(tmfSpecDir)) "$ODAA_REPO_CO_DIRS"
+  prepGitRepo "$(compSpecRepoUrl)" "$(compSpecRepoBranch)" $(compDirIn $(tmfSpecDir)) "$(compSpecRepoVersionDir)"
+  prepGitRepo "$(apiSpecRepoUrl)" "$(apiSpecRepoBranch)" $(apisDirIn $(tmfSpecDir)) "$(apiSpecRepoSpecDir),$(apiSpecRepoCtkDir)"
 }
 
 function setupWorkspace() {

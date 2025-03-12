@@ -19,21 +19,6 @@ readonly WORKDIR_SUfFIX_NAA="api-build-np"
 readonly WORKDIR_SUfFIX_AZW="arz-workflow-build"
 readonly WORKDIR_SUfFIX_CR="ctk-run"
 
-readonly ODAC_REPO_URL=$(compSpecRepoUrl)
-readonly ODAC_REPO_BRANCH=$(compSpecRepoBranch)
-readonly ODAC_SPEC_VER=$(compSpecRepoVersionDir)
-readonly ODAC_REPO_CO_DIRS="$ODAC_SPEC_VER"
-
-readonly ODAA_REPO_URL=$(apiSpecRepoUrl)
-readonly ODAA_REPO_BRANCH=$(apiSpecRepoBranch)
-readonly ODAA_SPEC_DIR_NAME=$(apiSpecRepoSpecDir)
-readonly ODAA_CTK_SPEC_DIR_NAME=$(apiSpecRepoCtkDir)
-readonly ODAA_REPO_CO_DIRS="$ODAA_SPEC_DIR_NAME,$ODAA_CTK_SPEC_DIR_NAME"
-
-readonly GIT_AUTH_TOKEN_ADO=$(specRepoAdoAuth)
-readonly GIT_AUTH_TOKEN_LOCAL=$(specRepoLocalAuth)
-readonly GIT_REPO_PROXY=$(specRepoProxy)
-
 readonly ENV_EAT="eat"
 readonly ENV_PROD="prod"
 readonly ENV_LOCAL="local"

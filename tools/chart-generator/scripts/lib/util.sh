@@ -130,17 +130,17 @@ function configureGitClient() {
   if [[ "$(runtimeHost)" == "$RUNTIME_HOST_CONTAINER" ]]; then
     if [[ "$(runtimeMode)" == "$RUNTIME_MODE_LOCAL" ]]; then
       show "Configuring PAT as auth token"
-      git config --global http.extraHeader "Authorization: Bearer $GIT_AUTH_TOKEN_LOCAL"
+      git config --global http.extraHeader "Authorization: Bearer $(specRepoLocalAuth)"
     elif [[ "$(runtimeMode)" == "$RUNTIME_MODE_PIPELINE" ]]; then
       show "Configuring ADO (System Access Token) as auth token"
-      git config --global http.extraHeader "Authorization: Bearer $GIT_AUTH_TOKEN_ADO"
+      git config --global http.extraHeader "Authorization: Bearer $(specRepoAdoAuth)"
     fi
   fi
 
   if [[ "$(runtimeMode)" == "$RUNTIME_MODE_PIPELINE" ]]; then
-    show "Configuring proxy to be '$GIT_REPO_PROXY'"
-    git config --global http.proxy "$GIT_REPO_PROXY"
-    git config --global https.proxy "$GIT_REPO_PROXY"
+    show "Configuring proxy to be '$(specRepoProxy)'"
+    git config --global http.proxy "$(specRepoProxy)"
+    git config --global https.proxy "$(specRepoProxy)"
   fi
 }
 
