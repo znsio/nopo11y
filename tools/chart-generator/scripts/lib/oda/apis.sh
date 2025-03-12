@@ -240,8 +240,8 @@ function publishArtifacts() {
     ls -lah "$(apiArtifactCopyPath)"
 
   elif [[ "$(runtimeMode)" == "$RUNTIME_MODE_PIPELINE" ]]; then
-    show "Publishing artifact '$zipFile' to '$API_ARTIFACT_REPO_URL'"
-    curl -k -i -X PUT -T "$zipFile" -u "$API_ARTIFACT_REPO_CRED" "$API_ARTIFACT_REPO_URL/$zipName"
+    show "Publishing artifact '$zipFile' to '$(apiArtifactRepoUrl)'"
+    curl -k -i -X PUT -T "$zipFile" -u "$(apiArtifactRepoCred)" "$(apiArtifactRepoUrl)/$zipName"
   else
     show "Runtime mode '$(runtimeMode)' not supported! Exiting..." "x"
     exit 1

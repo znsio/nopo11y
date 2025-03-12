@@ -56,10 +56,6 @@ declare -rA SPEC_MISMATCH_ACTION=(
     ["$KEY_DEPENDENT"]=$(onSpecMismatchForApi "$KEY_DEPENDENT")
 )
 
-readonly API_ARTIFACTS_PATH=$(apiArtifactCopyPath)
-readonly API_ARTIFACT_REPO_URL=$(apiArtifactRepoUrl)
-readonly API_ARTIFACT_REPO_CRED=$(apiArtifactRepoCred)
-
 readonly CTK_EXEC_FILE_NAME="Mac-Linux-RUNCTK.sh"
 readonly CTK_RESULTS_JSON_FILE_NAME="jsonResults.json"
 readonly CTK_RESULTS_HTML_FILE_NAME="htmlResults.html"
