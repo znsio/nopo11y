@@ -33,7 +33,6 @@ function setupArazzoWorkflowWorkspace() {
 }
 
 function generateArazzoWorkflowArtifacts() {
-  show "generateArazzoWorkflowArtifacts" "h2"
 
   function finalizeArtifacts() {
     show "Finalizing artifact (of component)" "h2"
@@ -69,8 +68,40 @@ function generateArazzoWorkflowArtifacts() {
     fi
   }
 
+  function displayReleaseInfo() {
+    local zipName="$componentName.zip"
+
+    if [[ "$RUNTIME_MODE" == "$RUNTIME_MODE_LOCAL" ]]; then
+      zipFile=$(createPath "$API_ARTIFACTS_PATH" "$zipName")
+      trgDirName=$(basename "$zipFile" ".zip")
+      trgDir="$API_ARTIFACTS_PATH/$trgDirName"
+
+      show "Unzipping artifact '$zipName' in '$trgDir'" "h2"
+      if [[ -z "$API_ARTIFACTS_PATH" ]]; then
+        show "Invalid artifacts file path provided '$API_ARTIFACTS_PATH'" "x"
+      fi
+
+      show "Unzipping artifact '$zipFile' into '$trgDir'"
+      mkdir -p "$trgDir" && rm -rf "$trgDir" && mkdir -p "$trgDir"
+      unzip "$zipFile" -d "$trgDir"
+
+      show "Contents of destination '$trgDir' (after unzipping artifact)"
+      ls -lah "$trgDir"
+
+      show "API artifacts to download"
+      metaCnfigFile=$(metaConfigFileIn "$trgDir")
+      cat $metaCnfigFile | yq '.apis[] | "\(.name)-\(.version).zip"'
+
+      show "Arazzo command to use"
+      metaCnfigFile=$(metaConfigFileIn "$trgDir")
+      params=$(cat $metaCnfigFile | yq '.apis[] | "--serverUrlIndex=\(.arazzoSpecName):\(.server.urlIndexInSpec)"' | tr '\n' ' ')
+      echo "specmatic-arazzo test $params"
+    fi
+  }
+
   componentName=$(cat $(metaConfigFileIn $(inputDir)) | yq '.component.name')
 
   finalizeArtifacts
   publishArtifacts
+  displayReleaseInfo
 }
