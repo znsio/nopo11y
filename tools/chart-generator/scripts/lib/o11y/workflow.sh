@@ -9,16 +9,17 @@ function setupArazzoWorkflowWorkspace() {
   }
 
   function initialiseInputDirs() {
+    local repoPath="$(compCodeCheckoutDir)"
     trgPath=$(inputDir)
-    show "Copying required source content from '$INPUT_ODAC' under - '$trgPath'" "h2"
+    show "Copying required source content from '$repoPath' under - '$trgPath'" "h2"
 
     mkdir -p "$trgPath"
-    cp -r $(arazzoConfigDirIn "$INPUT_ODAC") "$trgPath"
-    copySpecmaticFilesIfPresent "$INPUT_ODAC" "$trgPath"
-    cp $(metaConfigFileIn "$INPUT_ODAC") $(metaConfigFileIn $trgPath)
+    cp -r $(arazzoConfigDirIn "$repoPath") "$trgPath"
+    copySpecmaticFilesIfPresent "$repoPath" "$trgPath"
+    cp $(metaConfigFileIn "$repoPath") $(metaConfigFileIn $trgPath)
 
-    show "Contents of source: '$INPUT_ODAC'"
-    ls -lah "$INPUT_ODAC"
+    show "Contents of source: '$repoPath'"
+    ls -lah "$repoPath"
 
     show "Contents of destination: '"$trgPath"'"
     ls -lah "$trgPath"
@@ -54,31 +55,31 @@ function generateArazzoWorkflowArtifacts() {
     cd "$artifactsDir" && zip -r "$zipFile" . && cd "$currentDir"
     unzip -l "$zipFile"
 
-    if [[ "$RUNTIME_MODE" == "$RUNTIME_MODE_LOCAL" ]]; then
-      if [[ -z "$API_ARTIFACTS_PATH" ]]; then
-        show "Invalid artifacts file path provided '$API_ARTIFACTS_PATH'" "x"
+    if [[ "$(runtimeMode)" == "$RUNTIME_MODE_LOCAL" ]]; then
+      if [[ -z "$(apiArtifactCopyPath)" ]]; then
+        show "Invalid artifacts file path provided '$(apiArtifactCopyPath)'" "x"
       fi
-      show "Publishing artifact '$zipFile' to '$API_ARTIFACTS_PATH'"
+      show "Publishing artifact '$zipFile' to '$(apiArtifactCopyPath)'"
 
-      mkdir -p "$API_ARTIFACTS_PATH"
-      mv "$zipFile" "$API_ARTIFACTS_PATH"
+      mkdir -p "$(apiArtifactCopyPath)"
+      mv "$zipFile" "$(apiArtifactCopyPath)"
 
-      show "Contents of destination '$API_ARTIFACTS_PATH' (after copying artifact)"
-      ls -lah "$API_ARTIFACTS_PATH"
+      show "Contents of destination '$(apiArtifactCopyPath)' (after copying artifact)"
+      ls -lah "$(apiArtifactCopyPath)"
     fi
   }
 
   function displayReleaseInfo() {
     local zipName="$componentName.zip"
 
-    if [[ "$RUNTIME_MODE" == "$RUNTIME_MODE_LOCAL" ]]; then
-      zipFile=$(createPath "$API_ARTIFACTS_PATH" "$zipName")
+    if [[ "$(runtimeMode)" == "$RUNTIME_MODE_LOCAL" ]]; then
+      zipFile=$(createPath "$(apiArtifactCopyPath)" "$zipName")
       trgDirName=$(basename "$zipFile" ".zip")
-      trgDir="$API_ARTIFACTS_PATH/$trgDirName"
+      trgDir="$(apiArtifactCopyPath)/$trgDirName"
 
       show "Unzipping artifact '$zipName' in '$trgDir'" "h2"
-      if [[ -z "$API_ARTIFACTS_PATH" ]]; then
-        show "Invalid artifacts file path provided '$API_ARTIFACTS_PATH'" "x"
+      if [[ -z "$(apiArtifactCopyPath)" ]]; then
+        show "Invalid artifacts file path provided '$(apiArtifactCopyPath)'" "x"
       fi
 
       show "Unzipping artifact '$zipFile' into '$trgDir'"

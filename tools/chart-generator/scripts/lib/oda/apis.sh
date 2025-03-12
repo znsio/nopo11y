@@ -227,23 +227,23 @@ function publishArtifacts() {
   cd "$artifactsDir" && zip -r "$zipFile" . && cd "$currentDir"
   unzip -l "$zipFile"
 
-  if [[ "$RUNTIME_MODE" == "$RUNTIME_MODE_LOCAL" ]]; then
-    if [[ -z "$API_ARTIFACTS_PATH" ]]; then
-      show "Invalid artifacts file path provided '$API_ARTIFACTS_PATH'" "x"
+  if [[ "$(runtimeMode)" == "$RUNTIME_MODE_LOCAL" ]]; then
+    if [[ -z "$(apiArtifactCopyPath)" ]]; then
+      show "Invalid artifacts file path provided '$(apiArtifactCopyPath)'" "x"
     fi
-    show "Publishing artifact '$zipFile' to '$API_ARTIFACTS_PATH'"
+    show "Publishing artifact '$zipFile' to '$(apiArtifactCopyPath)'"
 
-    mkdir -p "$API_ARTIFACTS_PATH"
-    cp "$zipFile" "$API_ARTIFACTS_PATH"
+    mkdir -p "$(apiArtifactCopyPath)"
+    cp "$zipFile" "$(apiArtifactCopyPath)"
 
-    show "Contents of destination '$API_ARTIFACTS_PATH' (after copying artifact)"
-    ls -lah "$API_ARTIFACTS_PATH"
+    show "Contents of destination '$(apiArtifactCopyPath)' (after copying artifact)"
+    ls -lah "$(apiArtifactCopyPath)"
 
-  elif [[ "$RUNTIME_MODE" == "$RUNTIME_MODE_PIPELINE" ]]; then
-    show "Publishing artifact '$zipFile' to '$API_ARTIFACT_REPO_URL'"
-    curl -k -i -X PUT -T "$zipFile" -u "$API_ARTIFACT_REPO_CRED" "$API_ARTIFACT_REPO_URL/$zipName"
+  elif [[ "$(runtimeMode)" == "$RUNTIME_MODE_PIPELINE" ]]; then
+    show "Publishing artifact '$zipFile' to '$(apiArtifactRepoUrl)'"
+    curl -k -i -X PUT -T "$zipFile" -u "$(apiArtifactRepoCred)" "$(apiArtifactRepoUrl)/$zipName"
   else
-    show "Runtime mode '$RUNTIME_MODE' not supported! Exiting..." "x"
+    show "Runtime mode '$(runtimeMode)' not supported! Exiting..." "x"
     exit 1
   fi
 }

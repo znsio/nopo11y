@@ -1,6 +1,6 @@
 
 function generateCompArtifacts() {
-  for env in $(echo -n "$ALL_ENVS")
+  for env in $(echo -n "$(allEnvsAsSsv)")
   do
     show "Generating ODAC artifacts by env '$env'" "h1"
 
@@ -14,7 +14,7 @@ function generateCompArtifacts() {
 }
 
 function generateApiArtifacts() {
-  for env in $(echo -n "$ALL_ENVS")
+  for env in $(echo -n "$(allEnvsAsSsv)")
   do
     show "Generating ODAA artifacts by env '$env'" "h1"
     prepApiArtifactsByEnv2 "$env"

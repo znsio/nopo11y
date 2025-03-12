@@ -3,16 +3,17 @@ function setupNopo11yWorkspace() {
   show "Setting up workspace under directory - '$(baseWorkDir)'" "h1"
 
   function initialiseInputDirs() {
-    # trgPath=$(createPath $(inputDir) $(projectChartName "$INPUT_ODAA_PROJECT_PATH"))
+    local repoPath="$(apiProjectPath)"
+    # trgPath=$(createPath $(inputDir) $(projectChartName "$repoPath"))
     trgPath=$(inputDir)
-    show "Copying required source content from '$INPUT_ODAA_PROJECT_PATH' under - '$trgPath'" "h2"
+    show "Copying required source content from '$repoPath' under - '$trgPath'" "h2"
 
     mkdir -p "$trgPath"
-    cp -r $(nopo11yConfigDirIn "$INPUT_ODAA_PROJECT_PATH") "$trgPath"
-    copySpecmaticFilesIfPresent "$INPUT_ODAA_PROJECT_PATH" "$trgPath"
+    cp -r $(nopo11yConfigDirIn "$repoPath") "$trgPath"
+    copySpecmaticFilesIfPresent "$repoPath" "$trgPath"
 
-    show "Contents of source: '$INPUT_ODAA_PROJECT_PATH'"
-    ls -lah "$INPUT_ODAA_PROJECT_PATH"
+    show "Contents of source: '$repoPath'"
+    ls -lah "$repoPath"
 
     show "Contents of destination: '"$trgPath"'"
     ls -lah "$trgPath"
@@ -33,13 +34,13 @@ function generateNopo11yApiArtifacts() {
     
     show "Creating Chart.yaml '$chartsFile'" "h3"
     mkdir -p "$tmpChartsDir"
-    cat $(nopo11yConfigFileIn $(inputDir) "default") | NAME="$NOPO11Y_HELM_NAME" VER="$NOPO11Y_HELM_VERSION" REPO="$NOPO11Y_HELM_REPO" yq '{"apiVersion": "v2", "name": .api.service.name, "description": .api.service.description, "type": "application", "version": "1.0.0", "appVersion": .api.service.version, "dependencies": [{"name": strenv(NAME), "version": strenv(VER), "repository": strenv(REPO)}]}' > "$chartsFile"
+    cat $(nopo11yConfigFileIn $(inputDir) "default") | NAME="$(nopo11yHelmName)" VER="$(nopo11yHelmVersion)" REPO="$(nopo11yHelmRepo)" yq '{"apiVersion": "v2", "name": .api.service.name, "description": .api.service.description, "type": "application", "version": "1.0.0", "appVersion": .api.service.version, "dependencies": [{"name": strenv(NAME), "version": strenv(VER), "repository": strenv(REPO)}]}' > "$chartsFile"
     cat "$chartsFile"
 
     show "Creating default and env wise values.yaml" "h3"
     show "Creating default values.yaml"
     cat $(nopo11yConfigFileIn $(inputDir) "default") | yq '{"meta-chart": .}' > $(valuesFileIn $tmpChartsDir)
-    for env in $(echo -n "$ALL_ENVS")
+    for env in $(echo -n "$(allEnvsAsSsv)")
     do
       srcFile=$(nopo11yConfigFileIn $(inputDir) "$env")
       if [[ -r "$srcFile" ]]; then
@@ -81,9 +82,9 @@ function generateNopo11yApiArtifacts() {
     cat "$valuesFile" | grep -A5 'nameGenerated'
 
     show "Adding generated image name to '$valuesFile'"
-    imgName=$(nonBlankValOrDefault "$APP_IMAGE_NAME" "$serviceName")
-    imgTag=$(nonBlankValOrDefault "$APP_IMAGE_TAG" "$serviceVer")
-    cat "$valuesFile" | IMG_URL=$(dockerImageUrl "$imgName" "$imgTag" "$APP_IMAGE_REPO") yq '.meta-chart.api.container.imageGenerated = strenv(IMG_URL)' > "$valuesFileTemp"
+    imgName=$(nonBlankValOrDefault "$(appImageName)" "$serviceName")
+    imgTag=$(nonBlankValOrDefault "$(appImageTag)" "$serviceVer")
+    cat "$valuesFile" | IMG_URL=$(dockerImageUrl "$imgName" "$imgTag" "$(appImageRepo)") yq '.meta-chart.api.container.imageGenerated = strenv(IMG_URL)' > "$valuesFileTemp"
     cp "$valuesFileTemp" "$valuesFile"
     cat "$valuesFile" | grep -A1 'imageGenerated'
 
@@ -117,17 +118,17 @@ function generateNopo11yApiArtifacts() {
     cd "$artifactsDir" && zip -r "$zipFile" . && cd "$currentDir"
     unzip -l "$zipFile"
 
-    if [[ "$RUNTIME_MODE" == "$RUNTIME_MODE_LOCAL" ]]; then
-      if [[ -z "$API_ARTIFACTS_PATH" ]]; then
-        show "Invalid artifacts file path provided '$API_ARTIFACTS_PATH'" "x"
+    if [[ "$(runtimeMode)" == "$RUNTIME_MODE_LOCAL" ]]; then
+      if [[ -z "$(apiArtifactCopyPath)" ]]; then
+        show "Invalid artifacts file path provided '$(apiArtifactCopyPath)'" "x"
       fi
-      show "Publishing artifact '$zipFile' to '$API_ARTIFACTS_PATH'"
+      show "Publishing artifact '$zipFile' to '$(apiArtifactCopyPath)'"
 
-      mkdir -p "$API_ARTIFACTS_PATH"
-      mv "$zipFile" "$API_ARTIFACTS_PATH"
+      mkdir -p "$(apiArtifactCopyPath)"
+      mv "$zipFile" "$(apiArtifactCopyPath)"
 
-      show "Contents of destination '$API_ARTIFACTS_PATH' (after copying artifact)"
-      ls -lah "$API_ARTIFACTS_PATH"
+      show "Contents of destination '$(apiArtifactCopyPath)' (after copying artifact)"
+      ls -lah "$(apiArtifactCopyPath)"
     fi
   }
 
@@ -137,7 +138,7 @@ function generateNopo11yApiArtifacts() {
   serviceVer=$(cat $(nopo11yConfigFileIn $(inputDir) "default") | yq '.api.service.version')
   generateInitialHelmCharts
 
-  for env in $(echo -n "$ALL_ENVS")
+  for env in $(echo -n "$(allEnvsAsSsv)")
   do
     show "Generating Nopo11y artifacts by env '$env'" "h1"
     generateArtifactsByEnv

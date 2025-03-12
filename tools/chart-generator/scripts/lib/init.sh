@@ -32,7 +32,7 @@ function prepGitRepo() {
   local repoDir="$3"
   local repoCheckoutDirs="$4"
 
-  if [[ "$CHECKOUT_OPTION" == "doFreshRepoClone" || ! -d "$repoDir" ]]; then
+  if [[ "$(specRepoCheckoutMode)" == "doFreshRepoClone" || ! -d "$repoDir" ]]; then
     show "Sparsely checking out '$repoUrl' (branch='$repoBranch', dirs='$repoCheckoutDirs') into '$repoDir'" "h2"
 
     show "Cloning '$repoUrl' ('$repoBranch')"
@@ -52,7 +52,7 @@ function prepGitRepo() {
 }
 
 function dirsToClean() {
-  if [[ "$ACTION" == "$GENERATE_COMP_ARTIFACTS" && ! "$CHECKOUT_OPTION" == "doFreshRepoClone" ]]; then
+  if [[ "$(requestedAction)" == "$GENERATE_COMP_ARTIFACTS" && ! "$(specRepoCheckoutMode)" == "doFreshRepoClone" ]]; then
       echo -n "$(pathOf 'IP') $(pathOf 'OP') $(pathOf 'TMP')"
   else
     echo -n "$(baseWorkDir)"
@@ -63,7 +63,7 @@ function createInitialDirs() {
   show "Creating initial set of directories under '$(baseWorkDir)'"
   mkdir -p $(tmfSpecDir) $(apisDirIn $(inputDir)) $(compDirIn $(inputDir))
 
-  for env in $(echo -n "$ALL_ENVS")
+  for env in $(echo -n "$(allEnvsAsSsv)")
   do
     mkdir -p $(envDirIn $(tempDir) "$env") $(envDirIn $(artifactsDirIn $(outputDir)) "$env")
   done
@@ -73,7 +73,7 @@ function createInitialDirs() {
 function createApiInitialDirs() {
   show "Creating initial set of directories under '$(baseWorkDir)'"
   mkdir -p $(inputDir)
-  for env in $(echo -n "$ALL_ENVS")
+  for env in $(echo -n "$(allEnvsAsSsv)")
   do
     mkdir -p $(envDirIn $(tempDir) "$env") $(envDirIn $(artifactsDirIn $(outputDir)) "$env")
   done
@@ -82,11 +82,11 @@ function createApiInitialDirs() {
 
 function initialiseInputDirs() {
   show "Copying required artifacts under - '$(baseWorkDir)'" "h2"
-  show "Contents of source: '$INPUT_ODAC'"
-  ls -lah "$INPUT_ODAC"
+  show "Contents of source: '$(compCodeCheckoutDir)'"
+  ls -lah "$(compCodeCheckoutDir)"
   compDir=$(createPath $(compDirIn $(inputDir)) $(extractCompId))
   mkdir -p "$compDir"
-  cp -r "$INPUT_ODAC/." "$compDir"
+  cp -r "$(compCodeCheckoutDir)/." "$compDir"
   show "Contents of destination: '$compDir'"
   ls -lah "$compDir"
 
@@ -99,19 +99,19 @@ function initialiseInputDirs() {
     trgZipFile="$trgDir/$zipName"
     mkdir -p "$trgDir"
 
-    if [[ "$RUNTIME_MODE" == "$RUNTIME_MODE_LOCAL" ]]; then
-      if [[ -z "$API_ARTIFACTS_PATH" ]]; then
-        show "Invalid artifacts file path provided '$API_ARTIFACTS_PATH'" "x"
+    if [[ "$(runtimeMode)" == "$RUNTIME_MODE_LOCAL" ]]; then
+      if [[ -z "$(apiArtifactCopyPath)" ]]; then
+        show "Invalid artifacts file path provided '$(apiArtifactCopyPath)'" "x"
       fi
-      show "Fetching artifact '$zipFile' to '$API_ARTIFACTS_PATH'"
-      zipFile=$(createPath "$API_ARTIFACTS_PATH" "$zipName")
+      show "Fetching artifact '$zipFile' to '$(apiArtifactCopyPath)'"
+      zipFile=$(createPath "$(apiArtifactCopyPath)" "$zipName")
       cp "$zipFile" "$trgDir"
-    elif [[ "$RUNTIME_MODE" == "$RUNTIME_MODE_PIPELINE" ]]; then
-      show "Fetching artifact '$zipName' from '$API_ARTIFACT_REPO_URL'"
-      zipFile=$(createPath "$API_ARTIFACTS_PATH" "$zipName")
-      curl -k -u "$API_ARTIFACT_REPO_CRED" "$API_ARTIFACT_REPO_URL/$zipName" -o "$trgZipFile"
+    elif [[ "$(runtimeMode)" == "$RUNTIME_MODE_PIPELINE" ]]; then
+      show "Fetching artifact '$zipName' from '$(apiArtifactRepoUrl)'"
+      zipFile=$(createPath "$(apiArtifactCopyPath)" "$zipName")
+      curl -k -u "$(apiArtifactRepoCred)" "$(apiArtifactRepoUrl)/$zipName" -o "$trgZipFile"
     else
-      show "Runtime mode '$RUNTIME_MODE' not supported! Exiting..." "x"
+      show "Runtime mode '$(runtimeMode)' not supported! Exiting..." "x"
       exit 1
     fi
 
@@ -128,16 +128,17 @@ function initialiseInputDirs() {
 }
 
 function initialiseApiInputDirs() {
-  # trgPath=$(createPath $(inputDir) $(projectChartName "$INPUT_ODAA_PROJECT_PATH"))
+  local repoPath="$(apiProjectPath)"
+  # trgPath=$(createPath $(inputDir) $(projectChartName "$repoPath"))
   trgPath=$(inputDir)
-  show "Copying required source content from '$INPUT_ODAA_PROJECT_PATH' under - '$trgPath'" "h2"
+  show "Copying required source content from '$repoPath' under - '$trgPath'" "h2"
 
   mkdir -p "$trgPath"
-  cp -r $(chartsDirIn "$INPUT_ODAA_PROJECT_PATH") "$trgPath"
-  copySpecmaticFilesIfPresent "$INPUT_ODAA_PROJECT_PATH" "$trgPath"
+  cp -r $(chartsDirIn "$repoPath") "$trgPath"
+  copySpecmaticFilesIfPresent "$repoPath" "$trgPath"
 
-  show "Contents of source: '$INPUT_ODAA_PROJECT_PATH'"
-  ls -lah "$INPUT_ODAA_PROJECT_PATH"
+  show "Contents of source: '$repoPath'"
+  ls -lah "$repoPath"
 
   show "Contents of destination: '"$trgPath"'"
   ls -lah "$trgPath"
@@ -148,8 +149,8 @@ function initialiseSpecDirs() {
   show "Prepping git client for git operations" "h2"
   configureGitClient
 
-  prepGitRepo "$ODAC_REPO_URL" "$ODAC_REPO_BRANCH" $(compDirIn $(tmfSpecDir)) "$ODAC_REPO_CO_DIRS"
-  prepGitRepo "$ODAA_REPO_URL" "$ODAA_REPO_BRANCH" $(apisDirIn $(tmfSpecDir)) "$ODAA_REPO_CO_DIRS"
+  prepGitRepo "$(compSpecRepoUrl)" "$(compSpecRepoBranch)" $(compDirIn $(tmfSpecDir)) "$(compSpecRepoVersionDir)"
+  prepGitRepo "$(apiSpecRepoUrl)" "$(apiSpecRepoBranch)" $(apisDirIn $(tmfSpecDir)) "$(apiSpecRepoSpecDir),$(apiSpecRepoCtkDir)"
 }
 
 function setupWorkspace() {

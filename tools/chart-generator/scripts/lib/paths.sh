@@ -12,18 +12,19 @@ function createPath() {
 }
 
 function baseWorkDir() {
-  if [[ "$ACTION" == "$GENERATE_COMP_ARTIFACTS" ]]; then
-    echo -n "$WORKDIR/$WORKDIR_SUfFIX_CA"
-  elif [[ "$ACTION" == "$GENERATE_API_ARTIFACTS" ]]; then
-    echo -n "$WORKDIR/$WORKDIR_SUfFIX_AA"
-  elif [[ "$ACTION" == "$GENERATE_NOPOLLY_API_ARTIFACTS" ]]; then
-    echo -n "$WORKDIR/$WORKDIR_SUfFIX_NAA"
-  elif [[ "$ACTION" == "$GENERATE_ARAZZO_WORKFLOW_ARTIFACTS" ]]; then
-    echo -n "$WORKDIR/$WORKDIR_SUfFIX_AZW"
-  elif [[ "$ACTION" == "$RUN_API_CTKS_FROM_COMP_ARTIFACTS" ]]; then
-    echo -n "$WORKDIR/$WORKDIR_SUfFIX_CR"
+  local action="$(requestedAction)"
+  if [[ "$action" == "$GENERATE_COMP_ARTIFACTS" ]]; then
+    echo -n "$(workDir)/comp-build"
+  elif [[ "$action" == "$GENERATE_API_ARTIFACTS" ]]; then
+    echo -n "$(workDir)/api-build"
+  elif [[ "$action" == "$GENERATE_NOPOLLY_API_ARTIFACTS" ]]; then
+    echo -n "$(workDir)/api-build-np"
+  elif [[ "$action" == "$GENERATE_ARAZZO_WORKFLOW_ARTIFACTS" ]]; then
+    echo -n "$(workDir)/arz-workflow-build"
+  elif [[ "$action" == "$RUN_API_CTKS_FROM_COMP_ARTIFACTS" ]]; then
+    echo -n "$(workDir)/ctk-run"
   else
-    show "Action '$ACTION' not supported for building work dir paths" "x"
+    show "Action '$action' not supported for building work dir paths" "x"
   fi
 }
 
@@ -217,7 +218,7 @@ function tempFileIn() {
 function compSpecFile() {
   local compId="$1"
 
-  local compSpecDir=$(compDirIn "$(tmfSpecDir)" "$ODAC_SPEC_VER")
+  local compSpecDir=$(compDirIn "$(tmfSpecDir)" "$(compSpecRepoVersionDir)")
   local specFile=$(find "$compSpecDir" -type f -name '*.yaml' -print | grep "$compId")
   if [[ -z $specFile ]]; then
     show "No ODA Component spec file found for - '$compId'." "x"
@@ -230,7 +231,7 @@ function apiSpecFile() {
   local apiId="$1"
   local version="$2"
 
-  local specDir=$(apisDirIn "$(tmfSpecDir)" "$ODAA_SPEC_DIR_NAME")
+  local specDir=$(apisDirIn "$(tmfSpecDir)" "$(apiSpecRepoSpecDir)")
   specFile=$(find "$specDir" -type f -name "${apiId}_$version*.json" -print)
   if [[ -z "$specFile" ]]; then
     show "No ODA API spec found for '$apiId' version '$version'" "x"
@@ -243,7 +244,7 @@ function apiCTKFile() {
   local apiId="$1"
   local version=$(echo "$2" | sed 's/v//g')
 
-  local specDir=$(apisDirIn "$(tmfSpecDir)" "$ODAA_CTK_SPEC_DIR_NAME")
+  local specDir=$(apisDirIn "$(tmfSpecDir)" "$(apiSpecRepoCtkDir)")
   ctkFile=$(find "$specDir" -type f -name "${apiId}*.zip" -print | grep -i "/ctk" | grep "/$version")
   if [[ -z "$ctkFile" ]]; then
     show "No ODA API CTK zip found for '$apiId' version '$version'" "x"
