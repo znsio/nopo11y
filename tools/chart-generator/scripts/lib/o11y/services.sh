@@ -34,7 +34,7 @@ function generateNopo11yApiArtifacts() {
     
     show "Creating Chart.yaml '$chartsFile'" "h3"
     mkdir -p "$tmpChartsDir"
-    cat $(nopo11yConfigFileIn $(inputDir) "default") | NAME="$(nopo11yHelmName)" VER="$(nopo11yHelmVersion)" REPO="$(nopo11yHelmRepo)" yq '{"apiVersion": "v2", "name": .api.service.name, "description": .api.service.description, "type": "application", "version": "1.0.0", "appVersion": .api.service.version, "dependencies": [{"name": strenv(NAME), "version": strenv(VER), "repository": strenv(REPO)}]}' > "$chartsFile"
+    cat $(nopo11yConfigFileIn $(inputDir) "default") | NAME="$(nopo11yHelmName)" VER="$(nopo11yHelmVersion)" REPO="$(nopo11yHelmRepo)" yq '{"apiVersion": "v2", "name": .api.service.name, "description": .api.service.description, "type": "application", "version": "1.0.0", "dependencies": [{"name": strenv(NAME), "version": strenv(VER), "repository": strenv(REPO)}]}' > "$chartsFile"
     cat "$chartsFile"
 
     show "Creating default and env wise values.yaml" "h3"
@@ -83,8 +83,7 @@ function generateNopo11yApiArtifacts() {
 
     show "Adding generated image name to '$valuesFile'"
     imgName=$(nonBlankValOrDefault "$(appImageName)" "$serviceName")
-    imgTag=$(nonBlankValOrDefault "$(appImageTag)" "$serviceVer")
-    cat "$valuesFile" | IMG_URL=$(dockerImageUrl "$imgName" "$imgTag" "$(appImageRepo)") yq '.meta-chart.api.container.imageGenerated = strenv(IMG_URL)' > "$valuesFileTemp"
+    cat "$valuesFile" | IMG_URL=$(dockerImageUrl "$imgName" "$(appImageTag)" "$(appImageRepo)") yq '.meta-chart.api.container.imageGenerated = strenv(IMG_URL)' > "$valuesFileTemp"
     cp "$valuesFileTemp" "$valuesFile"
     cat "$valuesFile" | grep -A1 'imageGenerated'
 
@@ -135,7 +134,6 @@ function generateNopo11yApiArtifacts() {
   tmpChartsDir=$(chartsDirIn $(tempDir))
   chartsFile=$(chartsFileIn $tmpChartsDir)
   serviceName=$(cat $(nopo11yConfigFileIn $(inputDir) "default") | yq '.api.service.name')
-  serviceVer=$(cat $(nopo11yConfigFileIn $(inputDir) "default") | yq '.api.service.version')
   generateInitialHelmCharts
 
   for env in $(echo -n "$(allEnvsAsSsv)")
