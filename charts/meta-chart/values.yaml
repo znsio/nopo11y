@@ -36,7 +36,7 @@ o11y:
             cpu: 500m
             memory: 512Mi
       - type: kafka
-        image: znsio/specmatic-kafka-trial
+        image: znsio/specmatic-kafka
         port: 9092
         resources:
           requests:
@@ -46,7 +46,7 @@ o11y:
             cpu: 1500m
             memory: 2048Mi
       - type: grpc
-        image: znsio/specmatic-grpc-trial
+        image: znsio/specmatic-grpc
         port: 9000
         resources:
           requests:
@@ -56,7 +56,7 @@ o11y:
             cpu: 500m
             memory: 512Mi
       - type: graphql
-        image: znsio/specmatic-graphql-trial
+        image: znsio/specmatic-graphql
         port: 9001
         resources:
           requests:
