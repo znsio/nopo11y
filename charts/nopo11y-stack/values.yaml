@@ -17524,7 +17524,7 @@ tempo-distributed:
       # -- Memcached Docker image repository
       repository: memcached
       # -- Memcached Docker image tag
-      tag: 1.6.29-alpine
+      tag: 1.6.38-alpine
       # -- Memcached Docker image pull policy
       pullPolicy: IfNotPresent
     host: memcached
