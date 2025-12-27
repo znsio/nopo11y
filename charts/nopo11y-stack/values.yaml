@@ -18780,7 +18780,7 @@ kuberhealthy:
       image:
         registry: docker.io
         repository: kuberhealthy/deployment-check
-        tag: v1.9.0
+        tag: v1.9.1
       extraEnvs:
         CHECK_DEPLOYMENT_REPLICAS: "4"
         CHECK_DEPLOYMENT_ROLLING_UPDATE: "true"
